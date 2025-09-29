@@ -2,11 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Shield, Users, Camera, MessageSquare, AlertTriangle, CheckCircle, Share2, Facebook, Twitter, Linkedin, Instagram, MessageCircle, Mail, Copy, Youtube, Send } from "lucide-react";
-import AuthNavigation from "@/components/AuthNavigation";
-import MobileNavigation from "@/components/MobileNavigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useVisitorTracking } from "@/hooks/useVisitorTracking";
 import SEOContent from "@/components/SEOContent";
+import Layout from "@/components/Layout";
 
 const Index = () => {
   const { user } = useAuth();
@@ -15,35 +14,13 @@ const Index = () => {
   useVisitorTracking();
 
   return (
-    <div className="min-h-screen bg-background">
+    <Layout>
       {/* Development Notice */}
       <div className="bg-muted py-3 text-center">
         <p className="text-sm text-muted-foreground">
           🚧 <strong>Site in Development</strong> - Content, statistics, and features shown are placeholders for demonstration purposes
         </p>
       </div>
-
-      {/* Header */}
-      <header className="border-b border-border bg-card">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Shield className="h-8 w-8 text-primary" />
-              <h1 className="text-2xl font-bold text-foreground">RedrowExposed</h1>
-            </div>
-            <div className="flex items-center space-x-6">
-              <nav className="hidden md:flex items-center space-x-6">
-                <a href="#features" className="text-muted-foreground hover:text-primary transition-colors">Features</a>
-                <a href="/upload-evidence" className="text-muted-foreground hover:text-primary transition-colors">Upload Evidence</a>
-                <a href="#community" className="text-muted-foreground hover:text-primary transition-colors">Community</a>
-                <a href="#contact" className="text-muted-foreground hover:text-primary transition-colors">Contact</a>
-              </nav>
-              <AuthNavigation />
-              <MobileNavigation />
-            </div>
-          </div>
-        </div>
-      </header>
 
       {/* Hero Section */}
       <section className="py-20 bg-gradient-to-br from-primary/5 via-background to-secondary/20">
@@ -416,7 +393,7 @@ const Index = () => {
           </div>
         </div>
       </footer>
-    </div>
+    </Layout>
   );
 };
 

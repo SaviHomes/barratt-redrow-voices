@@ -75,7 +75,16 @@ export default function MobileNavigation() {
             <a 
               href="#faq" 
               className="text-foreground hover:text-primary transition-colors py-2 text-lg"
-              onClick={closeMenu}
+              onClick={(e) => {
+                closeMenu();
+                // Small delay to allow menu to close before scrolling
+                setTimeout(() => {
+                  const element = document.getElementById('faq');
+                  if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }, 100);
+              }}
             >
               FAQ
             </a>

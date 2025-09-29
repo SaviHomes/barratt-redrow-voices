@@ -6,6 +6,13 @@ import { Shield, Users, Camera, MessageSquare, AlertTriangle, CheckCircle } from
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
+      {/* Development Notice */}
+      <div className="bg-muted py-3 text-center">
+        <p className="text-sm text-muted-foreground">
+          🚧 <strong>Site in Development</strong> - Content, statistics, and features shown are placeholders for demonstration purposes
+        </p>
+      </div>
+
       {/* Header */}
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-6 py-4">
@@ -49,11 +56,11 @@ const Index = () => {
       </section>
 
       {/* Issues Alert */}
-      <section className="py-12 bg-warning/10 border-y border-warning/20">
+      <section className="py-12 bg-primary/10 border-y border-primary/20">
         <div className="container mx-auto px-6">
-          <div className="flex items-center justify-center space-x-4 text-warning-foreground">
-            <AlertTriangle className="h-6 w-6 text-warning" />
-            <p className="text-lg font-medium">
+          <div className="flex items-center justify-center space-x-4">
+            <AlertTriangle className="h-6 w-6 text-primary" />
+            <p className="text-lg font-medium text-foreground">
               Experiencing quality issues with your Barratt Redrow home? You're not alone.
             </p>
           </div>

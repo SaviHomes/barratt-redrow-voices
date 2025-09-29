@@ -154,11 +154,11 @@ const UploadEvidence = () => {
   return (
     <Layout>
       {/* Banner Image */}
-      <div className="relative h-96 overflow-hidden">
+      <div className="relative h-48 sm:h-64 md:h-80 lg:h-96 overflow-hidden">
         <img 
           src={motorwayBanner} 
           alt="RedrowExposed.co.uk banner over UK motorway bridge - A public interest website"
-          className="w-full h-full object-cover object-top"
+          className="w-full h-full object-cover object-center"
         />
       </div>
 

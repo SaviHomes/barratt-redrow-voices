@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { AlertTriangle, Globe, Users, MapPin, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import Layout from "@/components/Layout";
 
 interface VisitorData {
   id: string;
@@ -289,6 +290,6 @@ export default function AdminDashboard() {
           </Button>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 }

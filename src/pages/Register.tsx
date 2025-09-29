@@ -15,6 +15,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import Layout from "@/components/Layout";
 
 const registerSchema = z.object({
   firstName: z.string().min(1, "First name is required").max(50, "First name must be less than 50 characters"),
@@ -466,8 +467,9 @@ export default function Register() {
               </form>
             </Form>
           </CardContent>
-        </Card>
+          </Card>
+        </div>
       </div>
-    </div>
+    </Layout>
   );
 }

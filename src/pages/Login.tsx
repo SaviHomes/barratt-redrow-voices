@@ -10,6 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { User, Session } from '@supabase/supabase-js';
+import Layout from "@/components/Layout";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -97,56 +98,58 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center py-12 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold">Welcome Back</CardTitle>
-          <CardDescription>
-            Sign in to your RedrowExposed account
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email Address</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="email" placeholder="Enter your email" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="password" placeholder="Enter your password" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" disabled={isLoading} className="w-full">
-                {isLoading ? "Signing In..." : "Sign In"}
-              </Button>
-            </form>
-          </Form>
-          <div className="text-center text-sm text-muted-foreground mt-4">
-            Don't have an account?{" "}
-            <Link to="/register" className="text-primary hover:underline">
-              Register here
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+    <Layout>
+      <div className="min-h-screen bg-background flex items-center justify-center py-12 px-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <CardTitle className="text-3xl font-bold">Welcome Back</CardTitle>
+            <CardDescription>
+              Sign in to your RedrowExposed account
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email Address</FormLabel>
+                      <FormControl>
+                        <Input {...field} type="email" placeholder="Enter your email" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input {...field} type="password" placeholder="Enter your password" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" disabled={isLoading} className="w-full">
+                  {isLoading ? "Signing In..." : "Sign In"}
+                </Button>
+              </form>
+            </Form>
+            <div className="text-center text-sm text-muted-foreground mt-4">
+              Don't have an account?{" "}
+              <Link to="/register" className="text-primary hover:underline">
+                Register here
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </Layout>
   );
 }

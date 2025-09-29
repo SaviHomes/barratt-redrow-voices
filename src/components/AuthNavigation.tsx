@@ -66,11 +66,6 @@ export default function AuthNavigation() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuItem asChild>
-          <Link to="/upload-evidence" className="flex items-center">
-            Upload Evidence
-          </Link>
-        </DropdownMenuItem>
         {isAdmin && (
           <DropdownMenuItem asChild>
             <Link to="/admin" className="flex items-center">

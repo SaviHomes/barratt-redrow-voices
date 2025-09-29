@@ -23,6 +23,7 @@ const Index = () => {
             </div>
             <nav className="hidden md:flex items-center space-x-6">
               <a href="#features" className="text-muted-foreground hover:text-primary transition-colors">Features</a>
+              <a href="/upload-evidence" className="text-muted-foreground hover:text-primary transition-colors">Upload Evidence</a>
               <a href="#community" className="text-muted-foreground hover:text-primary transition-colors">Community</a>
               <a href="#contact" className="text-muted-foreground hover:text-primary transition-colors">Contact</a>
             </nav>
@@ -45,8 +46,8 @@ const Index = () => {
             Share your story, upload evidence, and help others navigate their property issues.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button size="lg" className="px-8 py-6 text-lg">
-              Share Your Experience
+            <Button size="lg" className="px-8 py-6 text-lg" asChild>
+              <a href="/upload-evidence">Upload Evidence</a>
             </Button>
             <Button variant="outline" size="lg" className="px-8 py-6 text-lg">
               Browse Stories

@@ -123,7 +123,7 @@ const Index = () => {
                 </div>
                 <CardTitle>User Dashboard</CardTitle>
                 <CardDescription>
-                  Personal dashboard to track your cases, photos, and communication history
+                  Personal dashboard to track your cases, financial claims, photos, and communication history
                 </CardDescription>
               </CardHeader>
             </Card>

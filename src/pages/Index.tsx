@@ -6,6 +6,7 @@ import AuthNavigation from "@/components/AuthNavigation";
 import MobileNavigation from "@/components/MobileNavigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useVisitorTracking } from "@/hooks/useVisitorTracking";
+import SEOContent from "@/components/SEOContent";
 
 const Index = () => {
   const { user } = useAuth();
@@ -51,12 +52,12 @@ const Index = () => {
             Your Voice Matters
           </Badge>
           <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
-            Share Your <span className="text-primary">Barratt Redrow</span><br />
-            Home Experience
+            <span className="text-primary">Redrow Exposed</span> - The Definitive<br />
+            Resource for Homeowner Issues
           </h1>
           <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
-            A platform dedicated to transparency, accountability, and community support for Barratt Redrow homeowners. 
-            Share your story, upload evidence, and help others navigate their property issues.
+            The single authoritative source for Barratt Redrow homeowner experiences. Join over 1,000 homeowners documenting property issues, 
+            sharing evidence, and driving accountability in the UK housing industry. Your story matters - help expose the truth.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             {user ? (
@@ -380,6 +381,9 @@ const Index = () => {
         </div>
       </section>
 
+      {/* SEO Content Sections */}
+      <SEOContent />
+
       {/* Footer */}
       <footer className="py-12 border-t border-border">
         <div className="container mx-auto px-6">
@@ -395,9 +399,20 @@ const Index = () => {
             </div>
           </div>
           <div className="mt-8 pt-8 border-t border-border text-center">
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground mb-2">
               © 2024 RedrowExposed. Empowering homeowners through transparency.
             </p>
+            <div className="text-sm text-muted-foreground">
+              <p className="mb-2">
+                <strong>Redrow Exposed</strong> - The UK's definitive resource for Barratt Redrow homeowner experiences and property issues
+              </p>
+              <p className="mb-2">
+                Covering: Redrow problems, new build defects, homeowner rights, property warranties, building quality issues, and customer service complaints
+              </p>
+              <p>
+                Join our community of homeowners sharing real experiences across England, Wales, and Scotland
+              </p>
+            </div>
           </div>
         </div>
       </footer>

@@ -138,39 +138,57 @@ export type Database = {
         Row: {
           city: string | null
           country: string | null
+          detection_method: string | null
           id: string
           ip_address: unknown
+          is_lovable_infrastructure: boolean | null
           page_path: string | null
           referrer: string | null
           region: string | null
+          request_headers: Json | null
+          request_timing_ms: number | null
+          session_duration_ms: number | null
           session_id: string | null
           timezone: string | null
+          traffic_type: string | null
           user_agent: string | null
           visited_at: string
         }
         Insert: {
           city?: string | null
           country?: string | null
+          detection_method?: string | null
           id?: string
           ip_address: unknown
+          is_lovable_infrastructure?: boolean | null
           page_path?: string | null
           referrer?: string | null
           region?: string | null
+          request_headers?: Json | null
+          request_timing_ms?: number | null
+          session_duration_ms?: number | null
           session_id?: string | null
           timezone?: string | null
+          traffic_type?: string | null
           user_agent?: string | null
           visited_at?: string
         }
         Update: {
           city?: string | null
           country?: string | null
+          detection_method?: string | null
           id?: string
           ip_address?: unknown
+          is_lovable_infrastructure?: boolean | null
           page_path?: string | null
           referrer?: string | null
           region?: string | null
+          request_headers?: Json | null
+          request_timing_ms?: number | null
+          session_duration_ms?: number | null
           session_id?: string | null
           timezone?: string | null
+          traffic_type?: string | null
           user_agent?: string | null
           visited_at?: string
         }

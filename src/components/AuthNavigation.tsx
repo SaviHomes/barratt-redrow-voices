@@ -46,7 +46,7 @@ export default function AuthNavigation() {
 
   if (!user) {
     return (
-      <div className="flex items-center space-x-4">
+      <div className="hidden md:flex items-center space-x-4">
         <Button variant="ghost" asChild>
           <Link to="/login">Sign In</Link>
         </Button>

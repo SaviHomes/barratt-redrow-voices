@@ -170,16 +170,16 @@ const UploadEvidence = () => {
       </header>
 
       {/* Banner Image */}
-      <div className="relative h-64 overflow-hidden">
+      <div className="relative h-80 overflow-hidden">
         <img 
           src={motorwayBanner} 
           alt="RedrowExposed.co.uk banner over UK motorway bridge - A public interest website"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover object-center"
         />
-        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+        <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
           <div className="text-center text-white">
-            <h2 className="text-4xl font-bold mb-2">Upload Photo Evidence</h2>
-            <p className="text-lg">Share your documentation to help expose quality issues</p>
+            <h2 className="text-5xl font-bold mb-3">RedrowExposed.co.uk</h2>
+            <p className="text-xl font-medium">A public interest website</p>
           </div>
         </div>
       </div>

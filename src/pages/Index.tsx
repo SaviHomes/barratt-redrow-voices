@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Shield, Users, Camera, MessageSquare, AlertTriangle, CheckCircle } from "lucide-react";
 import AuthNavigation from "@/components/AuthNavigation";
+import MobileNavigation from "@/components/MobileNavigation";
 import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
@@ -33,6 +34,7 @@ const Index = () => {
                 <a href="#contact" className="text-muted-foreground hover:text-primary transition-colors">Contact</a>
               </nav>
               <AuthNavigation />
+              <MobileNavigation />
             </div>
           </div>
         </div>

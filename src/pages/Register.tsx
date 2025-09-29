@@ -342,21 +342,12 @@ export default function Register() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>What build style did you buy?</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select build style" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="new-build">New Build</SelectItem>
-                            <SelectItem value="off-plan">Off Plan</SelectItem>
-                            <SelectItem value="resale">Resale</SelectItem>
-                            <SelectItem value="help-to-buy">Help to Buy</SelectItem>
-                            <SelectItem value="shared-ownership">Shared Ownership</SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <FormControl>
+                          <Input 
+                            {...field} 
+                            placeholder="e.g., New Build, Help to Buy, Off Plan, etc."
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}

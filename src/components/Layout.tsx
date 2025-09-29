@@ -35,6 +35,12 @@ export default function Layout({ children }: LayoutProps) {
                 Upload Evidence
               </a>
               <a 
+                href="#faq" 
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
+                FAQ
+              </a>
+              <a 
                 href="#community" 
                 className="text-muted-foreground hover:text-primary transition-colors"
               >

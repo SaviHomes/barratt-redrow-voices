@@ -4,7 +4,7 @@ const SEOContent = () => {
   return (
     <>
       {/* FAQ Section for Rich Snippets */}
-      <section className="py-16 bg-muted/30" itemScope itemType="https://schema.org/FAQPage">
+      <section id="faq" className="py-16 bg-muted/30" itemScope itemType="https://schema.org/FAQPage">
         <div className="container mx-auto px-6">
           <h2 className="text-3xl font-bold text-center mb-12 text-foreground">
             Frequently Asked Questions About Redrow Exposed

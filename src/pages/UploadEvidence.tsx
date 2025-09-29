@@ -170,7 +170,7 @@ const UploadEvidence = () => {
       </header>
 
       {/* Banner Image */}
-      <div className="relative h-80 overflow-hidden">
+      <div className="relative h-96 overflow-hidden">
         <img 
           src={motorwayBanner} 
           alt="RedrowExposed.co.uk banner over UK motorway bridge - A public interest website"

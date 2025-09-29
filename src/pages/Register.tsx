@@ -114,9 +114,10 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-background py-12 px-4">
-      <div className="max-w-2xl mx-auto">
-        <Card>
+    <Layout>
+      <div className="min-h-screen bg-background py-12 px-4">
+        <div className="max-w-2xl mx-auto">
+          <Card>
           <CardHeader className="text-center">
             <CardTitle className="text-3xl font-bold">Join RedrowExposed</CardTitle>
             <CardDescription>

@@ -152,24 +152,7 @@ const UploadEvidence = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Shield className="h-8 w-8 text-primary" />
-              <h1 className="text-2xl font-bold text-foreground">RedrowExposed</h1>
-            </div>
-            <nav className="hidden md:flex items-center space-x-6">
-              <a href="/" className="text-muted-foreground hover:text-primary transition-colors">Home</a>
-              <a href="/upload-evidence" className="text-primary font-medium">Upload Evidence</a>
-              <a href="#contact" className="text-muted-foreground hover:text-primary transition-colors">Contact</a>
-            </nav>
-          </div>
-        </div>
-      </header>
-
+    <Layout>
       {/* Banner Image */}
       <div className="relative h-96 overflow-hidden">
         <img 

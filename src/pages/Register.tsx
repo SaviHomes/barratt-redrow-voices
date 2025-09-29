@@ -34,6 +34,7 @@ const registerSchema = z.object({
   adviceToOthers: z.string().optional(),
   nhbcContact: z.enum(["yes", "no", "not-answered"], { required_error: "Please select an option" }),
   socialMediaConsent: z.enum(["yes", "no", "not-answered"], { required_error: "Please select an option" }),
+  decisionInfluenced: z.enum(["yes", "no", "not-answered"], { required_error: "Please select an option" }),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -52,6 +53,7 @@ export default function Register() {
       whatsappConsent: false,
       nhbcContact: "not-answered",
       socialMediaConsent: "not-answered",
+      decisionInfluenced: "not-answered",
     },
   });
 
@@ -79,6 +81,7 @@ export default function Register() {
             advice_to_others: data.adviceToOthers || '',
             nhbc_contact: data.nhbcContact === "yes",
             social_media_consent: data.socialMediaConsent === "yes",
+            decision_influenced: data.decisionInfluenced === "yes",
           },
         },
       });
@@ -414,6 +417,32 @@ export default function Register() {
                             <div className="flex items-center space-x-2">
                               <RadioGroupItem value="no" id="social-no" />
                               <Label htmlFor="social-no">No</Label>
+                            </div>
+                          </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="decisionInfluenced"
+                    render={({ field }) => (
+                      <FormItem className="space-y-3">
+                        <FormLabel>We are planning on making all UK Estate Agents aware of people's experience with Barratt Redrow by virtue of this website. It is hoped they will help their sellers make more informed buying decisions when considering a new build property. Do you think your decision would have been influenced with the benefit of this information?</FormLabel>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex flex-col space-y-1"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="yes" id="decision-yes" />
+                              <Label htmlFor="decision-yes">Yes</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="no" id="decision-no" />
+                              <Label htmlFor="decision-no">No</Label>
                             </div>
                           </RadioGroup>
                         </FormControl>

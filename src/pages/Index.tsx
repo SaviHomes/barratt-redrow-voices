@@ -5,9 +5,13 @@ import { Shield, Users, Camera, MessageSquare, AlertTriangle, CheckCircle } from
 import AuthNavigation from "@/components/AuthNavigation";
 import MobileNavigation from "@/components/MobileNavigation";
 import { useAuth } from "@/hooks/useAuth";
+import { useVisitorTracking } from "@/hooks/useVisitorTracking";
 
 const Index = () => {
   const { user } = useAuth();
+  
+  // Track visitor analytics
+  useVisitorTracking();
 
   return (
     <div className="min-h-screen bg-background">

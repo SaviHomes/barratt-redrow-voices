@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Shield, Users, Camera, MessageSquare, AlertTriangle, CheckCircle } from "lucide-react";
+import { Shield, Users, Camera, MessageSquare, AlertTriangle, CheckCircle, Share2, Facebook, Twitter, Linkedin, Instagram, MessageCircle, Mail, Copy, Youtube, Send } from "lucide-react";
 import AuthNavigation from "@/components/AuthNavigation";
 import MobileNavigation from "@/components/MobileNavigation";
 import { useAuth } from "@/hooks/useAuth";
@@ -171,6 +171,165 @@ const Index = () => {
                 </CardDescription>
               </CardHeader>
             </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Social Media Sharing Section */}
+      <section className="py-20 bg-gradient-to-r from-primary/5 via-secondary/10 to-primary/5">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-6">
+              <Share2 className="h-8 w-8 text-primary" />
+            </div>
+            <h2 className="text-4xl font-bold text-foreground mb-4">
+              Help Spread Awareness
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+              Share RedrowExposed with your network to help more homeowners find support, document their experiences, 
+              and drive positive change in the housing industry. Every share makes our community stronger.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 max-w-4xl mx-auto">
+            {/* Facebook */}
+            <button
+              onClick={() => {
+                const url = encodeURIComponent(window.location.href);
+                const text = encodeURIComponent("Join the RedrowExposed community - A platform for homeowner transparency and accountability");
+                window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`, '_blank');
+              }}
+              className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border"
+            >
+              <div className="w-12 h-12 bg-[#1877F2]/10 rounded-full flex items-center justify-center mb-3 group-hover:bg-[#1877F2]/20 transition-colors">
+                <Facebook className="h-6 w-6 text-[#1877F2]" />
+              </div>
+              <span className="text-sm font-medium text-foreground">Facebook</span>
+            </button>
+
+            {/* Twitter/X */}
+            <button
+              onClick={() => {
+                const url = encodeURIComponent(window.location.href);
+                const text = encodeURIComponent("Check out RedrowExposed - A platform for homeowner transparency and accountability #HomeownerRights #PropertyIssues");
+                window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
+              }}
+              className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border"
+            >
+              <div className="w-12 h-12 bg-foreground/10 rounded-full flex items-center justify-center mb-3 group-hover:bg-foreground/20 transition-colors">
+                <Twitter className="h-6 w-6 text-foreground" />
+              </div>
+              <span className="text-sm font-medium text-foreground">Twitter/X</span>
+            </button>
+
+            {/* LinkedIn */}
+            <button
+              onClick={() => {
+                const url = encodeURIComponent(window.location.href);
+                const title = encodeURIComponent("RedrowExposed - Homeowner Transparency Platform");
+                const summary = encodeURIComponent("A community-driven platform for Barratt Redrow homeowners to share experiences and drive accountability");
+                window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}&title=${title}&summary=${summary}`, '_blank');
+              }}
+              className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border"
+            >
+              <div className="w-12 h-12 bg-[#0A66C2]/10 rounded-full flex items-center justify-center mb-3 group-hover:bg-[#0A66C2]/20 transition-colors">
+                <Linkedin className="h-6 w-6 text-[#0A66C2]" />
+              </div>
+              <span className="text-sm font-medium text-foreground">LinkedIn</span>
+            </button>
+
+            {/* WhatsApp */}
+            <button
+              onClick={() => {
+                const url = encodeURIComponent(window.location.href);
+                const text = encodeURIComponent("Check out RedrowExposed - A platform for homeowner transparency and accountability");
+                window.open(`https://wa.me/?text=${text}%20${url}`, '_blank');
+              }}
+              className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border"
+            >
+              <div className="w-12 h-12 bg-[#25D366]/10 rounded-full flex items-center justify-center mb-3 group-hover:bg-[#25D366]/20 transition-colors">
+                <MessageCircle className="h-6 w-6 text-[#25D366]" />
+              </div>
+              <span className="text-sm font-medium text-foreground">WhatsApp</span>
+            </button>
+
+            {/* Telegram */}
+            <button
+              onClick={() => {
+                const url = encodeURIComponent(window.location.href);
+                const text = encodeURIComponent("Check out RedrowExposed - A platform for homeowner transparency and accountability");
+                window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank');
+              }}
+              className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border"
+            >
+              <div className="w-12 h-12 bg-[#0088CC]/10 rounded-full flex items-center justify-center mb-3 group-hover:bg-[#0088CC]/20 transition-colors">
+                <Send className="h-6 w-6 text-[#0088CC]" />
+              </div>
+              <span className="text-sm font-medium text-foreground">Telegram</span>
+            </button>
+
+            {/* Email */}
+            <button
+              onClick={() => {
+                const subject = encodeURIComponent("RedrowExposed - Homeowner Transparency Platform");
+                const body = encodeURIComponent(`I wanted to share this platform with you: RedrowExposed\n\nIt's a community-driven platform for Barratt Redrow homeowners to share experiences, upload evidence of property issues, and drive accountability in the housing industry.\n\nCheck it out: ${window.location.href}\n\nBest regards`);
+                window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
+              }}
+              className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border"
+            >
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-3 group-hover:bg-primary/20 transition-colors">
+                <Mail className="h-6 w-6 text-primary" />
+              </div>
+              <span className="text-sm font-medium text-foreground">Email</span>
+            </button>
+
+            {/* Copy Link */}
+            <button
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(window.location.href);
+                  // You could add a toast notification here
+                  alert('Link copied to clipboard!');
+                } catch (err) {
+                  // Fallback for older browsers
+                  const textArea = document.createElement('textarea');
+                  textArea.value = window.location.href;
+                  document.body.appendChild(textArea);
+                  textArea.select();
+                  document.execCommand('copy');
+                  document.body.removeChild(textArea);
+                  alert('Link copied to clipboard!');
+                }
+              }}
+              className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border"
+            >
+              <div className="w-12 h-12 bg-secondary/30 rounded-full flex items-center justify-center mb-3 group-hover:bg-secondary/50 transition-colors">
+                <Copy className="h-6 w-6 text-muted-foreground group-hover:text-foreground transition-colors" />
+              </div>
+              <span className="text-sm font-medium text-foreground">Copy Link</span>
+            </button>
+
+            {/* Reddit */}
+            <button
+              onClick={() => {
+                const url = encodeURIComponent(window.location.href);
+                const title = encodeURIComponent("RedrowExposed - A platform for homeowner transparency and accountability");
+                window.open(`https://reddit.com/submit?url=${url}&title=${title}`, '_blank');
+              }}
+              className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border"
+            >
+              <div className="w-12 h-12 bg-[#FF4500]/10 rounded-full flex items-center justify-center mb-3 group-hover:bg-[#FF4500]/20 transition-colors">
+                <MessageSquare className="h-6 w-6 text-[#FF4500]" />
+              </div>
+              <span className="text-sm font-medium text-foreground">Reddit</span>
+            </button>
+          </div>
+
+          <div className="text-center mt-12">
+            <p className="text-muted-foreground">
+              <strong>Help us grow:</strong> The more homeowners who know about RedrowExposed, 
+              the stronger our collective voice becomes in demanding quality and accountability.
+            </p>
           </div>
         </div>
       </section>

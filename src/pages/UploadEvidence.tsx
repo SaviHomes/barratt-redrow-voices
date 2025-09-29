@@ -174,7 +174,7 @@ const UploadEvidence = () => {
         <img 
           src={motorwayBanner} 
           alt="RedrowExposed.co.uk banner over UK motorway bridge - A public interest website"
-          className="w-full h-full object-cover object-center"
+          className="w-full h-full object-cover object-top"
         />
       </div>
 

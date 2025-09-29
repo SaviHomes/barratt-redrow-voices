@@ -2,8 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Shield, Users, Camera, MessageSquare, AlertTriangle, CheckCircle } from "lucide-react";
+import AuthNavigation from "@/components/AuthNavigation";
+import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
+  const { user } = useAuth();
+
   return (
     <div className="min-h-screen bg-background">
       {/* Development Notice */}
@@ -21,12 +25,15 @@ const Index = () => {
               <Shield className="h-8 w-8 text-primary" />
               <h1 className="text-2xl font-bold text-foreground">RedrowExposed</h1>
             </div>
-            <nav className="hidden md:flex items-center space-x-6">
-              <a href="#features" className="text-muted-foreground hover:text-primary transition-colors">Features</a>
-              <a href="/upload-evidence" className="text-muted-foreground hover:text-primary transition-colors">Upload Evidence</a>
-              <a href="#community" className="text-muted-foreground hover:text-primary transition-colors">Community</a>
-              <a href="#contact" className="text-muted-foreground hover:text-primary transition-colors">Contact</a>
-            </nav>
+            <div className="flex items-center space-x-6">
+              <nav className="hidden md:flex items-center space-x-6">
+                <a href="#features" className="text-muted-foreground hover:text-primary transition-colors">Features</a>
+                <a href="/upload-evidence" className="text-muted-foreground hover:text-primary transition-colors">Upload Evidence</a>
+                <a href="#community" className="text-muted-foreground hover:text-primary transition-colors">Community</a>
+                <a href="#contact" className="text-muted-foreground hover:text-primary transition-colors">Contact</a>
+              </nav>
+              <AuthNavigation />
+            </div>
           </div>
         </div>
       </header>
@@ -46,9 +53,15 @@ const Index = () => {
             Share your story, upload evidence, and help others navigate their property issues.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button size="lg" className="px-8 py-6 text-lg" asChild>
-              <a href="/upload-evidence">Upload Evidence</a>
-            </Button>
+            {user ? (
+              <Button size="lg" className="px-8 py-6 text-lg" asChild>
+                <a href="/upload-evidence">Upload Evidence</a>
+              </Button>
+            ) : (
+              <Button size="lg" className="px-8 py-6 text-lg" asChild>
+                <a href="/register">Join Community</a>
+              </Button>
+            )}
             <Button variant="outline" size="lg" className="px-8 py-6 text-lg">
               Browse Stories
             </Button>
@@ -194,8 +207,10 @@ const Index = () => {
           <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
             Help build a transparent community where homeowner experiences drive positive change
           </p>
-          <Button size="lg" variant="secondary" className="px-8 py-6 text-lg">
-            Get Started Today
+          <Button size="lg" variant="secondary" className="px-8 py-6 text-lg" asChild>
+            <a href={user ? "/upload-evidence" : "/register"}>
+              {user ? "Upload Evidence" : "Get Started Today"}
+            </a>
           </Button>
         </div>
       </section>

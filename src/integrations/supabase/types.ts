@@ -47,6 +47,69 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          advice_to_others: string | null
+          build_style: string | null
+          county: string
+          created_at: string
+          first_name: string
+          home_tel: string | null
+          id: string
+          last_name: string
+          mobile_tel: string | null
+          nhbc_contact: boolean | null
+          postcode: string
+          property_number: string | null
+          social_media_consent: boolean | null
+          street_name: string
+          town_city: string
+          updated_at: string
+          user_id: string
+          whatsapp_consent: boolean
+        }
+        Insert: {
+          advice_to_others?: string | null
+          build_style?: string | null
+          county: string
+          created_at?: string
+          first_name: string
+          home_tel?: string | null
+          id?: string
+          last_name: string
+          mobile_tel?: string | null
+          nhbc_contact?: boolean | null
+          postcode: string
+          property_number?: string | null
+          social_media_consent?: boolean | null
+          street_name: string
+          town_city: string
+          updated_at?: string
+          user_id: string
+          whatsapp_consent?: boolean
+        }
+        Update: {
+          advice_to_others?: string | null
+          build_style?: string | null
+          county?: string
+          created_at?: string
+          first_name?: string
+          home_tel?: string | null
+          id?: string
+          last_name?: string
+          mobile_tel?: string | null
+          nhbc_contact?: boolean | null
+          postcode?: string
+          property_number?: string | null
+          social_media_consent?: boolean | null
+          street_name?: string
+          town_city?: string
+          updated_at?: string
+          user_id?: string
+          whatsapp_consent?: boolean
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

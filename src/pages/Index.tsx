@@ -202,7 +202,7 @@ const Index = () => {
               className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border"
             >
               <div className="w-12 h-12 bg-[#1877F2]/10 rounded-full flex items-center justify-center mb-3 group-hover:bg-[#1877F2]/20 transition-colors">
-                <Facebook className="h-6 w-6 text-[#1877F2]" />
+                <Facebook className="h-6 w-6 text-[#1877F2] group-hover:text-white transition-colors" />
               </div>
               <span className="text-sm font-medium text-foreground">Facebook</span>
             </button>
@@ -217,7 +217,7 @@ const Index = () => {
               className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border"
             >
               <div className="w-12 h-12 bg-foreground/10 rounded-full flex items-center justify-center mb-3 group-hover:bg-foreground/20 transition-colors">
-                <Twitter className="h-6 w-6 text-foreground" />
+                <Twitter className="h-6 w-6 text-foreground group-hover:text-white transition-colors" />
               </div>
               <span className="text-sm font-medium text-foreground">Twitter/X</span>
             </button>
@@ -233,7 +233,7 @@ const Index = () => {
               className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border"
             >
               <div className="w-12 h-12 bg-[#0A66C2]/10 rounded-full flex items-center justify-center mb-3 group-hover:bg-[#0A66C2]/20 transition-colors">
-                <Linkedin className="h-6 w-6 text-[#0A66C2]" />
+                <Linkedin className="h-6 w-6 text-[#0A66C2] group-hover:text-white transition-colors" />
               </div>
               <span className="text-sm font-medium text-foreground">LinkedIn</span>
             </button>
@@ -248,7 +248,7 @@ const Index = () => {
               className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border"
             >
               <div className="w-12 h-12 bg-[#25D366]/10 rounded-full flex items-center justify-center mb-3 group-hover:bg-[#25D366]/20 transition-colors">
-                <MessageCircle className="h-6 w-6 text-[#25D366]" />
+                <MessageCircle className="h-6 w-6 text-[#25D366] group-hover:text-white transition-colors" />
               </div>
               <span className="text-sm font-medium text-foreground">WhatsApp</span>
             </button>
@@ -263,7 +263,7 @@ const Index = () => {
               className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border"
             >
               <div className="w-12 h-12 bg-[#0088CC]/10 rounded-full flex items-center justify-center mb-3 group-hover:bg-[#0088CC]/20 transition-colors">
-                <Send className="h-6 w-6 text-[#0088CC]" />
+                <Send className="h-6 w-6 text-[#0088CC] group-hover:text-white transition-colors" />
               </div>
               <span className="text-sm font-medium text-foreground">Telegram</span>
             </button>
@@ -278,7 +278,7 @@ const Index = () => {
               className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border"
             >
               <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-3 group-hover:bg-primary/20 transition-colors">
-                <Mail className="h-6 w-6 text-primary" />
+                <Mail className="h-6 w-6 text-primary group-hover:text-white transition-colors" />
               </div>
               <span className="text-sm font-medium text-foreground">Email</span>
             </button>
@@ -319,7 +319,7 @@ const Index = () => {
               className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border"
             >
               <div className="w-12 h-12 bg-[#FF4500]/10 rounded-full flex items-center justify-center mb-3 group-hover:bg-[#FF4500]/20 transition-colors">
-                <MessageSquare className="h-6 w-6 text-[#FF4500]" />
+                <MessageSquare className="h-6 w-6 text-[#FF4500] group-hover:text-white transition-colors" />
               </div>
               <span className="text-sm font-medium text-foreground">Reddit</span>
             </button>

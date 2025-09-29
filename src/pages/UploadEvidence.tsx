@@ -176,12 +176,6 @@ const UploadEvidence = () => {
           alt="RedrowExposed.co.uk banner over UK motorway bridge - A public interest website"
           className="w-full h-full object-cover object-center"
         />
-        <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-          <div className="text-center text-white">
-            <h2 className="text-5xl font-bold mb-3">RedrowExposed.co.uk</h2>
-            <p className="text-xl font-medium">A public interest website</p>
-          </div>
-        </div>
       </div>
 
       {/* Main Content */}

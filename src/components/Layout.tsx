@@ -29,6 +29,12 @@ export default function Layout({ children }: LayoutProps) {
                 Features
               </a>
               <a 
+                href="/submit-claim" 
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
+                Submit Claim
+              </a>
+              <a 
                 href="/upload-evidence" 
                 className="text-muted-foreground hover:text-primary transition-colors"
               >

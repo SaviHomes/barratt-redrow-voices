@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import UploadEvidence from "./pages/UploadEvidence";
+import SubmitClaim from "./pages/SubmitClaim";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/submit-claim" element={<SubmitClaim />} />
             <Route path="/upload-evidence" element={<UploadEvidence />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/admin" element={<AdminDashboard />} />

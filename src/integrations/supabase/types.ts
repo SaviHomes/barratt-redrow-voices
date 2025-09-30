@@ -14,6 +14,93 @@ export type Database = {
   }
   public: {
     Tables: {
+      claims: {
+        Row: {
+          additional_notes: string | null
+          claim_description: string
+          claim_title: string
+          completion_date: string | null
+          costs_incurred: number | null
+          created_at: string
+          defects_categories: string[] | null
+          development_name: string | null
+          email: string
+          estimated_damages: number | null
+          first_name: string
+          id: string
+          issues_discovered_date: string | null
+          last_name: string
+          legal_representation: boolean | null
+          phone: string | null
+          previous_contact_with_redrow: boolean | null
+          property_address: string
+          property_type: string | null
+          purchase_date: string | null
+          receipts_available: boolean | null
+          repair_quotes_obtained: boolean | null
+          status: string | null
+          supporting_documents: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          additional_notes?: string | null
+          claim_description: string
+          claim_title: string
+          completion_date?: string | null
+          costs_incurred?: number | null
+          created_at?: string
+          defects_categories?: string[] | null
+          development_name?: string | null
+          email: string
+          estimated_damages?: number | null
+          first_name: string
+          id?: string
+          issues_discovered_date?: string | null
+          last_name: string
+          legal_representation?: boolean | null
+          phone?: string | null
+          previous_contact_with_redrow?: boolean | null
+          property_address: string
+          property_type?: string | null
+          purchase_date?: string | null
+          receipts_available?: boolean | null
+          repair_quotes_obtained?: boolean | null
+          status?: string | null
+          supporting_documents?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          additional_notes?: string | null
+          claim_description?: string
+          claim_title?: string
+          completion_date?: string | null
+          costs_incurred?: number | null
+          created_at?: string
+          defects_categories?: string[] | null
+          development_name?: string | null
+          email?: string
+          estimated_damages?: number | null
+          first_name?: string
+          id?: string
+          issues_discovered_date?: string | null
+          last_name?: string
+          legal_representation?: boolean | null
+          phone?: string | null
+          previous_contact_with_redrow?: boolean | null
+          property_address?: string
+          property_type?: string | null
+          purchase_date?: string | null
+          receipts_available?: boolean | null
+          repair_quotes_obtained?: boolean | null
+          status?: string | null
+          supporting_documents?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       evidence: {
         Row: {
           category: string

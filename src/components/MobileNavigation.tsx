@@ -66,6 +66,13 @@ export default function MobileNavigation() {
               Features
             </a>
             <a 
+              href="/submit-claim" 
+              className="text-foreground hover:text-primary transition-colors py-2 text-lg"
+              onClick={closeMenu}
+            >
+              Submit Claim
+            </a>
+            <a 
               href="/upload-evidence" 
               className="text-foreground hover:text-primary transition-colors py-2 text-lg"
               onClick={closeMenu}

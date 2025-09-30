@@ -87,7 +87,7 @@ export default function MobileNavigation() {
               Upload Evidence
             </a>
             <a 
-              href="#faq" 
+              href="/#faq" 
               className="text-foreground hover:text-primary transition-colors py-2 text-lg"
               onClick={closeMenu}
             >

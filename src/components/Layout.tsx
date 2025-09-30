@@ -47,7 +47,7 @@ export default function Layout({ children }: LayoutProps) {
                 Community
               </a>
               <a 
-                href="#contact" 
+                href="/contact" 
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
                 Contact

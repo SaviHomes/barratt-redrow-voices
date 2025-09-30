@@ -9,6 +9,7 @@ import UploadEvidence from "./pages/UploadEvidence";
 import SubmitClaim from "./pages/SubmitClaim";
 import RedrowDefects from "./pages/RedrowDefects";
 import RedrowComplaints from "./pages/RedrowComplaints";
+import ComplaintsDatabase from "./pages/ComplaintsDatabase";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -32,6 +33,7 @@ const App = () => (
             <Route path="/submit-claim" element={<SubmitClaim />} />
             <Route path="/redrow-defects" element={<RedrowDefects />} />
             <Route path="/redrow-complaints" element={<RedrowComplaints />} />
+            <Route path="/complaints-database" element={<ComplaintsDatabase />} />
             <Route path="/upload-evidence" element={<UploadEvidence />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/admin" element={<AdminDashboard />} />

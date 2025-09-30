@@ -256,7 +256,14 @@ const RedrowComplaints = () => {
                     </CardContent>
                   </Card>
                 ))}
-              </div>
+               </div>
+               
+               {/* Read More Button */}
+               <div className="text-center mt-8">
+                 <Button size="lg" asChild>
+                   <Link to="/complaints-database">Read More Complaints</Link>
+                 </Button>
+               </div>
             </section>
 
             {/* How to Complain */}

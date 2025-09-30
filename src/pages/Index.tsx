@@ -14,6 +14,64 @@ const Index = () => {
   useVisitorTracking();
 
   return (
+    <>
+      {/* SEO Meta Tags */}
+      <title>Redrow Exposed - Redrow Property Defects, Build Quality Issues & Homeowner Complaints</title>
+      <meta name="description" content="The definitive resource for Redrow property defects and build quality issues. Submit financial claims, document defects, read complaints, and get compensation for Redrow homeowner problems." />
+      <meta name="keywords" content="Redrow defects, Redrow complaints, Redrow build quality, Redrow property issues, Redrow homeowner problems, Redrow compensation claims" />
+      <link rel="canonical" href={window.location.origin} />
+      
+      {/* Structured Data */}
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "Redrow Exposed",
+          "description": "Platform for Redrow homeowners to document property defects, submit financial claims, and share experiences about build quality issues",
+          "url": window.location.origin,
+          "sameAs": [],
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": `${window.location.origin}/redrow-defects?q={search_term_string}`,
+            "query-input": "required name=search_term_string"
+          }
+        })}
+      </script>
+
+      {/* FAQ Structured Data */}
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What types of Redrow property defects are common?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Common Redrow defects include structural issues, water damage, electrical problems, heating/insulation issues, roof leaks, and poor build quality finishing."
+              }
+            },
+            {
+              "@type": "Question", 
+              "name": "Can I claim compensation for Redrow property defects?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, you may be entitled to compensation for repair costs, temporary accommodation, legal fees, and inconvenience caused by Redrow property defects."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How do I submit a complaint about Redrow build quality?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "You can submit a formal complaint through our platform, contact Redrow customer care directly, or escalate to the Housing Ombudsman if necessary."
+              }
+            }
+          ]
+        })}
+      </script>
+
     <Layout>
       {/* Development Notice */}
       <div className="bg-muted py-3 text-center">
@@ -29,26 +87,33 @@ const Index = () => {
             Your Voice Matters
           </Badge>
           <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
-            <span className="text-primary">Redrow Exposed</span> - The Definitive<br />
-            Resource for Homeowner Issues
+            <span className="text-primary">Redrow Exposed</span> - Redrow Property Defects<br />
+            & Build Quality Issues Hub
           </h1>
           <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
-            The single authoritative source for Barratt Redrow homeowner experiences. Join over 1,000 homeowners documenting property issues, 
-            sharing evidence, and driving accountability in the UK housing industry. Your story matters - help expose the truth.
+            The authoritative source for Redrow homeowner experiences, property defects, and build quality issues. 
+            Join hundreds of Redrow homeowners documenting defects, sharing evidence, and fighting for accountability. 
+            Submit financial claims for compensation and get support from our community.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            {user ? (
-              <Button size="lg" className="px-8 py-6 text-lg" asChild>
-                <a href="/upload-evidence">Upload Evidence</a>
-              </Button>
-            ) : (
-              <Button size="lg" className="px-8 py-6 text-lg" asChild>
-                <a href="/register">Join Community</a>
-              </Button>
-            )}
-            <Button variant="outline" size="lg" className="px-8 py-6 text-lg">
-              Browse Stories
+            <Button size="lg" className="px-8 py-6 text-lg" asChild>
+              <a href="/submit-claim">Submit Redrow Claim</a>
             </Button>
+            <Button variant="outline" size="lg" className="px-8 py-6 text-lg" asChild>
+              <a href="/redrow-defects">View Redrow Defects</a>
+            </Button>
+            <Button variant="outline" size="lg" className="px-8 py-6 text-lg" asChild>
+              <a href="/redrow-complaints">Read Complaints</a>
+            </Button>
+          </div>
+          
+          {/* Quick Navigation to Key Pages */}
+          <div className="mt-12 flex flex-wrap justify-center gap-4">
+            <a href="/redrow-defects" className="text-primary hover:underline">Common Redrow Defects</a>
+            <span className="text-muted-foreground">•</span>
+            <a href="/redrow-complaints" className="text-primary hover:underline">Redrow Complaints & Reviews</a>
+            <span className="text-muted-foreground">•</span>
+            <a href="/upload-evidence" className="text-primary hover:underline">Upload Evidence</a>
           </div>
         </div>
       </section>
@@ -59,7 +124,7 @@ const Index = () => {
           <div className="flex items-center justify-center space-x-4">
             <AlertTriangle className="h-6 w-6 text-primary" />
             <p className="text-lg font-medium text-foreground">
-              Experiencing quality issues with your Barratt Redrow home? You're not alone.
+              Experiencing Redrow property defects or build quality issues? Document your case and claim compensation.
             </p>
           </div>
         </div>
@@ -70,10 +135,10 @@ const Index = () => {
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-foreground mb-4">
-              Platform Features
+              Redrow Property Issues Platform
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Everything you need to document, share, and resolve property issues
+              Everything you need to document Redrow defects, submit financial claims, and get compensation
             </p>
           </div>
 
@@ -394,6 +459,7 @@ const Index = () => {
         </div>
       </footer>
     </Layout>
+    </>
   );
 };
 

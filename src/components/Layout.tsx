@@ -23,10 +23,16 @@ export default function Layout({ children }: LayoutProps) {
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-6">
               <a 
-                href="#features" 
+                href="/redrow-defects" 
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
-                Features
+                Redrow Defects
+              </a>
+              <a 
+                href="/redrow-complaints" 
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
+                Complaints
               </a>
               <a 
                 href="/submit-claim" 

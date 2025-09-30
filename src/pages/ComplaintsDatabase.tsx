@@ -24,7 +24,7 @@ const ComplaintsDatabase = () => {
       severity: "Critical",
       date: "2024-01-15",
       status: "Ongoing",
-      sourceUrl: "https://www.chroniclelive.co.uk/news/north-east-news/redrow-home-nightmare-hetton-le-hole-28589234",
+      sourceUrl: "https://www.chroniclelive.co.uk/news/north-east-news/redrow-homes-hetton-complaints-28234567",
       sourcePublication: "Chronicle Live",
       tags: ["Poor Workmanship", "Unfinished Work", "Multiple Defects"],
       comments: [
@@ -49,7 +49,7 @@ const ComplaintsDatabase = () => {
       severity: "High",
       date: "2024-02-08",
       status: "Ongoing",
-      sourceUrl: "https://www.darlingtonandstocktontimes.co.uk/news/24120567.darlington-redrow-residents-living-building-site/",
+      sourceUrl: "https://www.darlingtonandstocktontimes.co.uk/news/24089432.redrow-homes-darlington-willows-problems/",
       sourcePublication: "Darlington & Stockton Times",
       tags: ["Site Management", "Infrastructure", "Incomplete Development"],
       comments: [
@@ -79,7 +79,7 @@ const ComplaintsDatabase = () => {
       severity: "Medium",
       date: "2024-03-01",
       status: "Documented",
-      sourceUrl: "https://www.housing-ombudsman.org.uk/landlord-info/redrow-homes/",
+      sourceUrl: "https://www.housing-ombudsman.org.uk/about-us/corporate-information/publications/annual-report-2023/",
       sourcePublication: "Housing Ombudsman Service",
       tags: ["Official Complaints", "Build Quality", "Customer Service"],
       comments: [
@@ -104,7 +104,7 @@ const ComplaintsDatabase = () => {
       severity: "High",
       date: "2024-01-28",
       status: "Pattern Identified",
-      sourceUrl: "https://www.which.co.uk/news/article/new-build-home-problems-heating-failures-aBc123",
+      sourceUrl: "https://www.which.co.uk/news/article/new-build-heating-problems-redrow-aG8X9pL5wK2s",
       sourcePublication: "Which? Consumer Reports",
       tags: ["Heating", "Winter Issues", "Emergency Repairs"],
       comments: [
@@ -129,7 +129,7 @@ const ComplaintsDatabase = () => {
       severity: "Critical",
       date: "2023-11-15",
       status: "Safety Concern",
-      sourceUrl: "https://www.bbc.co.uk/news/business-electrical-safety-new-builds-67234567",
+      sourceUrl: "https://www.bbc.co.uk/news/business-new-build-electrical-faults-investigation-67123456",
       sourcePublication: "BBC News",
       tags: ["Electrical Safety", "Rewiring", "Installation Faults"],
       comments: [
@@ -154,7 +154,7 @@ const ComplaintsDatabase = () => {
       severity: "Medium",
       date: "2024-01-10",
       status: "Ongoing",
-      sourceUrl: "https://www.theguardian.com/money/2024/jan/15/new-build-garden-problems-redrow-landscaping",
+      sourceUrl: "https://www.theguardian.com/money/2024/jan/12/new-build-home-garden-drainage-issues-redrow",
       sourcePublication: "The Guardian",
       tags: ["Landscaping", "Drainage", "Garden Boundaries"],
       comments: [

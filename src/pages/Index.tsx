@@ -73,13 +73,6 @@ const Index = () => {
       </script>
 
     <Layout>
-      {/* Development Notice */}
-      <div className="bg-muted py-3 text-center">
-        <p className="text-sm text-muted-foreground">
-          🚧 <strong>Site in Development</strong> - Content, statistics, and features shown are placeholders for demonstration purposes
-        </p>
-      </div>
-
       {/* Hero Section */}
       <section className="py-20 bg-gradient-to-br from-primary/5 via-background to-secondary/20">
         <div className="container mx-auto px-6 text-center">

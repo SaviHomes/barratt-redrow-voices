@@ -9,6 +9,13 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen bg-background">
+      {/* Development Notice */}
+      <div className="bg-muted py-3 text-center border-b border-border">
+        <p className="text-sm text-muted-foreground px-4">
+          🚧 <strong>Site in Development</strong> - Content, statistics, and features shown are placeholders for demonstration purposes
+        </p>
+      </div>
+
       {/* Header */}
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-6 py-4">

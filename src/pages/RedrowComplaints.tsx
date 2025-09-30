@@ -258,12 +258,12 @@ const RedrowComplaints = () => {
                 ))}
                </div>
                
-               {/* Read More Button */}
-               <div className="text-center mt-8">
-                 <Button size="lg" asChild>
-                   <Link to="/complaints-database">Read More Complaints</Link>
-                 </Button>
-               </div>
+                {/* Read More Button */}
+                <div className="text-center mt-8">
+                  <Button size="lg" asChild>
+                    <Link to="/complaints-database" onClick={() => window.scrollTo(0, 0)}>Read More Complaints</Link>
+                  </Button>
+                </div>
             </section>
 
             {/* How to Complain */}

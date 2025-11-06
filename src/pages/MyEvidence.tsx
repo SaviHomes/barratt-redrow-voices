@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Image as ImageIcon, Search, Filter, Trash2 } from "lucide-react";
+import { Image as ImageIcon, Search, Trash2, Download, Images } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -21,6 +21,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useEvidencePhotos } from "@/hooks/useEvidencePhotos";
+import EvidenceLightbox from "@/components/EvidenceLightbox";
+import JSZip from "jszip";
 
 export default function MyEvidence() {
   const { user } = useAuth();
@@ -32,6 +35,11 @@ export default function MyEvidence() {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [severityFilter, setSeverityFilter] = useState("all");
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [selectedEvidenceId, setSelectedEvidenceId] = useState<string | null>(null);
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
+
+  const { evidenceWithPhotos, loading: photosLoading, deletePhoto, refetch: refetchPhotos } = useEvidencePhotos(evidence, user?.id);
 
   useEffect(() => {
     if (user) {
@@ -41,7 +49,7 @@ export default function MyEvidence() {
 
   useEffect(() => {
     filterEvidence();
-  }, [evidence, searchTerm, categoryFilter, severityFilter]);
+  }, [evidenceWithPhotos, searchTerm, categoryFilter, severityFilter]);
 
   const fetchEvidence = async () => {
     if (!user) return;
@@ -68,7 +76,7 @@ export default function MyEvidence() {
   };
 
   const filterEvidence = () => {
-    let filtered = evidence;
+    let filtered = evidenceWithPhotos;
 
     if (searchTerm) {
       filtered = filtered.filter(item =>
@@ -117,6 +125,7 @@ export default function MyEvidence() {
       });
 
       setEvidence(prev => prev.filter(item => item.id !== deleteId));
+      refetchPhotos();
     } catch (error) {
       console.error('Error deleting evidence:', error);
       toast({
@@ -139,7 +148,69 @@ export default function MyEvidence() {
     }
   };
 
-  if (loading) {
+  const openLightbox = (evidenceId: string, photoIndex: number) => {
+    setSelectedEvidenceId(evidenceId);
+    setSelectedPhotoIndex(photoIndex);
+    setLightboxOpen(true);
+  };
+
+  const handleDeletePhoto = async (photoPath: string) => {
+    const result = await deletePhoto(selectedEvidenceId!, photoPath);
+    return result;
+  };
+
+  const handleBulkDownload = async (evidenceId: string, evidenceTitle: string) => {
+    const item = evidenceWithPhotos.find(e => e.id === evidenceId);
+    if (!item || item.photos.length === 0) return;
+
+    try {
+      toast({
+        title: "Preparing download",
+        description: "Creating zip file...",
+      });
+
+      const zip = new JSZip();
+      
+      // Download all photos and add to zip
+      await Promise.all(
+        item.photos.map(async (photo, index) => {
+          const response = await fetch(photo.url);
+          const blob = await response.blob();
+          const ext = photo.name.split('.').pop();
+          zip.file(`${evidenceTitle}_${index + 1}.${ext}`, blob);
+        })
+      );
+
+      // Generate zip file
+      const content = await zip.generateAsync({ type: "blob" });
+      
+      // Trigger download
+      const url = window.URL.createObjectURL(content);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${evidenceTitle}_photos_${new Date().toISOString().split('T')[0]}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast({
+        title: "Download complete",
+        description: `All ${item.photos.length} photos downloaded successfully.`,
+      });
+    } catch (error) {
+      console.error("Error downloading photos:", error);
+      toast({
+        title: "Download failed",
+        description: "Failed to download photos. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const selectedEvidence = evidenceWithPhotos.find(e => e.id === selectedEvidenceId);
+
+  if (loading || photosLoading) {
     return (
       <Layout>
         <div className="min-h-screen flex items-center justify-center">
@@ -259,9 +330,71 @@ export default function MyEvidence() {
                       <Badge variant="outline">{item.category}</Badge>
                     </div>
                     {item.description && (
-                      <p className="text-sm text-muted-foreground line-clamp-2">
+                      <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
                         {item.description}
                       </p>
+                    )}
+
+                    {/* Photo Gallery */}
+                    {item.photos && item.photos.length > 0 ? (
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Images className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-sm font-medium">
+                              {item.photos.length} {item.photos.length === 1 ? 'photo' : 'photos'}
+                            </span>
+                          </div>
+                          {item.photos.length > 1 && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleBulkDownload(item.id, item.title)}
+                            >
+                              <Download className="h-4 w-4 mr-1" />
+                              Download All
+                            </Button>
+                          )}
+                        </div>
+
+                        {/* Photo Thumbnails Grid */}
+                        <div className="grid grid-cols-4 gap-2">
+                          {item.photos.slice(0, 4).map((photo, index) => (
+                            <div
+                              key={photo.path}
+                              className="relative aspect-square rounded-md overflow-hidden cursor-pointer group border border-border hover:border-primary transition-colors"
+                              onClick={() => openLightbox(item.id, index)}
+                            >
+                              <img
+                                src={photo.url}
+                                alt={`${item.title} - Photo ${index + 1}`}
+                                className="w-full h-full object-cover transition-transform group-hover:scale-110"
+                              />
+                              {index === 3 && item.photos.length > 4 && (
+                                <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white font-semibold">
+                                  +{item.photos.length - 4}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+
+                        {item.photos.length > 4 && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full"
+                            onClick={() => openLightbox(item.id, 0)}
+                          >
+                            View All {item.photos.length} Photos
+                          </Button>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="text-center py-4 border border-dashed border-border rounded-md">
+                        <ImageIcon className="h-8 w-8 mx-auto mb-2 text-muted-foreground opacity-50" />
+                        <p className="text-sm text-muted-foreground">No photos uploaded</p>
+                      </div>
                     )}
                   </CardContent>
                 </Card>
@@ -286,6 +419,18 @@ export default function MyEvidence() {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+
+          {/* Lightbox */}
+          {selectedEvidence && (
+            <EvidenceLightbox
+              photos={selectedEvidence.photos}
+              initialIndex={selectedPhotoIndex}
+              isOpen={lightboxOpen}
+              onClose={() => setLightboxOpen(false)}
+              onDeletePhoto={handleDeletePhoto}
+              evidenceTitle={selectedEvidence.title}
+            />
+          )}
         </div>
       </Layout>
     </ProtectedRoute>

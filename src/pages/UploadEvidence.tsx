@@ -356,7 +356,7 @@ const UploadEvidence = () => {
 
       <main className="container mx-auto px-6 py-12">
         <div className="max-w-4xl mx-auto">
-          <BackToDashboard />
+          {user && <BackToDashboard />}
           <div className="mb-8">
             <Badge variant="secondary" className="mb-4">
               Confidential & Secure

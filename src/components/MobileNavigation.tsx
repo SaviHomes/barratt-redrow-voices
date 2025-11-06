@@ -59,11 +59,18 @@ export default function MobileNavigation() {
           </SheetHeader>
           <nav className="flex flex-col space-y-4 mt-6">
             <a 
+              href="/developments" 
+              className="text-foreground hover:text-primary transition-colors py-2 text-lg"
+              onClick={closeMenu}
+            >
+              Developments
+            </a>
+            <a 
               href="/redrow-defects" 
               className="text-foreground hover:text-primary transition-colors py-2 text-lg"
               onClick={closeMenu}
             >
-              Redrow Defects
+              Defects
             </a>
             <a 
               href="/redrow-complaints" 

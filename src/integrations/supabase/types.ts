@@ -101,6 +101,48 @@ export type Database = {
         }
         Relationships: []
       }
+      development_ratings: {
+        Row: {
+          build_quality_rating: number | null
+          created_at: string
+          customer_service_rating: number | null
+          development_name: string
+          id: string
+          overall_rating: number | null
+          review_text: string | null
+          updated_at: string
+          user_id: string
+          value_for_money_rating: number | null
+          would_recommend: boolean | null
+        }
+        Insert: {
+          build_quality_rating?: number | null
+          created_at?: string
+          customer_service_rating?: number | null
+          development_name: string
+          id?: string
+          overall_rating?: number | null
+          review_text?: string | null
+          updated_at?: string
+          user_id: string
+          value_for_money_rating?: number | null
+          would_recommend?: boolean | null
+        }
+        Update: {
+          build_quality_rating?: number | null
+          created_at?: string
+          customer_service_rating?: number | null
+          development_name?: string
+          id?: string
+          overall_rating?: number | null
+          review_text?: string | null
+          updated_at?: string
+          user_id?: string
+          value_for_money_rating?: number | null
+          would_recommend?: boolean | null
+        }
+        Relationships: []
+      }
       evidence: {
         Row: {
           category: string
@@ -299,6 +341,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      rating_value: "1" | "2" | "3" | "4" | "5"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -427,6 +470,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      rating_value: ["1", "2", "3", "4", "5"],
     },
   },
 } as const

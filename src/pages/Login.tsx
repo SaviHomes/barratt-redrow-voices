@@ -99,7 +99,7 @@ export default function Login() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-background flex items-center justify-center py-12 px-4">
+      <div className="bg-background flex items-center justify-center py-12 px-4 min-h-[calc(100vh-200px)]">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <CardTitle className="text-3xl font-bold">Welcome Back</CardTitle>

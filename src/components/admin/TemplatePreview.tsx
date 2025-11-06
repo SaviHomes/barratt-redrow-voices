@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Monitor, Smartphone, Send } from "lucide-react";
-import { useState } from "react";
+import { Monitor, Smartphone, Send, User as UserIcon } from "lucide-react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -27,6 +27,15 @@ interface TemplatePreviewProps {
 export function TemplatePreview({ open, template, onClose }: TemplatePreviewProps) {
   const [testEmail, setTestEmail] = useState("");
   const [sending, setSending] = useState(false);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      setUser(data.user);
+    };
+    getUser();
+  }, []);
 
   if (!template) return null;
 
@@ -36,13 +45,24 @@ export function TemplatePreview({ open, template, onClose }: TemplatePreviewProp
     });
   };
 
+  const useMyEmail = () => {
+    if (user?.email) {
+      setTestEmail(user.email);
+    }
+  };
+
   const previewData = template.preview_data || {};
   const renderedHtml = replaceVariables(template.html_content, previewData);
   const renderedSubject = replaceVariables(template.subject_template, previewData);
 
   const handleSendTest = async () => {
-    if (!testEmail) {
-      toast.error("Please enter an email address");
+    const emails = testEmail
+      .split(',')
+      .map(e => e.trim())
+      .filter(e => e.length > 0);
+
+    if (emails.length === 0) {
+      toast.error("Please enter at least one email address");
       return;
     }
 
@@ -51,14 +71,14 @@ export function TemplatePreview({ open, template, onClose }: TemplatePreviewProp
       const { error } = await supabase.functions.invoke('send-admin-email', {
         body: {
           templateId: template.id,
-          recipients: [testEmail],
+          recipients: emails,
           customData: previewData,
         },
       });
 
       if (error) throw error;
       
-      toast.success("Test email sent successfully!");
+      toast.success(`Test email sent to ${emails.length} recipient${emails.length > 1 ? 's' : ''}!`);
       setTestEmail("");
     } catch (error: any) {
       console.error('Error sending test email:', error);
@@ -116,13 +136,29 @@ export function TemplatePreview({ open, template, onClose }: TemplatePreviewProp
         <div className="flex gap-2 pt-4 border-t">
           <div className="flex-1 space-y-2">
             <Label htmlFor="test-email">Send Test Email</Label>
-            <Input
-              id="test-email"
-              type="email"
-              placeholder="your@email.com"
-              value={testEmail}
-              onChange={(e) => setTestEmail(e.target.value)}
-            />
+            <div className="flex gap-2">
+              <Input
+                id="test-email"
+                type="email"
+                placeholder="email1@example.com, email2@example.com"
+                value={testEmail}
+                onChange={(e) => setTestEmail(e.target.value)}
+                className="flex-1"
+              />
+              {user?.email && (
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={useMyEmail}
+                  title="Use my email"
+                >
+                  <UserIcon className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Separate multiple emails with commas
+            </p>
           </div>
           <Button
             onClick={handleSendTest}

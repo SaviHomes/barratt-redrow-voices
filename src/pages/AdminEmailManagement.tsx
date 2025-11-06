@@ -11,13 +11,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { Mail, Send, ArrowLeft, Users, Clock } from "lucide-react";
+import { Mail, Send, ArrowLeft, Users, Clock, Zap } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TemplateList } from "@/components/admin/TemplateList";
 import { TemplateEditor } from "@/components/admin/TemplateEditor";
 import { TemplatePreview } from "@/components/admin/TemplatePreview";
 import { TriggerList } from "@/components/admin/TriggerList";
 import { TriggerEditor } from "@/components/admin/TriggerEditor";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface EmailLog {
   id: string;
@@ -44,6 +45,9 @@ export default function AdminEmailManagement() {
   const [previewTemplate, setPreviewTemplate] = useState<any>(null);
   const [triggerEditorOpen, setTriggerEditorOpen] = useState(false);
   const [editingTrigger, setEditingTrigger] = useState<any>(null);
+  const [quickTestTemplate, setQuickTestTemplate] = useState<string>("");
+  const [quickTestEmail, setQuickTestEmail] = useState("");
+  const [sendingQuickTest, setSendingQuickTest] = useState(false);
   
   // Form state
   const [template, setTemplate] = useState<string>("newsletter");
@@ -212,6 +216,73 @@ export default function AdminEmailManagement() {
     }
   };
 
+  const handleQuickTest = async () => {
+    if (!quickTestEmail || !quickTestTemplate) {
+      toast.error("Please select a template and enter an email address");
+      return;
+    }
+
+    setSendingQuickTest(true);
+    try {
+      const template = templates.find(t => t.id === quickTestTemplate);
+      if (!template) throw new Error("Template not found");
+
+      const { error } = await supabase.functions.invoke('send-admin-email', {
+        body: {
+          templateId: quickTestTemplate,
+          recipients: [quickTestEmail],
+          customData: template.preview_data || {},
+        },
+      });
+
+      if (error) throw error;
+      
+      toast.success("Quick test email sent successfully!");
+      setQuickTestEmail("");
+    } catch (error: any) {
+      console.error('Error sending quick test:', error);
+      toast.error(error.message || "Failed to send test email");
+    } finally {
+      setSendingQuickTest(false);
+    }
+  };
+
+  const handleBatchTest = async () => {
+    const email = prompt("Enter email address to receive all test templates:");
+    if (!email) return;
+
+    const activeTemplates = templates.filter(t => t.is_active);
+    if (activeTemplates.length === 0) {
+      toast.error("No active templates to test");
+      return;
+    }
+
+    const toastId = toast.loading(`Sending ${activeTemplates.length} test emails...`);
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const template of activeTemplates) {
+      try {
+        const { error } = await supabase.functions.invoke('send-admin-email', {
+          body: {
+            templateId: template.id,
+            recipients: [email],
+            customData: template.preview_data || {},
+          },
+        });
+
+        if (error) throw error;
+        successCount++;
+      } catch (error) {
+        console.error(`Failed to send test for ${template.display_name}:`, error);
+        failCount++;
+      }
+    }
+
+    toast.dismiss(toastId);
+    toast.success(`Batch test complete: ${successCount} sent, ${failCount} failed`);
+  };
+
   const getTemplateBadge = (type: string) => {
     const badges: Record<string, { label: string; class: string }> = {
       'welcome': { label: 'Welcome', class: 'bg-primary' },
@@ -250,7 +321,45 @@ export default function AdminEmailManagement() {
             <TabsTrigger value="history">Email History</TabsTrigger>
           </TabsList>
 
-        <TabsContent value="compose">
+        <TabsContent value="compose" className="space-y-4">
+          <Alert>
+            <Zap className="h-4 w-4" />
+            <AlertDescription>
+              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-end">
+                <div className="flex-1 space-y-2">
+                  <Label htmlFor="quick-test-template" className="text-sm font-medium">Quick Test</Label>
+                  <div className="flex gap-2">
+                    <Select value={quickTestTemplate} onValueChange={setQuickTestTemplate}>
+                      <SelectTrigger id="quick-test-template" className="h-9">
+                        <SelectValue placeholder="Select template" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {templates.filter(t => t.is_active).map(t => (
+                          <SelectItem key={t.id} value={t.id}>{t.display_name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      placeholder="your@email.com"
+                      value={quickTestEmail}
+                      onChange={(e) => setQuickTestEmail(e.target.value)}
+                      className="h-9"
+                    />
+                    <Button 
+                      size="sm"
+                      onClick={handleQuickTest}
+                      disabled={sendingQuickTest || !quickTestTemplate || !quickTestEmail}
+                      className="gap-2 whitespace-nowrap"
+                    >
+                      <Send className="h-4 w-4" />
+                      {sendingQuickTest ? 'Sending...' : 'Send'}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </AlertDescription>
+          </Alert>
+
           <Card>
             <CardHeader>
               <CardTitle>Compose New Email</CardTitle>
@@ -435,9 +544,15 @@ export default function AdminEmailManagement() {
                 <h3 className="text-lg font-semibold">Email Templates</h3>
                 <p className="text-sm text-muted-foreground">Manage your email templates library</p>
               </div>
-              <Button onClick={() => { setEditingTemplate(null); setEditorOpen(true); }}>
-                Create Template
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={handleBatchTest}>
+                  <Zap className="h-4 w-4 mr-2" />
+                  Test All Active
+                </Button>
+                <Button onClick={() => { setEditingTemplate(null); setEditorOpen(true); }}>
+                  Create Template
+                </Button>
+              </div>
             </div>
             <TemplateList
               templates={templates}
@@ -458,6 +573,7 @@ export default function AdminEmailManagement() {
                 await supabase.from('email_templates').update({ is_active: active }).eq('id', id);
                 fetchTemplates();
               }}
+              userEmail={user?.email}
             />
           </TabsContent>
 

@@ -1,10 +1,11 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Edit, Copy, Trash2, Lock, Power, PowerOff } from "lucide-react";
+import { Eye, Edit, Copy, Trash2, Lock, Power, PowerOff, Send } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
+import { QuickTestDialog } from "./QuickTestDialog";
 
 interface EmailTemplate {
   id: string;
@@ -28,6 +29,7 @@ interface TemplateListProps {
   onDuplicate: (template: EmailTemplate) => void;
   onPreview: (template: EmailTemplate) => void;
   onToggleActive: (id: string, active: boolean) => void;
+  userEmail?: string;
 }
 
 export function TemplateList({
@@ -37,9 +39,11 @@ export function TemplateList({
   onDuplicate,
   onPreview,
   onToggleActive,
+  userEmail,
 }: TemplateListProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [testTemplate, setTestTemplate] = useState<EmailTemplate | null>(null);
 
   const filteredTemplates = templates.filter(template => {
     const matchesSearch = template.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -127,6 +131,14 @@ export function TemplateList({
                     <Button
                       variant="ghost"
                       size="icon"
+                      onClick={() => setTestTemplate(template)}
+                      title="Send Test Email"
+                    >
+                      <Send className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       onClick={() => onPreview(template)}
                       title="Preview"
                     >
@@ -177,6 +189,13 @@ export function TemplateList({
           </TableBody>
         </Table>
       </div>
+
+      <QuickTestDialog
+        open={!!testTemplate}
+        template={testTemplate}
+        onClose={() => setTestTemplate(null)}
+        userEmail={userEmail}
+      />
     </div>
   );
 }

@@ -166,11 +166,17 @@ export default function UserDashboard() {
               <CardDescription>Common tasks you might want to perform</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <Button asChild variant="outline" className="h-auto py-4">
                   <Link to="/upload-evidence" className="flex flex-col items-center gap-2">
                     <Upload className="h-6 w-6" />
                     <span>Upload Evidence</span>
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" className="h-auto py-4">
+                  <Link to="/my-evidence" className="flex flex-col items-center gap-2">
+                    <ImageIcon className="h-6 w-6" />
+                    <span>My Evidence</span>
                   </Link>
                 </Button>
                 <Button asChild variant="outline" className="h-auto py-4">

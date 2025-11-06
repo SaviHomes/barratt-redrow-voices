@@ -72,12 +72,6 @@ export default function Layout({ children }: LayoutProps) {
                 FAQ
               </a>
               <a 
-                href="#community" 
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
-                Community
-              </a>
-              <a 
                 href="/contact" 
                 className="text-muted-foreground hover:text-primary transition-colors"
               >

@@ -119,13 +119,6 @@ export default function MobileNavigation() {
               FAQ
             </a>
             <a 
-              href="#community" 
-              className="text-foreground hover:text-primary transition-colors py-2 text-lg"
-              onClick={closeMenu}
-            >
-              Community
-            </a>
-            <a 
               href="/contact" 
               className="text-foreground hover:text-primary transition-colors py-2 text-lg"
               onClick={closeMenu}

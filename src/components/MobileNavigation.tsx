@@ -60,6 +60,13 @@ export default function MobileNavigation() {
             <SheetTitle>Navigation</SheetTitle>
           </SheetHeader>
           <nav className="flex flex-col space-y-4 mt-6">
+            <Link 
+              to="/" 
+              className="text-foreground hover:text-primary transition-colors py-2 text-lg"
+              onClick={closeMenu}
+            >
+              Home
+            </Link>
             {developmentsEnabled && (
               <Link 
                 to="/developments" 

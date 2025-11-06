@@ -36,6 +36,12 @@ export default function Layout({ children }: LayoutProps) {
             
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-6">
+              <Link 
+                to="/" 
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
+                Home
+              </Link>
               {developmentsEnabled && (
                 <Link 
                   to="/developments" 

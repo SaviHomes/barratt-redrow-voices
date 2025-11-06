@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { Mail, Send, ArrowLeft, Users, Clock, Zap } from "lucide-react";
+import { Mail, Send, ArrowLeft, Users, Clock, Zap, RefreshCw } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TemplateList } from "@/components/admin/TemplateList";
 import { TemplateEditor } from "@/components/admin/TemplateEditor";
@@ -19,6 +19,16 @@ import { TemplatePreview } from "@/components/admin/TemplatePreview";
 import { TriggerList } from "@/components/admin/TriggerList";
 import { TriggerEditor } from "@/components/admin/TriggerEditor";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { 
+  AlertDialog, 
+  AlertDialogAction, 
+  AlertDialogCancel, 
+  AlertDialogContent, 
+  AlertDialogDescription, 
+  AlertDialogFooter, 
+  AlertDialogHeader, 
+  AlertDialogTitle 
+} from "@/components/ui/alert-dialog";
 
 interface EmailLog {
   id: string;
@@ -48,6 +58,8 @@ export default function AdminEmailManagement() {
   const [quickTestTemplate, setQuickTestTemplate] = useState<string>("");
   const [quickTestEmail, setQuickTestEmail] = useState("");
   const [sendingQuickTest, setSendingQuickTest] = useState(false);
+  const [showSyncDialog, setShowSyncDialog] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   
   // Form state
   const [template, setTemplate] = useState<string>("newsletter");
@@ -281,6 +293,33 @@ export default function AdminEmailManagement() {
 
     toast.dismiss(toastId);
     toast.success(`Batch test complete: ${successCount} sent, ${failCount} failed`);
+  };
+
+  const handleSyncTemplates = async () => {
+    setSyncing(true);
+    setShowSyncDialog(false);
+
+    const loadingToast = toast.loading("Syncing templates from source files...");
+
+    try {
+      const { data, error } = await supabase.functions.invoke("sync-email-templates");
+
+      if (error) throw error;
+
+      const result = data as { success: boolean; message: string; results: any[] };
+
+      toast.dismiss(loadingToast);
+      toast.success(result.message);
+
+      // Refresh templates to show updated content
+      fetchTemplates();
+    } catch (error: any) {
+      toast.dismiss(loadingToast);
+      console.error("Error syncing templates:", error);
+      toast.error(error.message || "Failed to sync email templates");
+    } finally {
+      setSyncing(false);
+    }
   };
 
   const getTemplateBadge = (type: string) => {
@@ -545,6 +584,14 @@ export default function AdminEmailManagement() {
                 <p className="text-sm text-muted-foreground">Manage your email templates library</p>
               </div>
               <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowSyncDialog(true)}
+                  disabled={syncing}
+                >
+                  <RefreshCw className={`h-4 w-4 mr-2 ${syncing ? 'animate-spin' : ''}`} />
+                  Sync Templates
+                </Button>
                 <Button variant="outline" onClick={handleBatchTest}>
                   <Zap className="h-4 w-4 mr-2" />
                   Test All Active
@@ -640,6 +687,32 @@ export default function AdminEmailManagement() {
         }}
         onCancel={() => setTriggerEditorOpen(false)}
       />
+
+      <AlertDialog open={showSyncDialog} onOpenChange={setShowSyncDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Sync Email Templates?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will regenerate all email templates from the source files and update the database with the latest styling and content.
+              <br /><br />
+              <strong>This will update:</strong>
+              <ul className="list-disc list-inside mt-2 space-y-1">
+                <li>Header colors to dark blue (#1e3a8a)</li>
+                <li>Shield logo and branding</li>
+                <li>All template styling to match current design</li>
+              </ul>
+              <br />
+              Any manual edits to template HTML in the database will be overwritten.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleSyncTemplates}>
+              Sync Templates
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { Shield } from "lucide-react";
 import AuthNavigation from "@/components/AuthNavigation";
 import MobileNavigation from "@/components/MobileNavigation";
 import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -75,12 +76,11 @@ export default function Layout({ children }: LayoutProps) {
                 Contact
               </a>
               {user && (
-                <a 
-                  href="/user-dashboard" 
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  Dashboard
-                </a>
+                <Button asChild variant="default" size="sm">
+                  <a href="/user-dashboard">
+                    Dashboard
+                  </a>
+                </Button>
               )}
             </nav>
 

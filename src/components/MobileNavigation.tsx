@@ -117,13 +117,11 @@ export default function MobileNavigation() {
               Contact
             </a>
             {user && (
-              <a 
-                href="/user-dashboard" 
-                className="text-foreground hover:text-primary transition-colors py-2 text-lg"
-                onClick={closeMenu}
-              >
-                Dashboard
-              </a>
+              <Button asChild variant="default" className="justify-start h-12 w-full">
+                <a href="/user-dashboard" onClick={closeMenu}>
+                  Dashboard
+                </a>
+              </Button>
             )}
             
             {/* Authentication Section */}

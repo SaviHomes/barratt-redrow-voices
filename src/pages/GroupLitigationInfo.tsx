@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
-import ProtectedRoute from "@/components/ProtectedRoute";
 import BackToDashboard from "@/components/BackToDashboard";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -184,10 +183,9 @@ export default function GroupLitigationInfo() {
     }
   };
   return (
-    <ProtectedRoute>
-      <Layout>
-        <div className="container mx-auto px-4 py-8 max-w-5xl">
-          <BackToDashboard />
+    <Layout>
+      <div className="container mx-auto px-4 py-8 max-w-5xl">
+        {user && <BackToDashboard />}
           
           {/* Hero Section */}
           <div className="text-center mb-12">
@@ -403,236 +401,268 @@ export default function GroupLitigationInfo() {
               </p>
               <div className="flex flex-wrap gap-4">
                 <Button asChild>
-                  <Link to="/upload-evidence" className="flex items-center gap-2">
+                  <Link to={user ? "/upload-evidence" : "/login"} className="flex items-center gap-2">
                     <Upload className="h-4 w-4" />
-                    Upload Evidence
+                    {user ? "Upload Evidence" : "Sign In to Upload Evidence"}
                   </Link>
                 </Button>
-                <Button asChild variant="outline">
-                  <Link to="/my-evidence">View My Submissions</Link>
-                </Button>
+                {user && (
+                  <Button asChild variant="outline">
+                    <Link to="/my-evidence">View My Submissions</Link>
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>
 
           {/* GLO Interest Registration Form */}
-          <Card className="mb-8 border-primary/30">
-            <CardHeader>
-              <div className="flex items-center gap-2 mb-2">
-                <Users className="h-5 w-5 text-primary" />
-                <CardTitle>Register Your Interest</CardTitle>
-              </div>
-              <CardDescription>
-                Let us know you're interested in participating in a potential GLO. This helps us assess viability and keep you informed.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {existingRegistration && (
-                <Alert className="mb-6">
-                  <CheckCircle className="h-4 w-4" />
+          {user ? (
+            <Card className="mb-8 border-primary/30">
+              <CardHeader>
+                <div className="flex items-center gap-2 mb-2">
+                  <Users className="h-5 w-5 text-primary" />
+                  <CardTitle>Register Your Interest</CardTitle>
+                </div>
+                <CardDescription>
+                  Let us know you're interested in participating in a potential GLO. This helps us assess viability and keep you informed.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {existingRegistration && (
+                  <Alert className="mb-6">
+                    <CheckCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      You've already registered your interest on {new Date(existingRegistration.created_at).toLocaleDateString()}. You can update your information below.
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                <div className="mb-6 p-4 bg-muted/50 rounded-lg">
+                  <p className="text-sm text-muted-foreground">
+                    Help us assess the viability of a Group Litigation Order by registering your interest. This information will be kept confidential and only used to evaluate collective legal action. By registering, you're not committing to participate—we'll contact you if a GLO becomes available with full details so you can make an informed decision.
+                  </p>
+                </div>
+
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="first_name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>First Name *</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="last_name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Last Name *</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email Address *</FormLabel>
+                            <FormControl>
+                              <Input type="email" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="phone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Phone Number (Optional)</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <FormField
+                      control={form.control}
+                      name="development_name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Development Name</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="property_address"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Property Address</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="defect_categories"
+                      render={() => (
+                        <FormItem>
+                          <div className="mb-4">
+                            <FormLabel>What defects are you experiencing? *</FormLabel>
+                            <FormDescription>Select all that apply</FormDescription>
+                          </div>
+                          <div className="grid md:grid-cols-2 gap-3">
+                            {defectCategories.map((category) => (
+                              <FormField
+                                key={category}
+                                control={form.control}
+                                name="defect_categories"
+                                render={({ field }) => (
+                                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                    <FormControl>
+                                      <Checkbox
+                                        checked={field.value?.includes(category)}
+                                        onCheckedChange={(checked) => {
+                                          return checked
+                                            ? field.onChange([...field.value, category])
+                                            : field.onChange(field.value?.filter((value) => value !== category));
+                                        }}
+                                      />
+                                    </FormControl>
+                                    <FormLabel className="font-normal cursor-pointer">
+                                      {category}
+                                    </FormLabel>
+                                  </FormItem>
+                                )}
+                              />
+                            ))}
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="estimated_damages"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Estimated Damages or Costs Incurred (£) (Optional)</FormLabel>
+                          <FormControl>
+                            <Input type="number" min="0" step="0.01" {...field} />
+                          </FormControl>
+                          <FormDescription>Approximate total damages or repair costs</FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="additional_comments"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Additional Comments (Optional)</FormLabel>
+                          <FormControl>
+                            <Textarea rows={4} {...field} />
+                          </FormControl>
+                          <FormDescription>Any additional information you'd like to share</FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="contact_consent"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel className="cursor-pointer">
+                              I consent to being contacted about GLO updates and developments *
+                            </FormLabel>
+                            <FormDescription>
+                              We'll only contact you regarding the Group Litigation Order initiative
+                            </FormDescription>
+                            <FormMessage />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+
+                    <Button type="submit" disabled={submitting} size="lg">
+                      {submitting ? "Submitting..." : existingRegistration ? "Update Registration" : "Register Interest"}
+                    </Button>
+                  </form>
+                </Form>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="mb-8 border-primary/30">
+              <CardHeader>
+                <div className="flex items-center gap-2 mb-2">
+                  <Users className="h-5 w-5 text-primary" />
+                  <CardTitle>Register Your Interest</CardTitle>
+                </div>
+                <CardDescription>
+                  Sign in or create an account to register your interest in the Group Litigation Order
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Alert>
+                  <Info className="h-4 w-4" />
                   <AlertDescription>
-                    You've already registered your interest on {new Date(existingRegistration.created_at).toLocaleDateString()}. You can update your information below.
+                    To register your interest and receive updates about the GLO initiative, please sign in to your account or create a new one.
                   </AlertDescription>
                 </Alert>
-              )}
-
-              <div className="mb-6 p-4 bg-muted/50 rounded-lg">
-                <p className="text-sm text-muted-foreground">
-                  Help us assess the viability of a Group Litigation Order by registering your interest. This information will be kept confidential and only used to evaluate collective legal action. By registering, you're not committing to participate—we'll contact you if a GLO becomes available with full details so you can make an informed decision.
-                </p>
-              </div>
-
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="first_name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>First Name *</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="last_name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Last Name *</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email Address *</FormLabel>
-                          <FormControl>
-                            <Input type="email" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="phone"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Phone Number (Optional)</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <FormField
-                    control={form.control}
-                    name="development_name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Development Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="property_address"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Property Address</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="defect_categories"
-                    render={() => (
-                      <FormItem>
-                        <div className="mb-4">
-                          <FormLabel>What defects are you experiencing? *</FormLabel>
-                          <FormDescription>Select all that apply</FormDescription>
-                        </div>
-                        <div className="grid md:grid-cols-2 gap-3">
-                          {defectCategories.map((category) => (
-                            <FormField
-                              key={category}
-                              control={form.control}
-                              name="defect_categories"
-                              render={({ field }) => (
-                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                                  <FormControl>
-                                    <Checkbox
-                                      checked={field.value?.includes(category)}
-                                      onCheckedChange={(checked) => {
-                                        return checked
-                                          ? field.onChange([...field.value, category])
-                                          : field.onChange(field.value?.filter((value) => value !== category));
-                                      }}
-                                    />
-                                  </FormControl>
-                                  <FormLabel className="font-normal cursor-pointer">
-                                    {category}
-                                  </FormLabel>
-                                </FormItem>
-                              )}
-                            />
-                          ))}
-                        </div>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="estimated_damages"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Estimated Damages or Costs Incurred (£) (Optional)</FormLabel>
-                        <FormControl>
-                          <Input type="number" min="0" step="0.01" {...field} />
-                        </FormControl>
-                        <FormDescription>Approximate total damages or repair costs</FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="additional_comments"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Additional Comments (Optional)</FormLabel>
-                        <FormControl>
-                          <Textarea rows={4} {...field} />
-                        </FormControl>
-                        <FormDescription>Any additional information you'd like to share</FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="contact_consent"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                        <div className="space-y-1 leading-none">
-                          <FormLabel className="cursor-pointer">
-                            I consent to being contacted about GLO updates and developments *
-                          </FormLabel>
-                          <FormDescription>
-                            We'll only contact you regarding the Group Litigation Order initiative
-                          </FormDescription>
-                          <FormMessage />
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-
-                  <Button type="submit" disabled={submitting} size="lg">
-                    {submitting ? "Submitting..." : existingRegistration ? "Update Registration" : "Register Interest"}
+                <div className="flex gap-4">
+                  <Button asChild>
+                    <Link to="/login">Sign In</Link>
                   </Button>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
+                  <Button variant="outline" asChild>
+                    <Link to="/register">Create Account</Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Disclaimer */}
           <Alert variant="default" className="mb-8">
@@ -643,6 +673,5 @@ export default function GroupLitigationInfo() {
           </Alert>
         </div>
       </Layout>
-    </ProtectedRoute>
   );
 }

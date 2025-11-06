@@ -1,13 +1,10 @@
-import {
-  Body,
-  Container,
-  Head,
-  Html,
-  Img,
-  Hr,
-  Text,
-  Link,
-} from 'https://esm.sh/@react-email/components@0.0.22';
+import { Body } from 'https://esm.sh/@react-email/body@0.0.7';
+import { Container } from 'https://esm.sh/@react-email/container@0.0.11';
+import { Head } from 'https://esm.sh/@react-email/head@0.0.8';
+import { Html } from 'https://esm.sh/@react-email/html@0.0.7';
+import { Hr } from 'https://esm.sh/@react-email/hr@0.0.7';
+import { Text } from 'https://esm.sh/@react-email/text@0.0.7';
+import { Link } from 'https://esm.sh/@react-email/link@0.0.7';
 import * as React from 'https://esm.sh/react@18.3.1';
 
 interface EmailLayoutProps {

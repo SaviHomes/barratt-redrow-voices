@@ -1,4 +1,5 @@
-import { Heading, Text } from 'https://esm.sh/@react-email/components@0.0.22';
+import { Heading } from 'https://esm.sh/@react-email/heading@0.0.11';
+import { Text } from 'https://esm.sh/@react-email/text@0.0.7';
 import * as React from 'https://esm.sh/react@18.3.1';
 import { EmailLayout } from './layout.tsx';
 

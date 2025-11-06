@@ -211,6 +211,12 @@ export default function AdminDashboard() {
     <Layout>
       <div className="min-h-screen bg-background py-8">
         <div className="max-w-7xl mx-auto px-4">
+          <div className="mb-6">
+            <Button onClick={() => navigate('/')} variant="default">
+              Back to Home
+            </Button>
+          </div>
+
           <div className="mb-8">
             <h1 className="text-3xl font-bold">Admin Dashboard</h1>
             <p className="text-muted-foreground">Visitor analytics and site management</p>
@@ -411,11 +417,6 @@ export default function AdminDashboard() {
             </DialogContent>
           </Dialog>
 
-          <div className="mt-8">
-            <Button onClick={() => navigate('/')} variant="outline">
-              Back to Home
-            </Button>
-          </div>
         </div>
       </div>
     </Layout>

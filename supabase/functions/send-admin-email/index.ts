@@ -39,7 +39,8 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const supabaseClient = createClient(
+    // Create auth client with ANON key to verify user and check role
+    const authClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_ANON_KEY") ?? "",
       {
@@ -52,14 +53,14 @@ const handler = async (req: Request): Promise<Response> => {
     // Verify user is authenticated
     const {
       data: { user },
-    } = await supabaseClient.auth.getUser();
+    } = await authClient.auth.getUser();
 
     if (!user) {
       throw new Error("Unauthorized");
     }
 
     // Check if user is admin using the has_role function
-    const { data: isAdmin, error: roleError } = await supabaseClient
+    const { data: isAdmin, error: roleError } = await authClient
       .rpc("has_role", { _user_id: user.id, _role: "admin" });
 
     if (roleError || !isAdmin) {
@@ -67,14 +68,20 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("Admin access required");
     }
 
+    // Create admin client with SERVICE_ROLE key for database operations
+    const adminClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
+
     const { templateId, template, recipients, subject, customData = {} }: AdminEmailRequest = await req.json();
 
     let html: string;
     let finalSubject: string;
 
     if (templateId) {
-      // Fetch template from database
-      const { data: templateData, error: templateError } = await supabaseClient
+      // Fetch template from database using admin client
+      const { data: templateData, error: templateError } = await adminClient
         .from('email_templates')
         .select('*')
         .eq('id', templateId)
@@ -190,8 +197,8 @@ const handler = async (req: Request): Promise<Response> => {
     const successCount = results.filter(r => r.success).length;
     const failedCount = results.filter(r => !r.success).length;
 
-    // Log the email send in database
-    await supabaseClient.from("email_logs").insert({
+    // Log the email send in database using admin client
+    await adminClient.from("email_logs").insert({
       template_type: templateId ? 'custom_template' : template || 'unknown',
       subject: finalSubject,
       recipients: recipients,

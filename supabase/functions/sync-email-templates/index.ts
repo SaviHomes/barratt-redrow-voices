@@ -95,9 +95,10 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error('Unauthorized');
     }
 
-    const supabaseClient = createClient(
+    // Create auth client with ANON key to verify user and check role
+    const authClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       {
         global: {
           headers: { Authorization: authHeader },
@@ -109,20 +110,26 @@ const handler = async (req: Request): Promise<Response> => {
     const {
       data: { user },
       error: userError,
-    } = await supabaseClient.auth.getUser();
+    } = await authClient.auth.getUser();
 
     if (userError || !user) {
       throw new Error('Unauthorized');
     }
 
     // Verify user is admin using the has_role function
-    const { data: isAdmin, error: roleError } = await supabaseClient
+    const { data: isAdmin, error: roleError } = await authClient
       .rpc('has_role', { _user_id: user.id, _role: 'admin' });
 
     if (roleError || !isAdmin) {
       console.error('Admin check failed:', roleError);
       throw new Error('Forbidden: Admin access required');
     }
+
+    // Create admin client with SERVICE_ROLE key for database operations
+    const adminClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
 
     console.log('Starting email template sync...');
 
@@ -140,8 +147,8 @@ const handler = async (req: Request): Promise<Response> => {
 
         console.log(`Rendered HTML for ${template.name}, length: ${html.length}`);
 
-        // Update the database record
-        const { error: updateError } = await supabaseClient
+        // Update the database record using admin client
+        const { error: updateError } = await adminClient
           .from('email_templates')
           .update({
             html_content: html,

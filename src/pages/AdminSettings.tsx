@@ -15,12 +15,13 @@ export default function AdminSettings() {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { developmentsEnabled, isLoading: settingsLoading, refetch } = useSiteSettings();
+  const { developmentsEnabled, customerExperiencesEnabled, isLoading: settingsLoading, refetch } = useSiteSettings();
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState({
     developmentsPageEnabled: false,
+    customerExperiencesEnabled: false,
   });
 
   useEffect(() => {
@@ -31,9 +32,10 @@ export default function AdminSettings() {
     if (!settingsLoading) {
       setSettings({
         developmentsPageEnabled: developmentsEnabled,
+        customerExperiencesEnabled: customerExperiencesEnabled,
       });
     }
-  }, [developmentsEnabled, settingsLoading]);
+  }, [developmentsEnabled, customerExperiencesEnabled, settingsLoading]);
 
   const checkAdminStatus = async () => {
     if (!user) {
@@ -79,7 +81,8 @@ export default function AdminSettings() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const { error } = await supabase
+      // Update developments page setting
+      const { error: devError } = await supabase
         .from('site_settings')
         .update({
           value: settings.developmentsPageEnabled,
@@ -88,7 +91,19 @@ export default function AdminSettings() {
         })
         .eq('key', 'developments_page_enabled');
 
-      if (error) throw error;
+      if (devError) throw devError;
+
+      // Update customer experiences setting
+      const { error: custError } = await supabase
+        .from('site_settings')
+        .update({
+          value: settings.customerExperiencesEnabled,
+          updated_by: user?.id,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('key', 'customer_experiences_enabled');
+
+      if (custError) throw custError;
 
       await refetch();
 
@@ -169,6 +184,25 @@ export default function AdminSettings() {
                   checked={settings.developmentsPageEnabled}
                   onCheckedChange={(checked) => 
                     setSettings(prev => ({ ...prev, developmentsPageEnabled: checked }))
+                  }
+                />
+              </div>
+
+              <div className="flex items-center justify-between space-x-4 pt-6 border-t">
+                <div className="flex-1">
+                  <Label htmlFor="customer-experiences" className="text-base font-medium">
+                    Customer Experiences by Development Section
+                  </Label>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    When enabled, the "Customer Experiences by Development" section will be visible on the homepage.
+                    When disabled, the section will be hidden from all users.
+                  </p>
+                </div>
+                <Switch
+                  id="customer-experiences"
+                  checked={settings.customerExperiencesEnabled}
+                  onCheckedChange={(checked) => 
+                    setSettings(prev => ({ ...prev, customerExperiencesEnabled: checked }))
                   }
                 />
               </div>

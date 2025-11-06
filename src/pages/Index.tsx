@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useVisitorTracking } from "@/hooks/useVisitorTracking";
 import SEOContent from "@/components/SEOContent";
 import Layout from "@/components/Layout";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 import DevelopmentFilter from "@/components/DevelopmentFilter";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,6 +24,7 @@ interface FAQ {
 const Index = () => {
   const { user } = useAuth();
   const [faqs, setFaqs] = useState<FAQ[]>([]);
+  const { customerExperiencesEnabled } = useSiteSettings();
   
   // Track visitor analytics
   useVisitorTracking();
@@ -484,7 +486,7 @@ const Index = () => {
       </section>
 
       {/* Development Filter Section */}
-      <DevelopmentFilter />
+      {customerExperiencesEnabled && <DevelopmentFilter />}
 
       {/* FAQ Section */}
       <section id="faq" className="py-20 bg-muted/30">

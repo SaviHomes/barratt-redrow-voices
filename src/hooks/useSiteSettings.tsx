@@ -33,6 +33,7 @@ export function useSiteSettings() {
 
   return {
     developmentsEnabled: data?.developments_page_enabled === true,
+    customerExperiencesEnabled: data?.customer_experiences_enabled === true,
     settings: data,
     isLoading,
     refetch,

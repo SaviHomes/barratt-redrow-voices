@@ -125,6 +125,15 @@ export default function MobileNavigation() {
             >
               Contact
             </a>
+            {user && (
+              <a 
+                href="/user-dashboard" 
+                className="text-foreground hover:text-primary transition-colors py-2 text-lg"
+                onClick={closeMenu}
+              >
+                Dashboard
+              </a>
+            )}
             
             {/* Authentication Section */}
             <div className="border-t border-border pt-4 mt-6">

@@ -1,12 +1,15 @@
 import { Shield } from "lucide-react";
 import AuthNavigation from "@/components/AuthNavigation";
 import MobileNavigation from "@/components/MobileNavigation";
+import { useAuth } from "@/hooks/useAuth";
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
 export default function Layout({ children }: LayoutProps) {
+  const { user } = useAuth();
+  
   return (
     <div className="min-h-screen bg-background">
       {/* Development Notice */}
@@ -77,6 +80,14 @@ export default function Layout({ children }: LayoutProps) {
               >
                 Contact
               </a>
+              {user && (
+                <a 
+                  href="/user-dashboard" 
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                >
+                  Dashboard
+                </a>
+              )}
             </nav>
 
             <div className="flex items-center space-x-4">

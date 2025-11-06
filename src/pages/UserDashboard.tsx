@@ -174,9 +174,12 @@ export default function UserDashboard() {
                   </Link>
                 </Button>
                 <Button asChild variant="outline" className="h-auto py-4">
-                  <Link to="/submit-claim" className="flex flex-col items-center gap-2">
+                  <Link to="/group-litigation-info" className="flex flex-col items-center gap-2">
                     <FileText className="h-6 w-6" />
-                    <span>Submit Claim</span>
+                    <div className="flex flex-col items-center">
+                      <span>Submit Claim</span>
+                      <Badge variant="secondary" className="mt-1 text-xs">Coming Soon</Badge>
+                    </div>
                   </Link>
                 </Button>
                 <Button asChild variant="outline" className="h-auto py-4">
@@ -240,9 +243,12 @@ export default function UserDashboard() {
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle>Recent Claims</CardTitle>
+                  <div className="flex items-center gap-2">
+                    <CardTitle>Recent Claims</CardTitle>
+                    <Badge variant="secondary" className="text-xs">Coming Soon</Badge>
+                  </div>
                   <Button asChild variant="ghost" size="sm">
-                    <Link to="/my-claims">View All</Link>
+                    <Link to="/group-litigation-info">View All</Link>
                   </Button>
                 </div>
               </CardHeader>
@@ -252,7 +258,7 @@ export default function UserDashboard() {
                     <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
                     <p>No claims submitted yet</p>
                     <Button asChild variant="link" className="mt-2">
-                      <Link to="/submit-claim">Submit your first claim</Link>
+                      <Link to="/group-litigation-info">Learn about Group Litigation</Link>
                     </Button>
                   </div>
                 ) : (

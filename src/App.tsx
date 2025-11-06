@@ -21,6 +21,7 @@ import UserDashboard from "./pages/UserDashboard";
 import MyEvidence from "./pages/MyEvidence";
 import MyClaims from "./pages/MyClaims";
 import MyProfile from "./pages/MyProfile";
+import GroupLitigationInfo from "./pages/GroupLitigationInfo";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/submit-claim" element={<SubmitClaim />} />
+            <Route path="/group-litigation-info" element={<GroupLitigationInfo />} />
             <Route path="/redrow-defects" element={<RedrowDefects />} />
             <Route path="/redrow-complaints" element={<RedrowComplaints />} />
             <Route path="/complaints-database" element={<ComplaintsDatabase />} />

@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,12 +8,43 @@ import { useVisitorTracking } from "@/hooks/useVisitorTracking";
 import SEOContent from "@/components/SEOContent";
 import Layout from "@/components/Layout";
 import DevelopmentFilter from "@/components/DevelopmentFilter";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { supabase } from "@/integrations/supabase/client";
+
+interface FAQ {
+  id: string;
+  question: string;
+  answer: string;
+  category: string;
+  order_index: number;
+  is_published: boolean;
+}
 
 const Index = () => {
   const { user } = useAuth();
+  const [faqs, setFaqs] = useState<FAQ[]>([]);
   
   // Track visitor analytics
   useVisitorTracking();
+
+  useEffect(() => {
+    fetchFAQs();
+  }, []);
+
+  const fetchFAQs = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('faqs')
+        .select('*')
+        .eq('is_published', true)
+        .order('order_index', { ascending: true });
+      
+      if (error) throw error;
+      setFaqs(data || []);
+    } catch (error) {
+      console.error('Error fetching FAQs:', error);
+    }
+  };
 
   return (
     <>
@@ -514,73 +546,28 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="max-w-4xl mx-auto space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>What types of Redrow property defects are common?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Common Redrow defects include structural issues, water damage, electrical problems, heating/insulation issues, roof leaks, and poor build quality finishing. Our platform documents hundreds of real cases across different developments.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Can I claim compensation for Redrow property defects?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Yes, you may be entitled to compensation for repair costs, temporary accommodation, legal fees, and inconvenience caused by Redrow property defects. Our platform helps you document your case and submit formal claims.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>How do I submit a complaint about Redrow build quality?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  You can submit a formal complaint through our platform, contact Redrow customer care directly, or escalate to the Housing Ombudsman if necessary. We provide guidance on the most effective approach for your situation.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Is this platform officially affiliated with Redrow?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  No, this is an independent platform created by and for homeowners to share experiences and seek accountability. We are not affiliated with Redrow or Barratt Developments in any way.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>How can I upload evidence of property defects?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Use our secure upload system to share photos, documents, and detailed descriptions of property issues. All evidence is stored securely and can be used to support your claims and help other homeowners identify similar problems.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>What should I do if Redrow won't respond to my complaint?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  If Redrow doesn't respond adequately, you can escalate to the Housing Ombudsman, contact local trading standards, or consider legal action. Our platform provides resources and connects you with others who have faced similar issues.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
+          <Accordion type="multiple" className="max-w-4xl mx-auto space-y-4">
+            {faqs.length > 0 ? (
+              faqs.map((faq) => (
+                <AccordionItem 
+                  key={faq.id} 
+                  value={faq.id}
+                  className="border rounded-lg px-6 bg-card"
+                >
+                  <AccordionTrigger className="text-left hover:no-underline py-6">
+                    <span className="text-lg font-semibold">{faq.question}</span>
+                  </AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground pb-6">
+                    {faq.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                No FAQs available at this time.
+              </div>
+            )}
+          </Accordion>
         </div>
       </section>
 

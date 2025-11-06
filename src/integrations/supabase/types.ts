@@ -176,6 +176,39 @@ export type Database = {
         }
         Relationships: []
       }
+      faqs: {
+        Row: {
+          answer: string
+          category: string
+          created_at: string | null
+          id: string
+          is_published: boolean
+          order_index: number
+          question: string
+          updated_at: string | null
+        }
+        Insert: {
+          answer: string
+          category?: string
+          created_at?: string | null
+          id?: string
+          is_published?: boolean
+          order_index?: number
+          question: string
+          updated_at?: string | null
+        }
+        Update: {
+          answer?: string
+          category?: string
+          created_at?: string | null
+          id?: string
+          is_published?: boolean
+          order_index?: number
+          question?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       glo_interest: {
         Row: {
           additional_comments: string | null

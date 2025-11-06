@@ -21,6 +21,7 @@ const registerSchema = z.object({
   firstName: z.string().min(1, "First name is required").max(50, "First name must be less than 50 characters"),
   lastName: z.string().min(1, "Last name is required").max(50, "Last name must be less than 50 characters"),
   propertyNumber: z.string().optional(),
+  developmentName: z.string().max(100, "Development name must be less than 100 characters").optional(),
   streetName: z.string().min(1, "Street/Road name is required").max(100, "Street name must be less than 100 characters"),
   townCity: z.string().min(1, "Town/City is required").max(50, "Town/City must be less than 50 characters"),
   county: z.string().min(1, "County is required").max(50, "County must be less than 50 characters"),
@@ -71,6 +72,7 @@ export default function Register() {
             first_name: data.firstName,
             last_name: data.lastName,
             property_number: data.propertyNumber || '',
+            development_name: data.developmentName || '',
             street_name: data.streetName,
             town_city: data.townCity,
             county: data.county,
@@ -179,6 +181,21 @@ export default function Register() {
                         </FormItem>
                       )}
                     />
+                    <FormField
+                      control={form.control}
+                      name="developmentName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Development Name</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="e.g., The Meadows, Riverside Park, etc." />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 gap-4">
                     <FormField
                       control={form.control}
                       name="streetName"

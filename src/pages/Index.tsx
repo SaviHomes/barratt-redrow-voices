@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useVisitorTracking } from "@/hooks/useVisitorTracking";
 import SEOContent from "@/components/SEOContent";
 import Layout from "@/components/Layout";
+import DevelopmentFilter from "@/components/DevelopmentFilter";
 
 const Index = () => {
   const { user } = useAuth();
@@ -398,6 +399,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Development Filter Section */}
+      <DevelopmentFilter />
 
       {/* FAQ Section */}
       <section id="faq" className="py-20 bg-muted/30">

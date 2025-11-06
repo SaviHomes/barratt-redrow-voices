@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, Users, Mail, Phone, MapPin, Home, MessageSquare } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import EditDevelopmentName from "@/components/EditDevelopmentName";
 
 interface UserProfile {
   id: string;
@@ -17,6 +18,7 @@ interface UserProfile {
   last_name: string;
   street_name: string;
   property_number: string | null;
+  development_name: string | null;
   town_city: string;
   county: string;
   postcode: string;
@@ -239,6 +241,27 @@ const UserManagement = () => {
                         </h3>
                         <div className="space-y-2">
                           <p className="text-sm">{formatAddress(user)}</p>
+                          <div className="flex items-center gap-2">
+                            {user.development_name ? (
+                              <>
+                                <p><span className="font-medium">Development:</span> {user.development_name}</p>
+                                <EditDevelopmentName 
+                                  userId={user.user_id} 
+                                  currentName={user.development_name} 
+                                  onUpdate={fetchUsers} 
+                                />
+                              </>
+                            ) : (
+                              <>
+                                <p className="text-muted-foreground">No development name set</p>
+                                <EditDevelopmentName 
+                                  userId={user.user_id} 
+                                  currentName={null} 
+                                  onUpdate={fetchUsers} 
+                                />
+                              </>
+                            )}
+                          </div>
                           {user.build_style && (
                             <p><span className="font-medium">Build Style:</span> {user.build_style}</p>
                           )}

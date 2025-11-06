@@ -141,6 +141,7 @@ export type Database = {
           county: string
           created_at: string
           decision_influenced: boolean | null
+          development_name: string | null
           first_name: string
           home_tel: string | null
           id: string
@@ -162,6 +163,7 @@ export type Database = {
           county: string
           created_at?: string
           decision_influenced?: boolean | null
+          development_name?: string | null
           first_name: string
           home_tel?: string | null
           id?: string
@@ -183,6 +185,7 @@ export type Database = {
           county?: string
           created_at?: string
           decision_influenced?: boolean | null
+          development_name?: string | null
           first_name?: string
           home_tel?: string | null
           id?: string

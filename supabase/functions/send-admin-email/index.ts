@@ -58,15 +58,12 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("Unauthorized");
     }
 
-    // Check if user is admin
-    const { data: roleData } = await supabaseClient
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user.id)
-      .eq("role", "admin")
-      .single();
+    // Check if user is admin using the has_role function
+    const { data: isAdmin, error: roleError } = await supabaseClient
+      .rpc("has_role", { _user_id: user.id, _role: "admin" });
 
-    if (!roleData) {
+    if (roleError || !isAdmin) {
+      console.error("Admin check failed:", roleError);
       throw new Error("Admin access required");
     }
 

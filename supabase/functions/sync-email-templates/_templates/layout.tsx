@@ -78,7 +78,7 @@ const container = {
 
 const header = {
   padding: '32px 24px',
-  backgroundColor: '#1e3a8a',
+  backgroundColor: '#0f3f7a',
   borderRadius: '8px 8px 0 0',
 };
 
@@ -108,7 +108,7 @@ const footerText = {
 };
 
 const footerLink = {
-  color: '#0891b2',
+  color: '#0f3f7a',
   textDecoration: 'none',
 };
 

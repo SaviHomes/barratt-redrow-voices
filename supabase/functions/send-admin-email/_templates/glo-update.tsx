@@ -46,7 +46,7 @@ const content = {
 
 const badge = {
   display: 'inline-block',
-  backgroundColor: '#7c3aed',
+  backgroundColor: '#0f3f7a',
   color: '#ffffff',
   fontSize: '12px',
   fontWeight: 'bold',

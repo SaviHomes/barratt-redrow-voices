@@ -216,141 +216,55 @@ export default function AdminDashboard() {
             <p className="text-muted-foreground">Visitor analytics and site management</p>
           </div>
 
+          {/* Overview Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate("/admin/users")}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">User Management</CardTitle>
+                <Users className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">Manage</div>
+                <p className="text-xs text-muted-foreground mt-1">View all users</p>
+              </CardContent>
+            </Card>
+
+            <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate("/admin/faqs")}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">FAQ Management</CardTitle>
+                <HelpCircle className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">Manage</div>
+                <p className="text-xs text-muted-foreground mt-1">Edit FAQ content</p>
+              </CardContent>
+            </Card>
+
+            <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate("/admin/visitor-statistics")}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Website Visitor Statistics</CardTitle>
+                <Globe className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">View</div>
+                <p className="text-xs text-muted-foreground mt-1">Visitor analytics</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">GLO Interest</CardTitle>
+                <Scale className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{gloRegistrations.length}</div>
+                <p className="text-xs text-muted-foreground mt-1">Registrations</p>
+              </CardContent>
+            </Card>
+          </div>
+
           {analytics && (
             <>
-              {/* Overview Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-6 gap-6 mb-8">
-                <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate("/admin/users")}>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">User Management</CardTitle>
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">Manage</div>
-                    <p className="text-xs text-muted-foreground mt-1">View all users</p>
-                  </CardContent>
-                </Card>
-
-                <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate("/admin/faqs")}>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">FAQ Management</CardTitle>
-                    <HelpCircle className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">Manage</div>
-                    <p className="text-xs text-muted-foreground mt-1">Edit FAQ content</p>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Visitors</CardTitle>
-                    <Globe className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{analytics.totalVisitors}</div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Countries</CardTitle>
-                    <MapPin className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{analytics.uniqueCountries}</div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Top Country</CardTitle>
-                    <Clock className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">
-                      {analytics.topCountries[0]?.country || 'N/A'}
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      {analytics.topCountries[0]?.count || 0} visitors
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">GLO Interest</CardTitle>
-                    <Scale className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{gloRegistrations.length}</div>
-                    <p className="text-xs text-muted-foreground mt-1">Registrations</p>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Top Countries */}
-              <Card className="mb-8">
-                <CardHeader>
-                  <CardTitle>Top Countries</CardTitle>
-                  <CardDescription>Visitor distribution by country</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    {analytics.topCountries.map((country, index) => (
-                      <div key={country.country} className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <Badge variant="outline">{index + 1}</Badge>
-                          <span>{country.country}</span>
-                        </div>
-                        <span className="font-medium">{country.count} visitors</span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Recent Visitors Table */}
-              <Card className="mb-8">
-                <CardHeader>
-                  <CardTitle>Recent Visitors</CardTitle>
-                  <CardDescription>Latest visitor activity with IP addresses and locations</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>IP Address</TableHead>
-                        <TableHead>Location</TableHead>
-                        <TableHead>Page</TableHead>
-                        <TableHead>Referrer</TableHead>
-                        <TableHead>Visit Time</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {analytics.recentVisitors.map((visitor) => (
-                        <TableRow key={visitor.id}>
-                          <TableCell className="font-mono text-sm">
-                            {String(visitor.ip_address)}
-                          </TableCell>
-                          <TableCell>
-                            {getLocationString(visitor)}
-                          </TableCell>
-                          <TableCell>
-                            {visitor.page_path || '/'}
-                          </TableCell>
-                          <TableCell className="max-w-xs truncate">
-                            {visitor.referrer || 'Direct'}
-                          </TableCell>
-                          <TableCell>
-                            {formatDate(visitor.visited_at)}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
 
               {/* GLO Interest Registrations */}
               <Card>

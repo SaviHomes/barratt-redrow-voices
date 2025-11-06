@@ -144,6 +144,54 @@ const Index = () => {
       </div>
     </section>
 
+    {/* GLO Promotional Banner */}
+    <section className="py-16 bg-gradient-to-r from-blue-600/10 via-indigo-600/10 to-purple-600/10 dark:from-blue-500/20 dark:via-indigo-500/20 dark:to-purple-500/20 border-y-2 border-primary/30">
+      <div className="container mx-auto px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary to-indigo-600 rounded-2xl mb-6 shadow-lg">
+            <Scale className="h-10 w-10 text-white" />
+          </div>
+          
+          <Badge variant="secondary" className="mb-4 text-base px-4 py-1.5">
+            🎯 New Legal Initiative
+          </Badge>
+          
+          <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-6 leading-tight">
+            Join the Group Litigation Order Initiative
+          </h2>
+          
+          <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
+            Strength in numbers. We're exploring collective legal action to help Redrow homeowners pursue 
+            claims together. Lower costs, expert legal support, and a stronger voice for justice.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Button size="lg" className="px-10 py-7 text-lg bg-gradient-to-r from-primary to-indigo-600 hover:from-primary/90 hover:to-indigo-600/90 shadow-lg" asChild>
+              <a href="/group-litigation-info" className="flex items-center gap-2">
+                Learn About Group Litigation
+                <ArrowRight className="h-5 w-5" />
+              </a>
+            </Button>
+          </div>
+          
+          <div className="mt-8 flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4 text-primary" />
+              <span>Community-driven</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Scale className="h-4 w-4 text-primary" />
+              <span>Legal expertise</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Shield className="h-4 w-4 text-primary" />
+              <span>Shared resources</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     {/* Issues Alert */}
       <section className="py-12 bg-primary/10 border-y border-primary/20">
         <div className="container mx-auto px-6">

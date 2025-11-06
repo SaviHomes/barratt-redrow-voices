@@ -13,6 +13,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { toast } from "sonner";
 import { Mail, Send, ArrowLeft, Users, Clock } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TemplateList } from "@/components/admin/TemplateList";
+import { TemplateEditor } from "@/components/admin/TemplateEditor";
+import { TemplatePreview } from "@/components/admin/TemplatePreview";
+import { TriggerList } from "@/components/admin/TriggerList";
+import { TriggerEditor } from "@/components/admin/TriggerEditor";
 
 interface EmailLog {
   id: string;
@@ -30,6 +35,15 @@ export default function AdminEmailManagement() {
   const [loading, setLoading] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
   const [emailLogs, setEmailLogs] = useState<EmailLog[]>([]);
+  
+  // Template and trigger management state
+  const [templates, setTemplates] = useState<any[]>([]);
+  const [triggers, setTriggers] = useState<any[]>([]);
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [editingTemplate, setEditingTemplate] = useState<any>(null);
+  const [previewTemplate, setPreviewTemplate] = useState<any>(null);
+  const [triggerEditorOpen, setTriggerEditorOpen] = useState(false);
+  const [editingTrigger, setEditingTrigger] = useState<any>(null);
   
   // Form state
   const [template, setTemplate] = useState<string>("newsletter");
@@ -433,9 +447,9 @@ export default function AdminEmailManagement() {
                 toast.success("Template deleted");
                 fetchTemplates();
               }}
-              onDuplicate={async (t) => {
-                const { name, id, created_at, updated_at, ...rest } = t;
-                await supabase.from('email_templates').insert({ ...rest, name: `${name}-copy`, display_name: `${rest.display_name} (Copy)` });
+              onDuplicate={async (t: any) => {
+                const { name, id, created_at, updated_at, created_by, ...rest } = t;
+                await supabase.from('email_templates').insert({ ...rest, name: `${name}-copy`, display_name: `${rest.display_name} (Copy)`, is_system: false });
                 toast.success("Template duplicated");
                 fetchTemplates();
               }}
@@ -497,10 +511,12 @@ export default function AdminEmailManagement() {
         templates={templates}
         onSave={async (data) => {
           if (editingTrigger) {
-            await supabase.from('email_triggers').update(data).eq('id', editingTrigger.id);
+            const { error } = await supabase.from('email_triggers').update(data as any).eq('id', editingTrigger.id);
+            if (error) throw error;
             toast.success("Trigger updated");
           } else {
-            await supabase.from('email_triggers').insert(data);
+            const { error } = await supabase.from('email_triggers').insert(data as any);
+            if (error) throw error;
             toast.success("Trigger created");
           }
           setTriggerEditorOpen(false);

@@ -1,5 +1,8 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@3.2.0";
+import React from 'https://esm.sh/react@18.3.1';
+import { renderAsync } from 'https://esm.sh/@react-email/components@0.0.22';
+import { ContactAdminNotification } from './_templates/contact-admin-notification.tsx';
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -61,52 +64,55 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`[${crypto.randomUUID()}] Sending contact form email from: ${email}`);
 
-    // Send email using Resend
-    const emailResponse = await resend.emails.send({
-      from: "Redrow Exposed Contact Form <onboarding@resend.dev>",
-      to: ["contact@redrowexposed.co.uk"],
-      reply_to: email,
-      subject: `Contact Form: ${subject}`,
+    // Send confirmation email to user
+    const userEmailResponse = await resend.emails.send({
+      from: "Redrow Exposed <onboarding@resend.dev>",
+      to: [email],
+      subject: "We received your message!",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
           <div style="background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-            <h2 style="color: #333; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
-              New Contact Form Submission
-            </h2>
-            
-            <div style="margin-bottom: 20px;">
-              <h3 style="color: #555; margin-bottom: 5px;">Contact Information</h3>
-              <p style="margin: 5px 0;"><strong>Name:</strong> ${name}</p>
-              <p style="margin: 5px 0;"><strong>Email:</strong> <a href="mailto:${email}" style="color: #3b82f6;">${email}</a></p>
-              <p style="margin: 5px 0;"><strong>Subject:</strong> ${subject}</p>
-            </div>
-            
-            <div style="margin-bottom: 20px;">
-              <h3 style="color: #555; margin-bottom: 10px;">Message</h3>
-              <div style="background-color: #f8f9fa; padding: 15px; border-radius: 4px; border-left: 4px solid #3b82f6;">
-                <p style="margin: 0; white-space: pre-wrap; line-height: 1.6;">${message}</p>
-              </div>
-            </div>
-            
-            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #666;">
-              <p style="margin: 0;">This email was sent from the Redrow Exposed contact form on ${new Date().toLocaleString('en-GB', { 
-                timeZone: 'Europe/London',
-                dateStyle: 'full',
-                timeStyle: 'short'
-              })}.</p>
-            </div>
+            <h2 style="color: #333; margin-bottom: 20px;">Thank you for contacting us, ${name}!</h2>
+            <p style="margin: 15px 0; line-height: 1.6;">We have received your message and will get back to you as soon as possible.</p>
+            <p style="margin: 15px 0; line-height: 1.6;">Best regards,<br>The Redrow Exposed Team</p>
           </div>
         </div>
       `,
     });
 
-    console.log("Contact form email sent successfully:", emailResponse);
+    console.log("User confirmation email sent successfully:", userEmailResponse);
+
+    // Send notification email to admin
+    const adminEmailHtml = await renderAsync(
+      React.createElement(ContactAdminNotification, {
+        userName: name,
+        userEmail: email,
+        subject: subject,
+        message: message,
+        submittedAt: new Date().toLocaleString('en-GB', {
+          dateStyle: 'medium',
+          timeStyle: 'short',
+          timeZone: 'Europe/London'
+        })
+      })
+    );
+
+    const adminEmailResponse = await resend.emails.send({
+      from: "Redrow Exposed Contact Form <onboarding@resend.dev>",
+      to: ["contact@redrowexposed.co.uk"],
+      reply_to: email,
+      subject: `New Contact Form: ${subject}`,
+      html: adminEmailHtml,
+    });
+
+    console.log("Admin notification email sent successfully:", adminEmailResponse);
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: "Email sent successfully",
-        id: emailResponse.data?.id 
+        message: "Emails sent successfully",
+        userEmailId: userEmailResponse.data?.id,
+        adminEmailId: adminEmailResponse.data?.id 
       }),
       {
         status: 200,

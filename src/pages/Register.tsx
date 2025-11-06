@@ -33,6 +33,7 @@ const registerSchema = z.object({
   confirmPassword: z.string(),
   buildStyle: z.string().optional(),
   adviceToOthers: z.string().optional(),
+  gloUpdatesConsent: z.boolean().default(false),
   nhbcContact: z.enum(["yes", "no", "not-answered"], {
     required_error: "Please select an option"
   }),
@@ -57,6 +58,7 @@ export default function Register() {
     resolver: zodResolver(registerSchema),
     defaultValues: {
       whatsappConsent: false,
+      gloUpdatesConsent: false,
       nhbcContact: "not-answered",
       socialMediaConsent: "not-answered",
       decisionInfluenced: "not-answered"
@@ -66,6 +68,7 @@ export default function Register() {
     setIsLoading(true);
     try {
       const {
+        data: authData,
         error
       } = await supabase.auth.signUp({
         email: data.email,
@@ -88,7 +91,8 @@ export default function Register() {
             advice_to_others: data.adviceToOthers || '',
             nhbc_contact: data.nhbcContact === "yes",
             social_media_consent: data.socialMediaConsent === "yes",
-            decision_influenced: data.decisionInfluenced === "yes"
+            decision_influenced: data.decisionInfluenced === "yes",
+            glo_updates_consent: data.gloUpdatesConsent
           }
         }
       });
@@ -100,6 +104,29 @@ export default function Register() {
         });
         return;
       }
+
+      // If user consented to GLO updates, create glo_interest record
+      if (data.gloUpdatesConsent && authData.user) {
+        const { error: gloError } = await supabase
+          .from('glo_interest')
+          .insert({
+            user_id: authData.user.id,
+            first_name: data.firstName,
+            last_name: data.lastName,
+            email: data.email,
+            phone: data.mobileTel || data.homeTel || null,
+            development_name: data.developmentName || null,
+            property_address: `${data.propertyNumber || ''} ${data.streetName}, ${data.townCity}, ${data.county}, ${data.postcode}`.trim(),
+            contact_consent: true,
+            additional_comments: `Registered interest during account creation on ${new Date().toLocaleDateString()}`
+          });
+
+        if (gloError) {
+          console.error('Error creating GLO interest record:', gloError);
+          // Don't block registration if this fails
+        }
+      }
+
       toast({
         title: "Registration Successful!",
         description: "Welcome! You can now access all features."
@@ -253,6 +280,16 @@ export default function Register() {
                         </FormControl>
                         <FormLabel className="text-sm">
                           I would like to join the WhatsApp group for updates and discussions
+                        </FormLabel>
+                      </FormItem>} />
+                  <FormField control={form.control} name="gloUpdatesConsent" render={({
+                    field
+                  }) => <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                        <FormControl>
+                          <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                        </FormControl>
+                        <FormLabel className="text-sm">
+                          I want to be kept informed about updates and developments regarding Group Litigation Orders (GLOs)
                         </FormLabel>
                       </FormItem>} />
                   <FormField control={form.control} name="email" render={({

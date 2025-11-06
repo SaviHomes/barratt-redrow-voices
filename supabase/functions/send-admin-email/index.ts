@@ -9,6 +9,7 @@ import { EvidenceRejectedEmail } from "./_templates/evidence-rejected.tsx";
 import { NewsletterEmail } from "./_templates/newsletter.tsx";
 import { GloUpdateEmail } from "./_templates/glo-update.tsx";
 import { CustomEmail } from "./_templates/custom.tsx";
+import { ContactAdminNotification } from "./_templates/contact-admin-notification.tsx";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -20,7 +21,7 @@ const corsHeaders = {
 
 interface AdminEmailRequest {
   templateId?: string; // Use custom template from DB
-  template?: 'welcome' | 'evidence-approved' | 'evidence-rejected' | 'newsletter' | 'glo-update' | 'custom'; // Legacy
+  template?: 'welcome' | 'evidence-approved' | 'evidence-rejected' | 'newsletter' | 'glo-update' | 'custom' | 'contact-admin-notification'; // Legacy
   recipients: string[];
   subject?: string; // Optional override
   customData?: Record<string, any>; // Variables to replace
@@ -167,6 +168,18 @@ const handler = async (req: Request): Promise<Response> => {
               ctaUrl: customData.ctaUrl,
             })
           );
+          break;
+        case 'contact-admin-notification':
+          html = await renderAsync(
+            React.createElement(ContactAdminNotification, {
+              userName: customData.userName || 'User',
+              userEmail: customData.userEmail || 'user@example.com',
+              subject: customData.subject || 'Contact Form Submission',
+              message: customData.message || '',
+              submittedAt: customData.submittedAt || new Date().toLocaleString()
+            })
+          );
+          finalSubject = subject || 'New Contact Form Submission';
           break;
         default:
           throw new Error(`Unknown template: ${template}`);

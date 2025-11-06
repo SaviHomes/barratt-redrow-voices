@@ -10,6 +10,7 @@ import { EvidenceRejectedEmail } from './_templates/evidence-rejected.tsx';
 import { NewsletterEmail } from './_templates/newsletter.tsx';
 import { GloUpdateEmail } from './_templates/glo-update.tsx';
 import { CustomEmail } from './_templates/custom.tsx';
+import { ContactAdminNotification } from './_templates/contact-admin-notification.tsx';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -78,6 +79,17 @@ const templates: TemplateConfig[] = [
       body: '<p>This is a custom email message with important information for you.</p>',
       ctaText: 'Learn More',
       ctaUrl: 'https://example.com'
+    }
+  },
+  {
+    name: 'contact-admin-notification',
+    component: ContactAdminNotification,
+    previewData: {
+      userName: 'John Smith',
+      userEmail: 'john.smith@example.com',
+      subject: 'Question about my claim',
+      message: 'I would like to know more about the process for submitting evidence. I have several photos of defects in my property that I would like to share with the group.',
+      submittedAt: '15 Nov 2025, 14:30'
     }
   }
 ];

@@ -144,7 +144,7 @@ export default function AdminSettings() {
     <Layout>
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <Button onClick={() => navigate('/admin')} variant="ghost">
+          <Button onClick={() => navigate('/admin')} variant="default">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Admin Dashboard
           </Button>

@@ -5,12 +5,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Globe, Users, MapPin, Clock, Scale, HelpCircle } from "lucide-react";
+import { AlertTriangle, Globe, Users, MapPin, Clock, Scale, HelpCircle, ImageIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import EvidenceDetailDialog from "@/components/evidence/EvidenceDetailDialog";
+import { useEvidencePhotos, EvidenceWithPhotos } from "@/hooks/useEvidencePhotos";
 
 interface VisitorData {
   id: string;
@@ -50,6 +53,17 @@ interface GLORegistration {
   updated_at: string;
 }
 
+interface PendingEvidence {
+  id: string;
+  user_id: string;
+  title: string;
+  description: string | null;
+  category: string;
+  severity: string;
+  moderation_status: string;
+  created_at: string;
+}
+
 export default function AdminDashboard() {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -60,6 +74,12 @@ export default function AdminDashboard() {
   const [gloRegistrations, setGloRegistrations] = useState<GLORegistration[]>([]);
   const [selectedRegistration, setSelectedRegistration] = useState<GLORegistration | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [pendingEvidence, setPendingEvidence] = useState<PendingEvidence[]>([]);
+  const [previewEvidence, setPreviewEvidence] = useState<EvidenceWithPhotos | null>(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [rejectEvidenceId, setRejectEvidenceId] = useState<string | null>(null);
+  const [rejectionReason, setRejectionReason] = useState("");
 
   useEffect(() => {
     checkAdminStatus();
@@ -69,6 +89,7 @@ export default function AdminDashboard() {
     if (isAdmin) {
       fetchAnalytics();
       fetchGLORegistrations();
+      fetchPendingEvidence();
     }
   }, [isAdmin]);
 
@@ -192,6 +213,150 @@ export default function AdminDashboard() {
     setDetailsOpen(true);
   };
 
+  const fetchPendingEvidence = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('evidence')
+        .select('*')
+        .eq('moderation_status', 'pending')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setPendingEvidence(data || []);
+    } catch (error) {
+      console.error('Error fetching pending evidence:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch pending evidence.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const openPreview = async (evidence: PendingEvidence) => {
+    try {
+      // Fetch photos for this evidence
+      const { data: files, error } = await supabase.storage
+        .from('evidence-photos')
+        .list(`${evidence.user_id}/${evidence.id}`);
+
+      if (error) throw error;
+
+      const photos = await Promise.all(
+        (files || []).map(async (file) => {
+          const { data: { publicUrl } } = supabase.storage
+            .from('evidence-photos')
+            .getPublicUrl(`${evidence.user_id}/${evidence.id}/${file.name}`);
+
+          return {
+            name: file.name,
+            path: `${evidence.user_id}/${evidence.id}/${file.name}`,
+            url: publicUrl,
+            size: file.metadata?.size || 0,
+            created_at: file.created_at || new Date().toISOString(),
+          };
+        })
+      );
+
+      setPreviewEvidence({
+        ...evidence,
+        photos,
+      });
+      setPreviewOpen(true);
+    } catch (error) {
+      console.error('Error loading preview:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load evidence preview.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleApprove = async (evidenceId: string) => {
+    try {
+      const { error } = await supabase
+        .from('evidence')
+        .update({
+          moderation_status: 'approved',
+          is_public: true,
+          moderated_at: new Date().toISOString(),
+          moderated_by: user?.id,
+        })
+        .eq('id', evidenceId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Evidence approved",
+        description: "The evidence is now publicly visible.",
+      });
+
+      fetchPendingEvidence();
+    } catch (error) {
+      console.error('Error approving evidence:', error);
+      toast({
+        title: "Error",
+        description: "Failed to approve evidence.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const openRejectDialog = (evidenceId: string) => {
+    setRejectEvidenceId(evidenceId);
+    setRejectDialogOpen(true);
+  };
+
+  const confirmReject = async () => {
+    if (!rejectEvidenceId) return;
+
+    try {
+      const { error } = await supabase
+        .from('evidence')
+        .update({
+          moderation_status: 'rejected',
+          is_public: false,
+          moderated_at: new Date().toISOString(),
+          moderated_by: user?.id,
+          rejection_reason: rejectionReason.trim() || null,
+        })
+        .eq('id', rejectEvidenceId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Evidence declined",
+        description: "The submission has been marked as rejected.",
+      });
+
+      setRejectDialogOpen(false);
+      setRejectionReason('');
+      setRejectEvidenceId(null);
+      fetchPendingEvidence();
+    } catch (error) {
+      console.error('Error rejecting evidence:', error);
+      toast({
+        title: "Error",
+        description: "Failed to decline evidence.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const getSeverityVariant = (severity: string): "default" | "secondary" | "destructive" | "outline" => {
+    switch (severity.toLowerCase()) {
+      case 'critical':
+        return 'destructive';
+      case 'major':
+        return 'default';
+      case 'minor':
+        return 'secondary';
+      default:
+        return 'outline';
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -223,7 +388,7 @@ export default function AdminDashboard() {
           </div>
 
           {/* Overview Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
             <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate("/admin/users")}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">User Management</CardTitle>
@@ -267,7 +432,83 @@ export default function AdminDashboard() {
                 <p className="text-xs text-muted-foreground mt-1">Registrations</p>
               </CardContent>
             </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Pending Evidence</CardTitle>
+                <ImageIcon className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{pendingEvidence.length}</div>
+                <p className="text-xs text-muted-foreground mt-1">Awaiting review</p>
+              </CardContent>
+            </Card>
           </div>
+
+          {/* Pending Evidence Moderation */}
+          {pendingEvidence.length > 0 && (
+            <Card className="mb-8">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Pending Evidence Submissions</CardTitle>
+                    <CardDescription>Review and approve/decline user submissions</CardDescription>
+                  </div>
+                  <Badge variant="secondary">{pendingEvidence.length} Pending</Badge>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Title</TableHead>
+                      <TableHead>Category</TableHead>
+                      <TableHead>Severity</TableHead>
+                      <TableHead>Submitted By</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {pendingEvidence.map((evidence) => (
+                      <TableRow key={evidence.id}>
+                        <TableCell className="font-medium">{evidence.title}</TableCell>
+                        <TableCell><Badge variant="outline">{evidence.category}</Badge></TableCell>
+                        <TableCell><Badge variant={getSeverityVariant(evidence.severity)}>{evidence.severity}</Badge></TableCell>
+                        <TableCell>{evidence.user_id.substring(0, 8)}...</TableCell>
+                        <TableCell>{formatDate(evidence.created_at)}</TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => openPreview(evidence)}
+                            >
+                              Preview
+                            </Button>
+                            <Button 
+                              variant="default" 
+                              size="sm"
+                              onClick={() => handleApprove(evidence.id)}
+                            >
+                              Approve
+                            </Button>
+                            <Button 
+                              variant="destructive" 
+                              size="sm"
+                              onClick={() => openRejectDialog(evidence.id)}
+                            >
+                              Decline
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          )}
 
           {analytics && (
             <>
@@ -414,6 +655,43 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               )}
+            </DialogContent>
+          </Dialog>
+
+          {/* Evidence Preview Dialog */}
+          {previewEvidence && (
+            <EvidenceDetailDialog
+              evidence={previewEvidence}
+              open={previewOpen}
+              onOpenChange={setPreviewOpen}
+            />
+          )}
+
+          {/* Rejection Reason Dialog */}
+          <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Decline Evidence Submission</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <Label>Reason for declining (optional)</Label>
+                  <Textarea
+                    value={rejectionReason}
+                    onChange={(e) => setRejectionReason(e.target.value)}
+                    placeholder="Provide feedback to the user about why this submission was declined..."
+                    rows={4}
+                  />
+                </div>
+                <div className="flex justify-end gap-2">
+                  <Button variant="outline" onClick={() => setRejectDialogOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button variant="destructive" onClick={confirmReject}>
+                    Decline Submission
+                  </Button>
+                </div>
+              </div>
             </DialogContent>
           </Dialog>
 

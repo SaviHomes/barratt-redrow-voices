@@ -151,6 +151,12 @@ export type Database = {
           featured_image_index: number | null
           id: string
           is_public: boolean | null
+          moderated_at: string | null
+          moderated_by: string | null
+          moderation_status:
+            | Database["public"]["Enums"]["moderation_status"]
+            | null
+          rejection_reason: string | null
           severity: string
           title: string
           updated_at: string
@@ -164,6 +170,12 @@ export type Database = {
           featured_image_index?: number | null
           id?: string
           is_public?: boolean | null
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_status?:
+            | Database["public"]["Enums"]["moderation_status"]
+            | null
+          rejection_reason?: string | null
           severity: string
           title: string
           updated_at?: string
@@ -177,6 +189,12 @@ export type Database = {
           featured_image_index?: number | null
           id?: string
           is_public?: boolean | null
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_status?:
+            | Database["public"]["Enums"]["moderation_status"]
+            | null
+          rejection_reason?: string | null
           severity?: string
           title?: string
           updated_at?: string
@@ -472,6 +490,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      moderation_status: "pending" | "approved" | "rejected"
       rating_value: "1" | "2" | "3" | "4" | "5"
     }
     CompositeTypes: {
@@ -601,6 +620,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      moderation_status: ["pending", "approved", "rejected"],
       rating_value: ["1", "2", "3", "4", "5"],
     },
   },

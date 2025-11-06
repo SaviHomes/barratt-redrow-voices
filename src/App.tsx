@@ -19,6 +19,7 @@ import PublicGallery from "./pages/PublicGallery";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import Developments from "./pages/Developments";
+import Dashboard from "./pages/Dashboard";
 import UserDashboard from "./pages/UserDashboard";
 import MyEvidence from "./pages/MyEvidence";
 import MyClaims from "./pages/MyClaims";
@@ -46,7 +47,7 @@ const App = () => (
             <Route path="/upload-evidence" element={<UploadEvidence />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/developments" element={<Developments />} />
-            <Route path="/dashboard" element={<UserDashboard />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/user-dashboard" element={<UserDashboard />} />
             <Route path="/my-evidence" element={<MyEvidence />} />
             <Route path="/my-claims" element={<MyClaims />} />

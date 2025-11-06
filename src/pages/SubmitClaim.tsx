@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
 import { Loader2, DollarSign, FileText, Shield, AlertTriangle } from "lucide-react";
 import { Link } from "react-router-dom";
+import BackToDashboard from "@/components/BackToDashboard";
 
 const claimSchema = z.object({
   first_name: z.string().trim().min(1, "First name is required").max(50, "First name must be less than 50 characters"),
@@ -240,6 +241,7 @@ const SubmitClaim = () => {
       <Layout>
         <main className="min-h-screen bg-background py-12">
           <div className="container mx-auto px-6 max-w-4xl">
+            <BackToDashboard />
             {/* Breadcrumb */}
             <nav className="mb-8 text-sm text-muted-foreground">
               <a href="/" className="hover:text-foreground transition-colors">Home</a>

@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FileText, DollarSign } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import BackToDashboard from "@/components/BackToDashboard";
 
 export default function MyClaims() {
   const { user } = useAuth();
@@ -89,6 +90,7 @@ export default function MyClaims() {
     <ProtectedRoute>
       <Layout>
         <div className="container mx-auto px-4 py-8">
+          <BackToDashboard />
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-3xl font-bold mb-2">My Claims</h1>

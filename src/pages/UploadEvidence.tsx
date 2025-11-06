@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/Layout";
 import motorwayBanner from "@/assets/motorway-banner.jpg";
+import BackToDashboard from "@/components/BackToDashboard";
 
 const UploadEvidence = () => {
   const [title, setTitle] = useState("");
@@ -165,6 +166,7 @@ const UploadEvidence = () => {
       {/* Main Content */}
       <main className="container mx-auto px-6 py-12">
         <div className="max-w-4xl mx-auto">
+          <BackToDashboard />
           <div className="mb-8">
             <Badge variant="secondary" className="mb-4">
               Confidential & Secure

@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
+import BackToDashboard from "@/components/BackToDashboard";
 
 const profileSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -159,6 +160,7 @@ export default function MyProfile() {
     <ProtectedRoute>
       <Layout>
         <div className="container mx-auto px-4 py-8 max-w-4xl">
+          <BackToDashboard />
           <div className="mb-6">
             <h1 className="text-3xl font-bold mb-2">My Profile</h1>
             <p className="text-muted-foreground">

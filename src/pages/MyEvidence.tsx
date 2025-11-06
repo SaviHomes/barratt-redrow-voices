@@ -24,6 +24,7 @@ import {
 import { useEvidencePhotos } from "@/hooks/useEvidencePhotos";
 import EvidenceLightbox from "@/components/EvidenceLightbox";
 import JSZip from "jszip";
+import BackToDashboard from "@/components/BackToDashboard";
 
 export default function MyEvidence() {
   const { user } = useAuth();
@@ -227,6 +228,7 @@ export default function MyEvidence() {
     <ProtectedRoute>
       <Layout>
         <div className="container mx-auto px-4 py-8">
+          <BackToDashboard />
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-3xl font-bold mb-2">My Evidence</h1>

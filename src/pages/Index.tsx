@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Shield, Users, Camera, MessageSquare, AlertTriangle, CheckCircle, Share2, Facebook, Twitter, Linkedin, Instagram, MessageCircle, Mail, Copy, Youtube, Send } from "lucide-react";
+import { Shield, Users, Camera, MessageSquare, AlertTriangle, CheckCircle, Share2, Facebook, Twitter, Linkedin, Instagram, MessageCircle, Mail, Copy, Youtube, Send, Scale, ArrowRight } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useVisitorTracking } from "@/hooks/useVisitorTracking";
 import SEOContent from "@/components/SEOContent";
@@ -120,6 +120,57 @@ const Index = () => {
             <p className="text-lg font-medium text-foreground">
               Experiencing Redrow property defects or build quality issues? Document your case and claim compensation.
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Group Litigation Orders Section */}
+      <section className="py-20 bg-gradient-to-br from-blue-50/50 via-indigo-50/30 to-purple-50/50 dark:from-blue-950/20 dark:via-indigo-950/10 dark:to-purple-950/20 border-t border-primary/10">
+        <div className="container mx-auto px-6">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            {/* Left: Text Content */}
+            <div>
+              <Badge variant="secondary" className="mb-4">
+                New Initiative
+              </Badge>
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+                Exploring Group Litigation Orders (GLOs)
+              </h2>
+              <p className="text-lg text-muted-foreground mb-4">
+                We're investigating the possibility of Group Litigation Orders to help homeowners with similar Redrow property defects pursue claims collectively. GLOs allow multiple claimants to bring cases together, reducing individual costs and strengthening our negotiating position.
+              </p>
+              <p className="text-lg text-muted-foreground mb-6">
+                By pooling resources and evidence, homeowners can access expert legal support and share the financial burden of litigation. This collective approach has proven effective in similar housing defect cases across the UK.
+              </p>
+              <Button size="lg" asChild>
+                <a href="/group-litigation-info" className="flex items-center gap-2">
+                  Learn More About GLOs
+                  <ArrowRight className="h-5 w-5" />
+                </a>
+              </Button>
+            </div>
+            
+            {/* Right: Visual Element */}
+            <div className="flex items-center justify-center">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full blur-3xl"></div>
+                <div className="relative bg-gradient-to-br from-primary/10 to-secondary/10 dark:from-primary/20 dark:to-secondary/20 rounded-2xl p-12 shadow-xl border border-primary/20">
+                  <div className="flex flex-col items-center text-center space-y-4">
+                    <div className="w-24 h-24 bg-primary/10 dark:bg-primary/20 rounded-full flex items-center justify-center">
+                      <Scale className="h-12 w-12 text-primary" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-foreground">Stronger Together</h3>
+                    <p className="text-muted-foreground max-w-xs">
+                      Join homeowners exploring collective legal action for justice and accountability
+                    </p>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Users className="h-4 w-4 text-primary" />
+                      <span>Community-driven initiative</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>

@@ -191,6 +191,7 @@ export type Database = {
           created_at: string | null
           evidence_id: string | null
           id: string
+          label: string | null
           order_index: number | null
           photo_path: string
         }
@@ -199,6 +200,7 @@ export type Database = {
           created_at?: string | null
           evidence_id?: string | null
           id?: string
+          label?: string | null
           order_index?: number | null
           photo_path: string
         }
@@ -207,6 +209,7 @@ export type Database = {
           created_at?: string | null
           evidence_id?: string | null
           id?: string
+          label?: string | null
           order_index?: number | null
           photo_path?: string
         }

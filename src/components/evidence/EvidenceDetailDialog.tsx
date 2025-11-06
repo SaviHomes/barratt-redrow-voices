@@ -1,11 +1,20 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Calendar, MapPin, Image as ImageIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import { Calendar, Image as ImageIcon, ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { EvidenceWithPhotos } from "@/hooks/useEvidencePhotos";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+
+interface PhotoCaption {
+  id: string;
+  photo_path: string;
+  label: string | null;
+  caption: string | null;
+  order_index: number;
+}
 
 interface EvidenceDetailDialogProps {
   evidence: EvidenceWithPhotos | null;
@@ -15,10 +24,40 @@ interface EvidenceDetailDialogProps {
 
 export default function EvidenceDetailDialog({ evidence, open, onOpenChange }: EvidenceDetailDialogProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [captions, setCaptions] = useState<PhotoCaption[]>([]);
+  const [loadingCaptions, setLoadingCaptions] = useState(false);
+
+  useEffect(() => {
+    if (evidence && open) {
+      loadCaptions();
+    }
+  }, [evidence, open]);
+
+  const loadCaptions = async () => {
+    if (!evidence) return;
+    
+    setLoadingCaptions(true);
+    try {
+      const { data, error } = await supabase
+        .from('evidence_photo_captions')
+        .select('*')
+        .eq('evidence_id', evidence.id)
+        .order('order_index', { ascending: true });
+
+      if (error) throw error;
+      setCaptions(data || []);
+    } catch (error) {
+      console.error('Error loading captions:', error);
+    } finally {
+      setLoadingCaptions(false);
+    }
+  };
 
   if (!evidence) return null;
 
   const hasImages = evidence.photos.length > 0;
+  const currentPhoto = evidence.photos[currentImageIndex];
+  const currentCaption = captions.find(c => c.photo_path === currentPhoto?.path);
 
   const handlePrevImage = () => {
     setCurrentImageIndex((prev) => (prev === 0 ? evidence.photos.length - 1 : prev - 1));
@@ -73,6 +112,23 @@ export default function EvidenceDetailDialog({ evidence, open, onOpenChange }: E
                   </div>
                 </>
               )}
+
+              {/* Label overlay */}
+              {currentCaption?.label && (
+                <div className="absolute top-4 left-4 bg-black/70 text-white px-3 py-1 rounded-md text-sm flex items-center gap-1">
+                  <MapPin className="h-3 w-3" />
+                  {currentCaption.label}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Caption below current image */}
+          {hasImages && currentCaption?.caption && (
+            <div className="px-6 pt-4 pb-2 bg-muted/30 border-b">
+              <p className="text-sm text-muted-foreground italic">
+                "{currentCaption.caption}"
+              </p>
             </div>
           )}
 
@@ -98,7 +154,7 @@ export default function EvidenceDetailDialog({ evidence, open, onOpenChange }: E
 
             {evidence.description && (
               <div className="space-y-2">
-                <h4 className="font-semibold">Description</h4>
+                <h4 className="font-semibold">Overall Description</h4>
                 <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
                   {evidence.description}
                 </p>
@@ -120,22 +176,30 @@ export default function EvidenceDetailDialog({ evidence, open, onOpenChange }: E
               <div className="space-y-3">
                 <h4 className="font-semibold text-sm">All Photos</h4>
                 <div className="grid grid-cols-4 gap-2">
-                  {evidence.photos.map((photo, idx) => (
-                    <button
-                      key={photo.path}
-                      onClick={() => setCurrentImageIndex(idx)}
-                      className={cn(
-                        "relative aspect-square rounded-md overflow-hidden border-2 transition-all",
-                        idx === currentImageIndex ? "border-primary" : "border-transparent opacity-60 hover:opacity-100"
-                      )}
-                    >
-                      <img
-                        src={photo.url}
-                        alt={`Thumbnail ${idx + 1}`}
-                        className="w-full h-full object-cover"
-                      />
-                    </button>
-                  ))}
+                  {evidence.photos.map((photo, idx) => {
+                    const photoCaption = captions.find(c => c.photo_path === photo.path);
+                    return (
+                      <button
+                        key={photo.path}
+                        onClick={() => setCurrentImageIndex(idx)}
+                        className={cn(
+                          "relative aspect-square rounded-md overflow-hidden border-2 transition-all group",
+                          idx === currentImageIndex ? "border-primary" : "border-transparent opacity-60 hover:opacity-100"
+                        )}
+                      >
+                        <img
+                          src={photo.url}
+                          alt={`Thumbnail ${idx + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                        {photoCaption?.label && (
+                          <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs px-1 py-0.5 truncate">
+                            {photoCaption.label}
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}

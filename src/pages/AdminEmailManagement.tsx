@@ -20,6 +20,7 @@ import { TriggerList } from "@/components/admin/TriggerList";
 import { TriggerEditor } from "@/components/admin/TriggerEditor";
 import { BackupList } from "@/components/admin/BackupList";
 import { BackupManagementDialog } from "@/components/admin/BackupManagementDialog";
+import { TemplateCreationDialog } from "@/components/admin/TemplateCreationDialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { 
   AlertDialog, 
@@ -65,6 +66,7 @@ export default function AdminEmailManagement() {
   const [syncing, setSyncing] = useState(false);
   const [showBackupDialog, setShowBackupDialog] = useState(false);
   const [backupTemplateId, setBackupTemplateId] = useState<string>("");
+  const [showTemplateCreation, setShowTemplateCreation] = useState(false);
   
   // Form state
   const [template, setTemplate] = useState<string>("newsletter");
@@ -729,6 +731,13 @@ export default function AdminEmailManagement() {
               <div className="flex gap-2">
                 <Button 
                   variant="outline" 
+                  onClick={() => setShowTemplateCreation(true)}
+                >
+                  <Mail className="h-4 w-4 mr-2" />
+                  New Template
+                </Button>
+                <Button 
+                  variant="outline" 
                   onClick={() => setShowSyncDialog(true)}
                   disabled={syncing}
                 >
@@ -738,9 +747,6 @@ export default function AdminEmailManagement() {
                 <Button variant="outline" onClick={handleBatchTest}>
                   <Zap className="h-4 w-4 mr-2" />
                   Test All Active
-                </Button>
-                <Button onClick={() => { setEditingTemplate(null); setEditorOpen(true); }}>
-                  Create Template
                 </Button>
               </div>
             </div>
@@ -891,6 +897,11 @@ export default function AdminEmailManagement() {
         onCreateBackup={async (notes) => {
           await handleCreateBackup(backupTemplateId, notes);
         }}
+      />
+
+      <TemplateCreationDialog
+        open={showTemplateCreation}
+        onOpenChange={setShowTemplateCreation}
       />
     </div>
   );

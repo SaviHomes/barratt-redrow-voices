@@ -1,4 +1,4 @@
-import { Heading, Text, Button } from 'https://esm.sh/@react-email/components@0.0.22';
+import { Heading, Text } from 'https://esm.sh/@react-email/components@0.0.22';
 import * as React from 'https://esm.sh/react@18.3.1';
 import { EmailLayout } from './layout.tsx';
 
@@ -29,9 +29,9 @@ export const EvidenceApprovedEmail = ({ userName, evidenceTitle, viewUrl }: Evid
         who may be experiencing similar issues.
       </Text>
       <div style={buttonContainer}>
-        <Button href={viewUrl} style={button}>
+        <a href={viewUrl} style={button}>
           View Your Evidence
-        </Button>
+        </a>
       </div>
       <Text style={signature}>
         Thank you for your contribution,<br />

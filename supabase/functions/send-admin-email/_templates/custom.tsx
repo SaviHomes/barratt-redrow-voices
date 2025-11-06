@@ -1,4 +1,4 @@
-import { Heading, Text, Button } from 'https://esm.sh/@react-email/components@0.0.22';
+import { Heading, Text } from 'https://esm.sh/@react-email/components@0.0.22';
 import * as React from 'https://esm.sh/react@18.3.1';
 import { EmailLayout } from './layout.tsx';
 
@@ -19,9 +19,9 @@ export const CustomEmail = ({ title, body, ctaText, ctaUrl }: CustomEmailProps) 
       />
       {ctaText && ctaUrl && (
         <div style={buttonContainer}>
-          <Button href={ctaUrl} style={button}>
+          <a href={ctaUrl} style={button}>
             {ctaText}
-          </Button>
+          </a>
         </div>
       )}
       <Text style={signature}>

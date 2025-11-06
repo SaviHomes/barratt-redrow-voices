@@ -1,4 +1,4 @@
-import { Heading, Text, Button } from 'https://esm.sh/@react-email/components@0.0.22';
+import { Heading, Text } from 'https://esm.sh/@react-email/components@0.0.22';
 import * as React from 'https://esm.sh/react@18.3.1';
 import { EmailLayout } from './layout.tsx';
 
@@ -27,9 +27,9 @@ export const WelcomeEmail = ({ userName, dashboardUrl }: WelcomeEmailProps) => (
         <li style={listItem}>Rate your development</li>
       </ul>
       <div style={buttonContainer}>
-        <Button href={dashboardUrl} style={button}>
+        <a href={dashboardUrl} style={button}>
           Go to Your Dashboard
-        </Button>
+        </a>
       </div>
       <Text style={text}>
         If you have any questions, please don't hesitate to reach out through our contact page.

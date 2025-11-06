@@ -11,13 +11,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { Mail, Send, ArrowLeft, Users, Clock, Zap, RefreshCw } from "lucide-react";
+import { Mail, Send, ArrowLeft, Users, Clock, Zap, RefreshCw, FileDown, Database } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TemplateList } from "@/components/admin/TemplateList";
 import { TemplateEditor } from "@/components/admin/TemplateEditor";
 import { TemplatePreview } from "@/components/admin/TemplatePreview";
 import { TriggerList } from "@/components/admin/TriggerList";
 import { TriggerEditor } from "@/components/admin/TriggerEditor";
+import { BackupList } from "@/components/admin/BackupList";
+import { BackupManagementDialog } from "@/components/admin/BackupManagementDialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { 
   AlertDialog, 
@@ -50,6 +52,7 @@ export default function AdminEmailManagement() {
   // Template and trigger management state
   const [templates, setTemplates] = useState<any[]>([]);
   const [triggers, setTriggers] = useState<any[]>([]);
+  const [backups, setBackups] = useState<any[]>([]);
   const [editorOpen, setEditorOpen] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<any>(null);
   const [previewTemplate, setPreviewTemplate] = useState<any>(null);
@@ -60,6 +63,8 @@ export default function AdminEmailManagement() {
   const [sendingQuickTest, setSendingQuickTest] = useState(false);
   const [showSyncDialog, setShowSyncDialog] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [showBackupDialog, setShowBackupDialog] = useState(false);
+  const [backupTemplateId, setBackupTemplateId] = useState<string>("");
   
   // Form state
   const [template, setTemplate] = useState<string>("newsletter");
@@ -76,6 +81,7 @@ export default function AdminEmailManagement() {
     fetchEmailLogs();
     fetchTemplates();
     fetchTriggers();
+    fetchBackups();
   }, [user]);
 
   const checkAdminAccess = async () => {
@@ -97,12 +103,101 @@ export default function AdminEmailManagement() {
     }
   };
 
-  const fetchTemplates = async () => {
+  const fetchBackups = async () => {
     const { data } = await supabase
-      .from('email_templates')
+      .from('email_template_backups')
       .select('*')
-      .order('created_at', { ascending: false });
-    if (data) setTemplates(data);
+      .order('backed_up_at', { ascending: false });
+    setBackups(data || []);
+  };
+
+  const handleCreateBackup = async (templateId: string, notes: string) => {
+    try {
+      const { error } = await supabase.functions.invoke("backup-templates", {
+        body: { templateId, notes },
+      });
+
+      if (error) throw error;
+      
+      toast.success("Backup created successfully");
+      fetchBackups();
+    } catch (error: any) {
+      console.error("Backup error:", error);
+      toast.error(error.message || "Failed to create backup");
+    }
+  };
+
+  const handleRestoreBackup = async (backupId: string, restoreAsNew: boolean) => {
+    try {
+      const { data, error } = await supabase.functions.invoke("restore-template", {
+        body: { backupId, restoreAsNew },
+      });
+
+      if (error) throw error;
+      
+      toast.success(data.message || "Template restored successfully");
+      fetchTemplates();
+      fetchBackups();
+    } catch (error: any) {
+      console.error("Restore error:", error);
+      toast.error(error.message || "Failed to restore template");
+    }
+  };
+
+  const handleExportBackup = async (backupId: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke("export-templates", {
+        body: { backupId },
+      });
+
+      if (error) throw error;
+
+      // Create and download file
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `template-backup-${Date.now()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast.success("Backup exported successfully");
+    } catch (error: any) {
+      console.error("Export error:", error);
+      toast.error(error.message || "Failed to export backup");
+    }
+  };
+
+  const handleExportAllBackups = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke("export-templates", {
+        body: {},
+      });
+
+      if (error) throw error;
+
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `all-backups-${Date.now()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast.success("All backups exported successfully");
+    } catch (error: any) {
+      console.error("Export error:", error);
+      toast.error(error.message || "Failed to export backups");
+    }
+  };
+
+  const fetchTemplates = async () => {
+    const { data } = await supabase.from('email_templates').select('*').order('created_at', { ascending: false });
+    setTemplates(data || []);
   };
 
   const fetchTriggers = async () => {
@@ -391,12 +486,22 @@ export default function AdminEmailManagement() {
       </div>
 
       <Tabs defaultValue="compose" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="compose">Compose Email</TabsTrigger>
-            <TabsTrigger value="templates">Templates</TabsTrigger>
-            <TabsTrigger value="triggers">Automated Triggers</TabsTrigger>
-            <TabsTrigger value="history">Email History</TabsTrigger>
-          </TabsList>
+        <TabsList>
+          <TabsTrigger value="compose">
+            <Mail className="h-4 w-4 mr-2" />
+            Compose
+          </TabsTrigger>
+          <TabsTrigger value="history">
+            <Clock className="h-4 w-4 mr-2" />
+            History
+          </TabsTrigger>
+          <TabsTrigger value="templates">Templates</TabsTrigger>
+          <TabsTrigger value="triggers">Triggers</TabsTrigger>
+          <TabsTrigger value="backups">
+            <Database className="h-4 w-4 mr-2" />
+            Backups
+          </TabsTrigger>
+        </TabsList>
 
         <TabsContent value="compose" className="space-y-4">
           <Alert>
@@ -646,6 +751,7 @@ export default function AdminEmailManagement() {
                 await supabase.from('email_templates').delete().eq('id', id);
                 toast.success("Template deleted");
                 fetchTemplates();
+                fetchBackups();
               }}
               onDuplicate={async (t: any) => {
                 const { name, id, created_at, updated_at, created_by, ...rest } = t;
@@ -657,6 +763,11 @@ export default function AdminEmailManagement() {
               onToggleActive={async (id, active) => {
                 await supabase.from('email_templates').update({ is_active: active }).eq('id', id);
                 fetchTemplates();
+                fetchBackups();
+              }}
+              onBackup={(id) => {
+                setBackupTemplateId(id);
+                setShowBackupDialog(true);
               }}
               userEmail={user?.email}
             />
@@ -681,6 +792,26 @@ export default function AdminEmailManagement() {
               }}
             />
           </TabsContent>
+
+          <TabsContent value="backups" className="space-y-4">
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-semibold">Email Template Backups</h3>
+                <p className="text-sm text-muted-foreground">
+                  Automatic backups are created before updates and deletes
+                </p>
+              </div>
+              <Button variant="outline" onClick={handleExportAllBackups}>
+                <FileDown className="h-4 w-4 mr-2" />
+                Export All Backups
+              </Button>
+            </div>
+            <BackupList
+              backups={backups}
+              onRestore={handleRestoreBackup}
+              onExport={handleExportBackup}
+            />
+          </TabsContent>
         </Tabs>
 
       <TemplateEditor
@@ -690,6 +821,7 @@ export default function AdminEmailManagement() {
           if (editingTemplate) {
             await supabase.from('email_templates').update(data).eq('id', editingTemplate.id);
             toast.success("Template updated");
+            fetchBackups();
           } else {
             await supabase.from('email_templates').insert({ ...data, name: data.display_name.toLowerCase().replace(/\s+/g, '-') });
             toast.success("Template created");
@@ -751,6 +883,15 @@ export default function AdminEmailManagement() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <BackupManagementDialog
+        open={showBackupDialog}
+        onOpenChange={setShowBackupDialog}
+        templateName={templates.find(t => t.id === backupTemplateId)?.display_name || ""}
+        onCreateBackup={async (notes) => {
+          await handleCreateBackup(backupTemplateId, notes);
+        }}
+      />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Edit, Copy, Trash2, Lock, Power, PowerOff, Send } from "lucide-react";
+import { Eye, Edit, Copy, Trash2, Lock, Power, PowerOff, Send, Database } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
@@ -29,6 +29,7 @@ interface TemplateListProps {
   onDuplicate: (template: EmailTemplate) => void;
   onPreview: (template: EmailTemplate) => void;
   onToggleActive: (id: string, active: boolean) => void;
+  onBackup?: (id: string) => void;
   userEmail?: string;
 }
 
@@ -39,6 +40,7 @@ export function TemplateList({
   onDuplicate,
   onPreview,
   onToggleActive,
+  onBackup,
   userEmail,
 }: TemplateListProps) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -152,6 +154,16 @@ export function TemplateList({
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
+                    {onBackup && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onBackup(template.id)}
+                        title="Create Backup"
+                      >
+                        <Database className="h-4 w-4" />
+                      </Button>
+                    )}
                     <Button
                       variant="ghost"
                       size="icon"

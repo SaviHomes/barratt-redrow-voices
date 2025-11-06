@@ -215,6 +215,99 @@ export type Database = {
         }
         Relationships: []
       }
+      email_template_audit_log: {
+        Row: {
+          action: string
+          id: string
+          metadata: Json | null
+          performed_at: string | null
+          performed_by: string | null
+          template_id: string
+        }
+        Insert: {
+          action: string
+          id?: string
+          metadata?: Json | null
+          performed_at?: string | null
+          performed_by?: string | null
+          template_id: string
+        }
+        Update: {
+          action?: string
+          id?: string
+          metadata?: Json | null
+          performed_at?: string | null
+          performed_by?: string | null
+          template_id?: string
+        }
+        Relationships: []
+      }
+      email_template_backups: {
+        Row: {
+          backed_up_at: string | null
+          backed_up_by: string | null
+          backup_notes: string | null
+          backup_reason: string | null
+          category: string | null
+          created_at: string | null
+          description: string | null
+          display_name: string
+          html_content: string
+          id: string
+          is_active: boolean | null
+          is_system: boolean | null
+          name: string
+          original_created_at: string | null
+          original_updated_at: string | null
+          preview_data: Json | null
+          subject_template: string
+          template_id: string
+          variables: Json | null
+        }
+        Insert: {
+          backed_up_at?: string | null
+          backed_up_by?: string | null
+          backup_notes?: string | null
+          backup_reason?: string | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          display_name: string
+          html_content: string
+          id?: string
+          is_active?: boolean | null
+          is_system?: boolean | null
+          name: string
+          original_created_at?: string | null
+          original_updated_at?: string | null
+          preview_data?: Json | null
+          subject_template: string
+          template_id: string
+          variables?: Json | null
+        }
+        Update: {
+          backed_up_at?: string | null
+          backed_up_by?: string | null
+          backup_notes?: string | null
+          backup_reason?: string | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          display_name?: string
+          html_content?: string
+          id?: string
+          is_active?: boolean | null
+          is_system?: boolean | null
+          name?: string
+          original_created_at?: string | null
+          original_updated_at?: string | null
+          preview_data?: Json | null
+          subject_template?: string
+          template_id?: string
+          variables?: Json | null
+        }
+        Relationships: []
+      }
       email_templates: {
         Row: {
           category: string | null
@@ -653,6 +746,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      restore_email_template: {
+        Args: { backup_id: string; restore_as_new?: boolean }
+        Returns: string
       }
     }
     Enums: {

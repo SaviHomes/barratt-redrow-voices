@@ -3,6 +3,7 @@ import AuthNavigation from "@/components/AuthNavigation";
 import MobileNavigation from "@/components/MobileNavigation";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -26,60 +27,60 @@ export default function Layout({ children }: LayoutProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Shield className="h-8 w-8 text-primary" />
-              <a href="/" className="text-2xl font-bold text-foreground hover:text-primary transition-colors">
+              <Link to="/" className="text-2xl font-bold text-foreground hover:text-primary transition-colors">
                 RedrowExposed
-              </a>
+              </Link>
             </div>
             
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-6">
-              <a 
-                href="/developments" 
+              <Link 
+                to="/developments" 
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
                 Developments
-              </a>
-              <a 
-                href="/redrow-defects" 
+              </Link>
+              <Link 
+                to="/redrow-defects" 
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
                 Defects
-              </a>
-              <a 
-                href="/redrow-complaints" 
+              </Link>
+              <Link 
+                to="/redrow-complaints" 
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
                 Complaints
-              </a>
-              <a 
-                href="/submit-claim" 
+              </Link>
+              <Link 
+                to="/submit-claim" 
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
                 Submit Claim
-              </a>
-              <a 
-                href="/upload-evidence" 
+              </Link>
+              <Link 
+                to="/upload-evidence" 
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
                 Upload Evidence
-              </a>
+              </Link>
               <a 
                 href="/#faq" 
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
                 FAQ
               </a>
-              <a 
-                href="/contact" 
+              <Link 
+                to="/contact" 
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
                 Contact
-              </a>
+              </Link>
               {user && (
                 <Button asChild variant="default" size="sm">
-                  <a href="/user-dashboard">
+                  <Link to="/dashboard">
                     Dashboard
-                  </a>
+                  </Link>
                 </Button>
               )}
             </nav>

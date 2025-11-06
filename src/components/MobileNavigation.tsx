@@ -58,50 +58,50 @@ export default function MobileNavigation() {
             <SheetTitle>Navigation</SheetTitle>
           </SheetHeader>
           <nav className="flex flex-col space-y-4 mt-6">
-            <a 
-              href="/developments" 
+            <Link 
+              to="/developments" 
               className="text-foreground hover:text-primary transition-colors py-2 text-lg"
               onClick={closeMenu}
             >
               Developments
-            </a>
+            </Link>
             {user && (
-              <a 
-                href="/dashboard" 
+              <Link 
+                to="/dashboard" 
                 className="text-foreground hover:text-primary transition-colors py-2 text-lg"
                 onClick={closeMenu}
               >
                 My Dashboard
-              </a>
+              </Link>
             )}
-            <a 
-              href="/redrow-defects" 
+            <Link 
+              to="/redrow-defects" 
               className="text-foreground hover:text-primary transition-colors py-2 text-lg"
               onClick={closeMenu}
             >
               Defects
-            </a>
-            <a 
-              href="/redrow-complaints" 
+            </Link>
+            <Link 
+              to="/redrow-complaints" 
               className="text-foreground hover:text-primary transition-colors py-2 text-lg"
               onClick={closeMenu}
             >
               Complaints
-            </a>
-            <a 
-              href="/submit-claim" 
+            </Link>
+            <Link 
+              to="/submit-claim" 
               className="text-foreground hover:text-primary transition-colors py-2 text-lg"
               onClick={closeMenu}
             >
               Submit Claim
-            </a>
-            <a 
-              href="/upload-evidence" 
+            </Link>
+            <Link 
+              to="/upload-evidence" 
               className="text-foreground hover:text-primary transition-colors py-2 text-lg"
               onClick={closeMenu}
             >
               Upload Evidence
-            </a>
+            </Link>
             <a 
               href="/#faq" 
               className="text-foreground hover:text-primary transition-colors py-2 text-lg"
@@ -109,18 +109,18 @@ export default function MobileNavigation() {
             >
               FAQ
             </a>
-            <a 
-              href="/contact" 
+            <Link 
+              to="/contact" 
               className="text-foreground hover:text-primary transition-colors py-2 text-lg"
               onClick={closeMenu}
             >
               Contact
-            </a>
+            </Link>
             {user && (
               <Button asChild variant="default" className="justify-start h-12 w-full">
-                <a href="/user-dashboard" onClick={closeMenu}>
+                <Link to="/dashboard" onClick={closeMenu}>
                   Dashboard
-                </a>
+                </Link>
               </Button>
             )}
             

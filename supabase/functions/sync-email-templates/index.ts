@@ -3,13 +3,13 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { renderAsync } from 'https://esm.sh/@react-email/components@0.0.22';
 import * as React from 'https://esm.sh/react@18.3.1';
 
-// Import email templates from send-admin-email function
-import { WelcomeEmail } from '../send-admin-email/_templates/welcome.tsx';
-import { EvidenceApprovedEmail } from '../send-admin-email/_templates/evidence-approved.tsx';
-import { EvidenceRejectedEmail } from '../send-admin-email/_templates/evidence-rejected.tsx';
-import { NewsletterEmail } from '../send-admin-email/_templates/newsletter.tsx';
-import { GloUpdateEmail } from '../send-admin-email/_templates/glo-update.tsx';
-import { CustomEmail } from '../send-admin-email/_templates/custom.tsx';
+// Import email templates from local _templates directory
+import { WelcomeEmail } from './_templates/welcome.tsx';
+import { EvidenceApprovedEmail } from './_templates/evidence-approved.tsx';
+import { EvidenceRejectedEmail } from './_templates/evidence-rejected.tsx';
+import { NewsletterEmail } from './_templates/newsletter.tsx';
+import { GloUpdateEmail } from './_templates/glo-update.tsx';
+import { CustomEmail } from './_templates/custom.tsx';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',

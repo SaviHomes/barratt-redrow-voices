@@ -1,7 +1,7 @@
 import { serve } from 'https://deno.land/std@0.190.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
-import { renderAsync } from 'npm:@react-email/components@0.0.25';
-import * as React from 'npm:react@18.3.1';
+import { renderAsync } from 'https://esm.sh/@react-email/components@0.0.22';
+import * as React from 'https://esm.sh/react@18.3.1';
 
 // Import email templates from local _templates directory
 import { WelcomeEmail } from './_templates/welcome.tsx';

@@ -22,6 +22,7 @@ import Developments from "./pages/Developments";
 import Dashboard from "./pages/Dashboard";
 import UserDashboard from "./pages/UserDashboard";
 import AdminVisitorStatistics from "./pages/AdminVisitorStatistics";
+import AdminEmailManagement from "./pages/AdminEmailManagement";
 import MyEvidence from "./pages/MyEvidence";
 import MyClaims from "./pages/MyClaims";
 import MyProfile from "./pages/MyProfile";
@@ -57,6 +58,7 @@ const App = () => (
             <Route path="/admin/users" element={<UserManagement />} />
             <Route path="/admin/faqs" element={<AdminFAQManagement />} />
             <Route path="/admin/visitor-statistics" element={<AdminVisitorStatistics />} />
+            <Route path="/admin/emails" element={<AdminEmailManagement />} />
             <Route path="/gallery" element={<PublicGallery />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

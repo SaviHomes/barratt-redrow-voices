@@ -143,6 +143,78 @@ export type Database = {
         }
         Relationships: []
       }
+      email_logs: {
+        Row: {
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          recipients: string[]
+          resend_email_id: string | null
+          sent_at: string | null
+          sent_by: string | null
+          status: string | null
+          subject: string
+          template_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          recipients: string[]
+          resend_email_id?: string | null
+          sent_at?: string | null
+          sent_by?: string | null
+          status?: string | null
+          subject: string
+          template_type: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          recipients?: string[]
+          resend_email_id?: string | null
+          sent_at?: string | null
+          sent_by?: string | null
+          status?: string | null
+          subject?: string
+          template_type?: string
+        }
+        Relationships: []
+      }
+      email_preferences: {
+        Row: {
+          created_at: string | null
+          evidence_notifications: boolean | null
+          glo_updates: boolean | null
+          id: string
+          newsletter_enabled: boolean | null
+          unsubscribed_at: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          evidence_notifications?: boolean | null
+          glo_updates?: boolean | null
+          id?: string
+          newsletter_enabled?: boolean | null
+          unsubscribed_at?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          evidence_notifications?: boolean | null
+          glo_updates?: boolean | null
+          id?: string
+          newsletter_enabled?: boolean | null
+          unsubscribed_at?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       evidence: {
         Row: {
           category: string

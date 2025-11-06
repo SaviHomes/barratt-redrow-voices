@@ -1,0 +1,213 @@
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
+import { Resend } from "npm:resend@2.0.0";
+import React from "npm:react@18.3.1";
+import { renderAsync } from "npm:@react-email/components@0.0.22";
+import { WelcomeEmail } from "./_templates/welcome.tsx";
+import { EvidenceApprovedEmail } from "./_templates/evidence-approved.tsx";
+import { EvidenceRejectedEmail } from "./_templates/evidence-rejected.tsx";
+import { NewsletterEmail } from "./_templates/newsletter.tsx";
+import { GloUpdateEmail } from "./_templates/glo-update.tsx";
+import { CustomEmail } from "./_templates/custom.tsx";
+
+const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
+};
+
+interface AdminEmailRequest {
+  template: 'welcome' | 'evidence-approved' | 'evidence-rejected' | 'newsletter' | 'glo-update' | 'custom';
+  recipients: string[];
+  subject: string;
+  customData?: {
+    userName?: string;
+    evidenceTitle?: string;
+    rejectionReason?: string;
+    resubmitUrl?: string;
+    viewUrl?: string;
+    announcementTitle?: string;
+    announcementBody?: string;
+    ctaText?: string;
+    ctaUrl?: string;
+  };
+}
+
+const handler = async (req: Request): Promise<Response> => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      {
+        global: {
+          headers: { Authorization: req.headers.get("Authorization")! },
+        },
+      }
+    );
+
+    // Verify user is authenticated
+    const {
+      data: { user },
+    } = await supabaseClient.auth.getUser();
+
+    if (!user) {
+      throw new Error("Unauthorized");
+    }
+
+    // Check if user is admin
+    const { data: roleData } = await supabaseClient
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .single();
+
+    if (!roleData) {
+      throw new Error("Admin access required");
+    }
+
+    const { template, recipients, subject, customData = {} }: AdminEmailRequest = await req.json();
+
+    console.log(`Sending ${template} email to ${recipients.length} recipients`);
+
+    // Render the appropriate email template
+    let html: string;
+    switch (template) {
+      case 'welcome':
+        html = await renderAsync(
+          React.createElement(WelcomeEmail, {
+            userName: customData.userName || 'User',
+            dashboardUrl: customData.viewUrl || 'https://www.redrowexposed.co.uk',
+          })
+        );
+        break;
+      case 'evidence-approved':
+        html = await renderAsync(
+          React.createElement(EvidenceApprovedEmail, {
+            userName: customData.userName || 'User',
+            evidenceTitle: customData.evidenceTitle || 'Your Evidence',
+            viewUrl: customData.viewUrl || 'https://www.redrowexposed.co.uk/public-gallery',
+          })
+        );
+        break;
+      case 'evidence-rejected':
+        html = await renderAsync(
+          React.createElement(EvidenceRejectedEmail, {
+            userName: customData.userName || 'User',
+            evidenceTitle: customData.evidenceTitle || 'Your Evidence',
+            rejectionReason: customData.rejectionReason || 'Please review the guidelines and resubmit.',
+            resubmitUrl: customData.resubmitUrl || 'https://www.redrowexposed.co.uk/upload-evidence',
+          })
+        );
+        break;
+      case 'newsletter':
+        html = await renderAsync(
+          React.createElement(NewsletterEmail, {
+            announcementTitle: customData.announcementTitle || 'Newsletter',
+            announcementBody: customData.announcementBody || '',
+            ctaText: customData.ctaText,
+            ctaUrl: customData.ctaUrl,
+          })
+        );
+        break;
+      case 'glo-update':
+        html = await renderAsync(
+          React.createElement(GloUpdateEmail, {
+            updateTitle: customData.announcementTitle || 'GLO Update',
+            updateBody: customData.announcementBody || '',
+            ctaText: customData.ctaText,
+            ctaUrl: customData.ctaUrl,
+          })
+        );
+        break;
+      case 'custom':
+        html = await renderAsync(
+          React.createElement(CustomEmail, {
+            title: customData.announcementTitle || subject,
+            body: customData.announcementBody || '',
+            ctaText: customData.ctaText,
+            ctaUrl: customData.ctaUrl,
+          })
+        );
+        break;
+      default:
+        throw new Error(`Unknown template: ${template}`);
+    }
+
+    // Send emails
+    const emailPromises = recipients.map(async (email) => {
+      try {
+        const { data, error } = await resend.emails.send({
+          from: "Redrow Exposed <onboarding@resend.dev>",
+          to: [email],
+          subject: subject,
+          html: html,
+        });
+
+        if (error) {
+          console.error(`Failed to send to ${email}:`, error);
+          return { email, success: false, error: error.message };
+        }
+
+        console.log(`Email sent successfully to ${email}:`, data?.id);
+        return { email, success: true, resendId: data?.id };
+      } catch (err: any) {
+        console.error(`Error sending to ${email}:`, err);
+        return { email, success: false, error: err.message };
+      }
+    });
+
+    const results = await Promise.all(emailPromises);
+    const successCount = results.filter(r => r.success).length;
+    const failedCount = results.filter(r => !r.success).length;
+
+    // Log the email send in database
+    await supabaseClient.from("email_logs").insert({
+      template_type: template,
+      subject: subject,
+      recipients: recipients,
+      sent_by: user.id,
+      status: failedCount === 0 ? 'sent' : 'partial',
+      metadata: {
+        successCount,
+        failedCount,
+        customData,
+        results: results.filter(r => !r.success),
+      },
+    });
+
+    console.log(`Email batch complete: ${successCount} sent, ${failedCount} failed`);
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        message: `Sent ${successCount} emails successfully, ${failedCount} failed`,
+        results,
+      }),
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          ...corsHeaders,
+        },
+      }
+    );
+  } catch (error: any) {
+    console.error("Error in send-admin-email function:", error);
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      {
+        status: error.message === "Unauthorized" || error.message === "Admin access required" ? 403 : 500,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      }
+    );
+  }
+};
+
+serve(handler);

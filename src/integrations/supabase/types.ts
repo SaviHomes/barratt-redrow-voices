@@ -176,6 +176,57 @@ export type Database = {
         }
         Relationships: []
       }
+      glo_interest: {
+        Row: {
+          additional_comments: string | null
+          contact_consent: boolean
+          created_at: string
+          defect_categories: string[] | null
+          development_name: string | null
+          email: string
+          estimated_damages: number | null
+          first_name: string
+          id: string
+          last_name: string
+          phone: string | null
+          property_address: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          additional_comments?: string | null
+          contact_consent?: boolean
+          created_at?: string
+          defect_categories?: string[] | null
+          development_name?: string | null
+          email: string
+          estimated_damages?: number | null
+          first_name: string
+          id?: string
+          last_name: string
+          phone?: string | null
+          property_address?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          additional_comments?: string | null
+          contact_consent?: boolean
+          created_at?: string
+          defect_categories?: string[] | null
+          development_name?: string | null
+          email?: string
+          estimated_damages?: number | null
+          first_name?: string
+          id?: string
+          last_name?: string
+          phone?: string | null
+          property_address?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           advice_to_others: string | null

@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import BackToDashboard from "@/components/BackToDashboard";
@@ -6,10 +7,182 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Scale, Users, Shield, Info, Upload, ArrowRight } from "lucide-react";
+import { Scale, Users, Shield, Info, Upload, ArrowRight, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+
+const defectCategories = [
+  "Structural issues",
+  "Water ingress / damp",
+  "Drainage problems",
+  "Roof defects",
+  "Window/door defects",
+  "Heating/ventilation issues",
+  "Plumbing issues",
+  "Electrical issues",
+  "Flooring defects",
+  "External cladding issues",
+  "Other"
+];
+
+const gloInterestSchema = z.object({
+  first_name: z.string().min(1, "First name is required").max(100),
+  last_name: z.string().min(1, "Last name is required").max(100),
+  email: z.string().email("Invalid email address").max(255),
+  phone: z.string().max(20).optional(),
+  development_name: z.string().max(200).optional(),
+  property_address: z.string().max(500).optional(),
+  defect_categories: z.array(z.string()).min(1, "Select at least one defect category"),
+  estimated_damages: z.string().optional(),
+  additional_comments: z.string().max(2000).optional(),
+  contact_consent: z.boolean().refine(val => val === true, {
+    message: "You must consent to being contacted about GLO updates"
+  })
+});
+
+type GLOInterestForm = z.infer<typeof gloInterestSchema>;
 
 export default function GroupLitigationInfo() {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [existingRegistration, setExistingRegistration] = useState<any>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const form = useForm<GLOInterestForm>({
+    resolver: zodResolver(gloInterestSchema),
+    defaultValues: {
+      first_name: "",
+      last_name: "",
+      email: "",
+      phone: "",
+      development_name: "",
+      property_address: "",
+      defect_categories: [],
+      estimated_damages: "",
+      additional_comments: "",
+      contact_consent: false
+    }
+  });
+
+  useEffect(() => {
+    if (user) {
+      fetchUserProfile();
+      checkExistingRegistration();
+    }
+  }, [user]);
+
+  const fetchUserProfile = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user?.id)
+        .single();
+
+      if (data && !error) {
+        form.setValue('first_name', data.first_name || '');
+        form.setValue('last_name', data.last_name || '');
+        form.setValue('email', user?.email || '');
+        form.setValue('phone', data.mobile_tel || data.home_tel || '');
+        form.setValue('development_name', data.development_name || '');
+        const address = [data.property_number, data.street_name, data.town_city, data.county, data.postcode]
+          .filter(Boolean)
+          .join(', ');
+        form.setValue('property_address', address);
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  };
+
+  const checkExistingRegistration = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('glo_interest')
+        .select('*')
+        .eq('user_id', user?.id)
+        .single();
+
+      if (data && !error) {
+        setExistingRegistration(data);
+        // Populate form with existing data
+        form.setValue('first_name', data.first_name);
+        form.setValue('last_name', data.last_name);
+        form.setValue('email', data.email);
+        form.setValue('phone', data.phone || '');
+        form.setValue('development_name', data.development_name || '');
+        form.setValue('property_address', data.property_address || '');
+        form.setValue('defect_categories', data.defect_categories || []);
+        form.setValue('estimated_damages', data.estimated_damages?.toString() || '');
+        form.setValue('additional_comments', data.additional_comments || '');
+        form.setValue('contact_consent', data.contact_consent);
+      }
+    } catch (error) {
+      console.error('Error checking existing registration:', error);
+    }
+  };
+
+  const onSubmit = async (data: GLOInterestForm) => {
+    setSubmitting(true);
+    try {
+      const payload = {
+        user_id: user?.id || '',
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email,
+        phone: data.phone || null,
+        development_name: data.development_name || null,
+        property_address: data.property_address || null,
+        defect_categories: data.defect_categories,
+        estimated_damages: data.estimated_damages ? parseFloat(data.estimated_damages) : null,
+        additional_comments: data.additional_comments || null,
+        contact_consent: data.contact_consent
+      };
+
+      if (existingRegistration) {
+        const { error } = await supabase
+          .from('glo_interest')
+          .update(payload)
+          .eq('id', existingRegistration.id);
+
+        if (error) throw error;
+        toast({
+          title: "Success",
+          description: "Your registration has been updated successfully."
+        });
+      } else {
+        const { error } = await supabase
+          .from('glo_interest')
+          .insert([payload]);
+
+        if (error) throw error;
+        toast({
+          title: "Success",
+          description: "Thank you for registering your interest! We'll keep you informed as we progress."
+        });
+      }
+
+      await checkExistingRegistration();
+    } catch (error) {
+      console.error('Error submitting registration:', error);
+      toast({
+        title: "Error",
+        description: "Failed to register interest. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
   return (
     <ProtectedRoute>
       <Layout>
@@ -239,6 +412,225 @@ export default function GroupLitigationInfo() {
                   <Link to="/my-evidence">View My Submissions</Link>
                 </Button>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* GLO Interest Registration Form */}
+          <Card className="mb-8 border-primary/30">
+            <CardHeader>
+              <div className="flex items-center gap-2 mb-2">
+                <Users className="h-5 w-5 text-primary" />
+                <CardTitle>Register Your Interest</CardTitle>
+              </div>
+              <CardDescription>
+                Let us know you're interested in participating in a potential GLO. This helps us assess viability and keep you informed.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {existingRegistration && (
+                <Alert className="mb-6">
+                  <CheckCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    You've already registered your interest on {new Date(existingRegistration.created_at).toLocaleDateString()}. You can update your information below.
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              <div className="mb-6 p-4 bg-muted/50 rounded-lg">
+                <p className="text-sm text-muted-foreground">
+                  Help us assess the viability of a Group Litigation Order by registering your interest. This information will be kept confidential and only used to evaluate collective legal action. By registering, you're not committing to participate—we'll contact you if a GLO becomes available with full details so you can make an informed decision.
+                </p>
+              </div>
+
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="first_name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>First Name *</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="last_name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Last Name *</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email Address *</FormLabel>
+                          <FormControl>
+                            <Input type="email" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="phone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Phone Number (Optional)</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="development_name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Development Name</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="property_address"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Property Address</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="defect_categories"
+                    render={() => (
+                      <FormItem>
+                        <div className="mb-4">
+                          <FormLabel>What defects are you experiencing? *</FormLabel>
+                          <FormDescription>Select all that apply</FormDescription>
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-3">
+                          {defectCategories.map((category) => (
+                            <FormField
+                              key={category}
+                              control={form.control}
+                              name="defect_categories"
+                              render={({ field }) => (
+                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                  <FormControl>
+                                    <Checkbox
+                                      checked={field.value?.includes(category)}
+                                      onCheckedChange={(checked) => {
+                                        return checked
+                                          ? field.onChange([...field.value, category])
+                                          : field.onChange(field.value?.filter((value) => value !== category));
+                                      }}
+                                    />
+                                  </FormControl>
+                                  <FormLabel className="font-normal cursor-pointer">
+                                    {category}
+                                  </FormLabel>
+                                </FormItem>
+                              )}
+                            />
+                          ))}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="estimated_damages"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Estimated Damages or Costs Incurred (£) (Optional)</FormLabel>
+                        <FormControl>
+                          <Input type="number" min="0" step="0.01" {...field} />
+                        </FormControl>
+                        <FormDescription>Approximate total damages or repair costs</FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="additional_comments"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Additional Comments (Optional)</FormLabel>
+                        <FormControl>
+                          <Textarea rows={4} {...field} />
+                        </FormControl>
+                        <FormDescription>Any additional information you'd like to share</FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="contact_consent"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel className="cursor-pointer">
+                            I consent to being contacted about GLO updates and developments *
+                          </FormLabel>
+                          <FormDescription>
+                            We'll only contact you regarding the Group Litigation Order initiative
+                          </FormDescription>
+                          <FormMessage />
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button type="submit" disabled={submitting} size="lg">
+                    {submitting ? "Submitting..." : existingRegistration ? "Update Registration" : "Register Interest"}
+                  </Button>
+                </form>
+              </Form>
             </CardContent>
           </Card>
 

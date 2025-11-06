@@ -16,7 +16,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import Layout from "@/components/Layout";
-
 const registerSchema = z.object({
   firstName: z.string().min(1, "First name is required").max(50, "First name must be less than 50 characters"),
   lastName: z.string().min(1, "Last name is required").max(50, "Last name must be less than 50 characters"),
@@ -34,36 +33,41 @@ const registerSchema = z.object({
   confirmPassword: z.string(),
   buildStyle: z.string().optional(),
   adviceToOthers: z.string().optional(),
-  nhbcContact: z.enum(["yes", "no", "not-answered"], { required_error: "Please select an option" }),
-  socialMediaConsent: z.enum(["yes", "no", "not-answered"], { required_error: "Please select an option" }),
-  decisionInfluenced: z.enum(["yes", "no", "not-answered"], { required_error: "Please select an option" }),
-}).refine((data) => data.password === data.confirmPassword, {
+  nhbcContact: z.enum(["yes", "no", "not-answered"], {
+    required_error: "Please select an option"
+  }),
+  socialMediaConsent: z.enum(["yes", "no", "not-answered"], {
+    required_error: "Please select an option"
+  }),
+  decisionInfluenced: z.enum(["yes", "no", "not-answered"], {
+    required_error: "Please select an option"
+  })
+}).refine(data => data.password === data.confirmPassword, {
   message: "Passwords don't match",
-  path: ["confirmPassword"],
+  path: ["confirmPassword"]
 });
-
 type RegisterFormData = z.infer<typeof registerSchema>;
-
 export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const navigate = useNavigate();
-
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
       whatsappConsent: false,
       nhbcContact: "not-answered",
       socialMediaConsent: "not-answered",
-      decisionInfluenced: "not-answered",
-    },
+      decisionInfluenced: "not-answered"
+    }
   });
-
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
-    
     try {
-      const { error } = await supabase.auth.signUp({
+      const {
+        error
+      } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
         options: {
@@ -84,44 +88,39 @@ export default function Register() {
             advice_to_others: data.adviceToOthers || '',
             nhbc_contact: data.nhbcContact === "yes",
             social_media_consent: data.socialMediaConsent === "yes",
-            decision_influenced: data.decisionInfluenced === "yes",
-          },
-        },
+            decision_influenced: data.decisionInfluenced === "yes"
+          }
+        }
       });
-
       if (error) {
         toast({
           title: "Registration Failed",
           description: error.message,
-          variant: "destructive",
+          variant: "destructive"
         });
         return;
       }
-
       toast({
         title: "Registration Successful!",
-        description: "Welcome! You can now access all features.",
+        description: "Welcome! You can now access all features."
       });
-      
       navigate("/");
     } catch (error) {
       toast({
         title: "Registration Failed",
         description: "An unexpected error occurred. Please try again.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsLoading(false);
     }
   };
-
-  return (
-    <Layout>
+  return <Layout>
       <div className="min-h-screen bg-background py-12 px-4">
         <div className="max-w-2xl mx-auto">
           <Card>
           <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-bold">Join RedrowExposed</CardTitle>
+            <CardTitle className="text-3xl font-bold">Join Redrow Exposed</CardTitle>
             <CardDescription>
               Share your experience and help others make informed decisions about Barratt Redrow properties
             </CardDescription>
@@ -133,32 +132,24 @@ export default function Register() {
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold">Personal Information</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="firstName"
-                      render={({ field }) => (
-                        <FormItem>
+                    <FormField control={form.control} name="firstName" render={({
+                      field
+                    }) => <FormItem>
                           <FormLabel>First Name *</FormLabel>
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
                           <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="lastName"
-                      render={({ field }) => (
-                        <FormItem>
+                        </FormItem>} />
+                    <FormField control={form.control} name="lastName" render={({
+                      field
+                    }) => <FormItem>
                           <FormLabel>Last Name *</FormLabel>
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
                           <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                        </FormItem>} />
                   </div>
                 </div>
 
@@ -168,88 +159,64 @@ export default function Register() {
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold">Property Details</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="propertyNumber"
-                      render={({ field }) => (
-                        <FormItem>
+                    <FormField control={form.control} name="propertyNumber" render={({
+                      field
+                    }) => <FormItem>
                           <FormLabel>Property Number / Plot Number</FormLabel>
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
                           <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="developmentName"
-                      render={({ field }) => (
-                        <FormItem>
+                        </FormItem>} />
+                    <FormField control={form.control} name="developmentName" render={({
+                      field
+                    }) => <FormItem>
                           <FormLabel>Development Name</FormLabel>
                           <FormControl>
                             <Input {...field} placeholder="e.g., The Meadows, Riverside Park, etc." />
                           </FormControl>
                           <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                        </FormItem>} />
                   </div>
                   <div className="grid grid-cols-1 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="streetName"
-                      render={({ field }) => (
-                        <FormItem>
+                    <FormField control={form.control} name="streetName" render={({
+                      field
+                    }) => <FormItem>
                           <FormLabel>Street/Road Name *</FormLabel>
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
                           <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                        </FormItem>} />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="townCity"
-                      render={({ field }) => (
-                        <FormItem>
+                    <FormField control={form.control} name="townCity" render={({
+                      field
+                    }) => <FormItem>
                           <FormLabel>Town/City *</FormLabel>
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
                           <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="county"
-                      render={({ field }) => (
-                        <FormItem>
+                        </FormItem>} />
+                    <FormField control={form.control} name="county" render={({
+                      field
+                    }) => <FormItem>
                           <FormLabel>County *</FormLabel>
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
                           <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="postcode"
-                      render={({ field }) => (
-                        <FormItem>
+                        </FormItem>} />
+                    <FormField control={form.control} name="postcode" render={({
+                      field
+                    }) => <FormItem>
                           <FormLabel>Postcode *</FormLabel>
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
                           <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                        </FormItem>} />
                   </div>
                 </div>
 
@@ -259,63 +226,44 @@ export default function Register() {
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold">Contact Information</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="homeTel"
-                      render={({ field }) => (
-                        <FormItem>
+                    <FormField control={form.control} name="homeTel" render={({
+                      field
+                    }) => <FormItem>
                           <FormLabel>Home Tel</FormLabel>
                           <FormControl>
                             <Input {...field} type="tel" />
                           </FormControl>
                           <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="mobileTel"
-                      render={({ field }) => (
-                        <FormItem>
+                        </FormItem>} />
+                    <FormField control={form.control} name="mobileTel" render={({
+                      field
+                    }) => <FormItem>
                           <FormLabel>Mobile Tel</FormLabel>
                           <FormControl>
                             <Input {...field} type="tel" />
                           </FormControl>
                           <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                        </FormItem>} />
                   </div>
-                  <FormField
-                    control={form.control}
-                    name="whatsappConsent"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                  <FormField control={form.control} name="whatsappConsent" render={({
+                    field
+                  }) => <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                         <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
+                          <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                         </FormControl>
                         <FormLabel className="text-sm">
                           I would like to join the WhatsApp group for updates and discussions
                         </FormLabel>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
+                      </FormItem>} />
+                  <FormField control={form.control} name="email" render={({
+                    field
+                  }) => <FormItem>
                         <FormLabel>Email Address *</FormLabel>
                         <FormControl>
                           <Input {...field} type="email" />
                         </FormControl>
                         <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      </FormItem>} />
                 </div>
 
                 <Separator />
@@ -324,32 +272,24 @@ export default function Register() {
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold">Account Security</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
+                    <FormField control={form.control} name="password" render={({
+                      field
+                    }) => <FormItem>
                           <FormLabel>Choose Password *</FormLabel>
                           <FormControl>
                             <Input {...field} type="password" />
                           </FormControl>
                           <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="confirmPassword"
-                      render={({ field }) => (
-                        <FormItem>
+                        </FormItem>} />
+                    <FormField control={form.control} name="confirmPassword" render={({
+                      field
+                    }) => <FormItem>
                           <FormLabel>Confirm Password *</FormLabel>
                           <FormControl>
                             <Input {...field} type="password" />
                           </FormControl>
                           <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                        </FormItem>} />
                   </div>
                 </div>
 
@@ -358,51 +298,30 @@ export default function Register() {
                 {/* Property Experience */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold">Your Experience</h3>
-                  <FormField
-                    control={form.control}
-                    name="buildStyle"
-                    render={({ field }) => (
-                      <FormItem>
+                  <FormField control={form.control} name="buildStyle" render={({
+                    field
+                  }) => <FormItem>
                         <FormLabel>What build style did you buy?</FormLabel>
                         <FormControl>
-                          <Input 
-                            {...field} 
-                            placeholder="e.g., New Build, Help to Buy, Off Plan, etc."
-                          />
+                          <Input {...field} placeholder="e.g., New Build, Help to Buy, Off Plan, etc." />
                         </FormControl>
                         <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="adviceToOthers"
-                    render={({ field }) => (
-                      <FormItem>
+                      </FormItem>} />
+                  <FormField control={form.control} name="adviceToOthers" render={({
+                    field
+                  }) => <FormItem>
                         <FormLabel>What advice would you give to others thinking about buying a Barratt Redrow property?</FormLabel>
                         <FormControl>
-                          <Textarea 
-                            {...field} 
-                            className="min-h-[100px]"
-                            placeholder="Share your experience and advice..."
-                          />
+                          <Textarea {...field} className="min-h-[100px]" placeholder="Share your experience and advice..." />
                         </FormControl>
                         <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="nhbcContact"
-                    render={({ field }) => (
-                      <FormItem className="space-y-3">
+                      </FormItem>} />
+                  <FormField control={form.control} name="nhbcContact" render={({
+                    field
+                  }) => <FormItem className="space-y-3">
                         <FormLabel>Did you contact NHBC or any other redress scheme in relation to your experience?</FormLabel>
                         <FormControl>
-                          <RadioGroup
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                            className="flex flex-col space-y-1"
-                          >
+                          <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex flex-col space-y-1">
                             <div className="flex items-center space-x-2">
                               <RadioGroupItem value="yes" id="nhbc-yes" />
                               <Label htmlFor="nhbc-yes">Yes</Label>
@@ -414,21 +333,13 @@ export default function Register() {
                           </RadioGroup>
                         </FormControl>
                         <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="socialMediaConsent"
-                    render={({ field }) => (
-                      <FormItem className="space-y-3">
+                      </FormItem>} />
+                  <FormField control={form.control} name="socialMediaConsent" render={({
+                    field
+                  }) => <FormItem className="space-y-3">
                         <FormLabel>If you have left negative comments about your experience on Social Media, are you prepared to remove these comments in the event a positive outcome is achieved?</FormLabel>
                         <FormControl>
-                          <RadioGroup
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                            className="flex flex-col space-y-1"
-                          >
+                          <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex flex-col space-y-1">
                             <div className="flex items-center space-x-2">
                               <RadioGroupItem value="yes" id="social-yes" />
                               <Label htmlFor="social-yes">Yes</Label>
@@ -440,21 +351,13 @@ export default function Register() {
                           </RadioGroup>
                         </FormControl>
                         <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="decisionInfluenced"
-                    render={({ field }) => (
-                      <FormItem className="space-y-3">
+                      </FormItem>} />
+                  <FormField control={form.control} name="decisionInfluenced" render={({
+                    field
+                  }) => <FormItem className="space-y-3">
                         <FormLabel>We are planning on making all UK Estate Agents aware of people's experience with Barratt Redrow by virtue of this website. It is hoped they will help their sellers make more informed buying decisions when considering a new build property. Do you think your decision would have been influenced with the benefit of this information?</FormLabel>
                         <FormControl>
-                          <RadioGroup
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                            className="flex flex-col space-y-1"
-                          >
+                          <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex flex-col space-y-1">
                             <div className="flex items-center space-x-2">
                               <RadioGroupItem value="yes" id="decision-yes" />
                               <Label htmlFor="decision-yes">Yes</Label>
@@ -466,9 +369,7 @@ export default function Register() {
                           </RadioGroup>
                         </FormControl>
                         <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      </FormItem>} />
                 </div>
 
                 <div className="flex flex-col space-y-4">
@@ -488,6 +389,5 @@ export default function Register() {
           </Card>
         </div>
       </div>
-    </Layout>
-  );
+    </Layout>;
 }

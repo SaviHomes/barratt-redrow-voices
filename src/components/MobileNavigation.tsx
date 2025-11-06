@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Menu, User, LogOut, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 import {
   Sheet,
   SheetContent,
@@ -16,6 +17,7 @@ export default function MobileNavigation() {
   const [isOpen, setIsOpen] = useState(false);
   const { user, signOut, loading } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
+  const { developmentsEnabled } = useSiteSettings();
 
   const closeMenu = () => setIsOpen(false);
 
@@ -58,13 +60,15 @@ export default function MobileNavigation() {
             <SheetTitle>Navigation</SheetTitle>
           </SheetHeader>
           <nav className="flex flex-col space-y-4 mt-6">
-            <Link 
-              to="/developments" 
-              className="text-foreground hover:text-primary transition-colors py-2 text-lg"
-              onClick={closeMenu}
-            >
-              Developments
-            </Link>
+            {developmentsEnabled && (
+              <Link 
+                to="/developments" 
+                className="text-foreground hover:text-primary transition-colors py-2 text-lg"
+                onClick={closeMenu}
+              >
+                Developments
+              </Link>
+            )}
             {user && (
               <Link 
                 to="/dashboard" 

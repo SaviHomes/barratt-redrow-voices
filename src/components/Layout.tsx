@@ -2,6 +2,7 @@ import { Shield } from "lucide-react";
 import AuthNavigation from "@/components/AuthNavigation";
 import MobileNavigation from "@/components/MobileNavigation";
 import { useAuth } from "@/hooks/useAuth";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
@@ -11,6 +12,7 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const { user } = useAuth();
+  const { developmentsEnabled } = useSiteSettings();
   
   return (
     <div className="min-h-screen bg-background">
@@ -34,12 +36,14 @@ export default function Layout({ children }: LayoutProps) {
             
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-6">
-              <Link 
-                to="/developments" 
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
-                Developments
-              </Link>
+              {developmentsEnabled && (
+                <Link 
+                  to="/developments" 
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                >
+                  Developments
+                </Link>
+              )}
               <Link 
                 to="/redrow-defects" 
                 className="text-muted-foreground hover:text-primary transition-colors"

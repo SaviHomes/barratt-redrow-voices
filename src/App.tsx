@@ -15,6 +15,7 @@ import Login from "./pages/Login";
 import AdminDashboard from "./pages/AdminDashboard";
 import UserManagement from "./pages/UserManagement";
 import AdminFAQManagement from "./pages/AdminFAQManagement";
+import AdminSettings from "./pages/AdminSettings";
 import PublicGallery from "./pages/PublicGallery";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
@@ -59,6 +60,7 @@ const App = () => (
             <Route path="/admin/faqs" element={<AdminFAQManagement />} />
             <Route path="/admin/visitor-statistics" element={<AdminVisitorStatistics />} />
             <Route path="/admin/emails" element={<AdminEmailManagement />} />
+            <Route path="/admin/settings" element={<AdminSettings />} />
             <Route path="/gallery" element={<PublicGallery />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 import Layout from "@/components/Layout";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +12,7 @@ import { Upload, FileText, Star, User, Image as ImageIcon, AlertCircle } from "l
 
 export default function UserDashboard() {
   const { user } = useAuth();
+  const { developmentsEnabled } = useSiteSettings();
   const [stats, setStats] = useState({
     evidenceCount: 0,
     claimsCount: 0,
@@ -188,12 +190,14 @@ export default function UserDashboard() {
                     </div>
                   </Link>
                 </Button>
-                <Button asChild variant="outline" className="h-auto py-4">
-                  <Link to="/developments" className="flex flex-col items-center gap-2">
-                    <Star className="h-6 w-6" />
-                    <span>Rate Development</span>
-                  </Link>
-                </Button>
+                {developmentsEnabled && (
+                  <Button asChild variant="outline" className="h-auto py-4">
+                    <Link to="/developments" className="flex flex-col items-center gap-2">
+                      <Star className="h-6 w-6" />
+                      <span>Rate Development</span>
+                    </Link>
+                  </Button>
+                )}
                 <Button asChild variant="outline" className="h-auto py-4">
                   <Link to="/my-profile" className="flex flex-col items-center gap-2">
                     <User className="h-6 w-6" />

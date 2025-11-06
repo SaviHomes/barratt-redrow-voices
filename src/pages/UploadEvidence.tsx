@@ -6,9 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Upload, X, Image as ImageIcon, AlertCircle, Video, ArrowUp, ArrowDown } from "lucide-react";
+import { Upload, X, Image as ImageIcon, AlertCircle, Video, ArrowUp, ArrowDown, Loader2, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { Link } from "react-router-dom";
 import Layout from "@/components/Layout";
 import motorwayBanner from "@/assets/motorway-banner.jpg";
 import BackToDashboard from "@/components/BackToDashboard";
@@ -115,6 +117,7 @@ const PhotoCard = ({ item, index, onUpdate, onRemove, onMoveUp, onMoveDown, isFi
 };
 
 const UploadEvidence = () => {
+  const { user, loading: authLoading } = useAuth();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
@@ -306,6 +309,40 @@ const UploadEvidence = () => {
       setUploading(false);
     }
   };
+
+  if (authLoading) {
+    return (
+      <Layout>
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      </Layout>
+    );
+  }
+
+  if (!user) {
+    return (
+      <Layout>
+        <div className="min-h-screen bg-background py-12">
+          <div className="container mx-auto px-6 max-w-2xl text-center">
+            <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
+            <h1 className="text-2xl font-bold mb-4">Authentication Required</h1>
+            <p className="text-muted-foreground mb-6">
+              You need to be signed in to submit evidence. Please create an account or sign in to continue.
+            </p>
+            <div className="flex gap-4 justify-center">
+              <Button asChild>
+                <Link to="/register">Create Account</Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link to="/login">Sign In</Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>

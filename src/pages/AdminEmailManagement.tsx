@@ -44,6 +44,8 @@ export default function AdminEmailManagement() {
   useEffect(() => {
     checkAdminAccess();
     fetchEmailLogs();
+    fetchTemplates();
+    fetchTriggers();
   }, [user]);
 
   const checkAdminAccess = async () => {
@@ -63,6 +65,22 @@ export default function AdminEmailManagement() {
       toast.error("Access denied. Admin privileges required.");
       navigate("/");
     }
+  };
+
+  const fetchTemplates = async () => {
+    const { data } = await supabase
+      .from('email_templates')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (data) setTemplates(data);
+  };
+
+  const fetchTriggers = async () => {
+    const { data } = await supabase
+      .from('email_triggers')
+      .select('*, email_templates(*)')
+      .order('created_at', { ascending: false });
+    if (data) setTriggers(data);
   };
 
   const fetchEmailLogs = async () => {
@@ -211,10 +229,12 @@ export default function AdminEmailManagement() {
       </div>
 
       <Tabs defaultValue="compose" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="compose">Compose Email</TabsTrigger>
-          <TabsTrigger value="history">Email History</TabsTrigger>
-        </TabsList>
+          <TabsList>
+            <TabsTrigger value="compose">Compose Email</TabsTrigger>
+            <TabsTrigger value="templates">Templates</TabsTrigger>
+            <TabsTrigger value="triggers">Automated Triggers</TabsTrigger>
+            <TabsTrigger value="history">Email History</TabsTrigger>
+          </TabsList>
 
         <TabsContent value="compose">
           <Card>
@@ -393,8 +413,101 @@ export default function AdminEmailManagement() {
               )}
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+          </TabsContent>
+
+          <TabsContent value="templates" className="space-y-4">
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-semibold">Email Templates</h3>
+                <p className="text-sm text-muted-foreground">Manage your email templates library</p>
+              </div>
+              <Button onClick={() => { setEditingTemplate(null); setEditorOpen(true); }}>
+                Create Template
+              </Button>
+            </div>
+            <TemplateList
+              templates={templates}
+              onEdit={(t) => { setEditingTemplate(t); setEditorOpen(true); }}
+              onDelete={async (id) => {
+                await supabase.from('email_templates').delete().eq('id', id);
+                toast.success("Template deleted");
+                fetchTemplates();
+              }}
+              onDuplicate={async (t) => {
+                const { name, id, created_at, updated_at, ...rest } = t;
+                await supabase.from('email_templates').insert({ ...rest, name: `${name}-copy`, display_name: `${rest.display_name} (Copy)` });
+                toast.success("Template duplicated");
+                fetchTemplates();
+              }}
+              onPreview={(t) => setPreviewTemplate(t)}
+              onToggleActive={async (id, active) => {
+                await supabase.from('email_templates').update({ is_active: active }).eq('id', id);
+                fetchTemplates();
+              }}
+            />
+          </TabsContent>
+
+          <TabsContent value="triggers" className="space-y-4">
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-semibold">Automated Email Triggers</h3>
+                <p className="text-sm text-muted-foreground">Configure when emails are sent automatically</p>
+              </div>
+              <Button onClick={() => { setEditingTrigger(null); setTriggerEditorOpen(true); }}>
+                Create Trigger
+              </Button>
+            </div>
+            <TriggerList
+              triggers={triggers}
+              onEdit={(t) => { setEditingTrigger(t); setTriggerEditorOpen(true); }}
+              onToggleEnabled={async (id, enabled) => {
+                await supabase.from('email_triggers').update({ is_enabled: enabled }).eq('id', id);
+                fetchTriggers();
+              }}
+            />
+          </TabsContent>
+        </Tabs>
+
+      <TemplateEditor
+        open={editorOpen}
+        template={editingTemplate}
+        onSave={async (data) => {
+          if (editingTemplate) {
+            await supabase.from('email_templates').update(data).eq('id', editingTemplate.id);
+            toast.success("Template updated");
+          } else {
+            await supabase.from('email_templates').insert({ ...data, name: data.display_name.toLowerCase().replace(/\s+/g, '-') });
+            toast.success("Template created");
+          }
+          setEditorOpen(false);
+          fetchTemplates();
+        }}
+        onCancel={() => setEditorOpen(false)}
+      />
+
+      <TemplatePreview
+        open={!!previewTemplate}
+        template={previewTemplate}
+        onClose={() => setPreviewTemplate(null)}
+      />
+
+      <TriggerEditor
+        open={triggerEditorOpen}
+        trigger={editingTrigger}
+        templates={templates}
+        onSave={async (data) => {
+          if (editingTrigger) {
+            await supabase.from('email_triggers').update(data).eq('id', editingTrigger.id);
+            toast.success("Trigger updated");
+          } else {
+            await supabase.from('email_triggers').insert(data);
+            toast.success("Trigger created");
+          }
+          setTriggerEditorOpen(false);
+          fetchTriggers();
+        }}
+        onCancel={() => setTriggerEditorOpen(false)}
+      />
     </div>
   );
 }

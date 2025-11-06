@@ -19,21 +19,19 @@ const corsHeaders = {
 };
 
 interface AdminEmailRequest {
-  template: 'welcome' | 'evidence-approved' | 'evidence-rejected' | 'newsletter' | 'glo-update' | 'custom';
+  templateId?: string; // Use custom template from DB
+  template?: 'welcome' | 'evidence-approved' | 'evidence-rejected' | 'newsletter' | 'glo-update' | 'custom'; // Legacy
   recipients: string[];
-  subject: string;
-  customData?: {
-    userName?: string;
-    evidenceTitle?: string;
-    rejectionReason?: string;
-    resubmitUrl?: string;
-    viewUrl?: string;
-    announcementTitle?: string;
-    announcementBody?: string;
-    ctaText?: string;
-    ctaUrl?: string;
-  };
+  subject?: string; // Optional override
+  customData?: Record<string, any>; // Variables to replace
 }
+
+// Helper function to replace {{variable}} placeholders
+const replaceVariables = (template: string, data: Record<string, any>): string => {
+  return template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+    return data[key] !== undefined ? String(data[key]) : match;
+  });
+};
 
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
@@ -72,72 +70,100 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("Admin access required");
     }
 
-    const { template, recipients, subject, customData = {} }: AdminEmailRequest = await req.json();
+    const { templateId, template, recipients, subject, customData = {} }: AdminEmailRequest = await req.json();
 
-    console.log(`Sending ${template} email to ${recipients.length} recipients`);
-
-    // Render the appropriate email template
     let html: string;
-    switch (template) {
-      case 'welcome':
-        html = await renderAsync(
-          React.createElement(WelcomeEmail, {
-            userName: customData.userName || 'User',
-            dashboardUrl: customData.viewUrl || 'https://www.redrowexposed.co.uk',
-          })
-        );
-        break;
-      case 'evidence-approved':
-        html = await renderAsync(
-          React.createElement(EvidenceApprovedEmail, {
-            userName: customData.userName || 'User',
-            evidenceTitle: customData.evidenceTitle || 'Your Evidence',
-            viewUrl: customData.viewUrl || 'https://www.redrowexposed.co.uk/public-gallery',
-          })
-        );
-        break;
-      case 'evidence-rejected':
-        html = await renderAsync(
-          React.createElement(EvidenceRejectedEmail, {
-            userName: customData.userName || 'User',
-            evidenceTitle: customData.evidenceTitle || 'Your Evidence',
-            rejectionReason: customData.rejectionReason || 'Please review the guidelines and resubmit.',
-            resubmitUrl: customData.resubmitUrl || 'https://www.redrowexposed.co.uk/upload-evidence',
-          })
-        );
-        break;
-      case 'newsletter':
-        html = await renderAsync(
-          React.createElement(NewsletterEmail, {
-            announcementTitle: customData.announcementTitle || 'Newsletter',
-            announcementBody: customData.announcementBody || '',
-            ctaText: customData.ctaText,
-            ctaUrl: customData.ctaUrl,
-          })
-        );
-        break;
-      case 'glo-update':
-        html = await renderAsync(
-          React.createElement(GloUpdateEmail, {
-            updateTitle: customData.announcementTitle || 'GLO Update',
-            updateBody: customData.announcementBody || '',
-            ctaText: customData.ctaText,
-            ctaUrl: customData.ctaUrl,
-          })
-        );
-        break;
-      case 'custom':
-        html = await renderAsync(
-          React.createElement(CustomEmail, {
-            title: customData.announcementTitle || subject,
-            body: customData.announcementBody || '',
-            ctaText: customData.ctaText,
-            ctaUrl: customData.ctaUrl,
-          })
-        );
-        break;
-      default:
-        throw new Error(`Unknown template: ${template}`);
+    let finalSubject: string;
+
+    if (templateId) {
+      // Fetch template from database
+      const { data: templateData, error: templateError } = await supabaseClient
+        .from('email_templates')
+        .select('*')
+        .eq('id', templateId)
+        .eq('is_active', true)
+        .single();
+
+      if (templateError || !templateData) {
+        console.error('Template fetch error:', templateError);
+        throw new Error('Template not found or inactive');
+      }
+
+      // Replace variables in HTML content and subject
+      html = replaceVariables(templateData.html_content, customData);
+      finalSubject = subject || replaceVariables(templateData.subject_template, customData);
+
+      console.log(`Using database template: ${templateData.name}`);
+    } else if (template) {
+      // Legacy: use hardcoded React Email templates
+      finalSubject = subject || 'Email from Redrow Exposed';
+      
+      console.log(`Sending ${template} email to ${recipients.length} recipients`);
+
+      // Render the appropriate email template
+      switch (template) {
+        case 'welcome':
+          html = await renderAsync(
+            React.createElement(WelcomeEmail, {
+              userName: customData.userName || 'User',
+              dashboardUrl: customData.viewUrl || 'https://www.redrowexposed.co.uk',
+            })
+          );
+          break;
+        case 'evidence-approved':
+          html = await renderAsync(
+            React.createElement(EvidenceApprovedEmail, {
+              userName: customData.userName || 'User',
+              evidenceTitle: customData.evidenceTitle || 'Your Evidence',
+              viewUrl: customData.viewUrl || 'https://www.redrowexposed.co.uk/public-gallery',
+            })
+          );
+          break;
+        case 'evidence-rejected':
+          html = await renderAsync(
+            React.createElement(EvidenceRejectedEmail, {
+              userName: customData.userName || 'User',
+              evidenceTitle: customData.evidenceTitle || 'Your Evidence',
+              rejectionReason: customData.rejectionReason || 'Please review the guidelines and resubmit.',
+              resubmitUrl: customData.resubmitUrl || 'https://www.redrowexposed.co.uk/upload-evidence',
+            })
+          );
+          break;
+        case 'newsletter':
+          html = await renderAsync(
+            React.createElement(NewsletterEmail, {
+              announcementTitle: customData.announcementTitle || 'Newsletter',
+              announcementBody: customData.announcementBody || '',
+              ctaText: customData.ctaText,
+              ctaUrl: customData.ctaUrl,
+            })
+          );
+          break;
+        case 'glo-update':
+          html = await renderAsync(
+            React.createElement(GloUpdateEmail, {
+              updateTitle: customData.announcementTitle || 'GLO Update',
+              updateBody: customData.announcementBody || '',
+              ctaText: customData.ctaText,
+              ctaUrl: customData.ctaUrl,
+            })
+          );
+          break;
+        case 'custom':
+          html = await renderAsync(
+            React.createElement(CustomEmail, {
+              title: customData.announcementTitle || subject || 'Message',
+              body: customData.announcementBody || '',
+              ctaText: customData.ctaText,
+              ctaUrl: customData.ctaUrl,
+            })
+          );
+          break;
+        default:
+          throw new Error(`Unknown template: ${template}`);
+      }
+    } else {
+      throw new Error('Either templateId or template must be provided');
     }
 
     // Send emails
@@ -146,7 +172,7 @@ const handler = async (req: Request): Promise<Response> => {
         const { data, error } = await resend.emails.send({
           from: "Redrow Exposed <onboarding@resend.dev>",
           to: [email],
-          subject: subject,
+          subject: finalSubject,
           html: html,
         });
 
@@ -169,12 +195,13 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Log the email send in database
     await supabaseClient.from("email_logs").insert({
-      template_type: template,
-      subject: subject,
+      template_type: templateId ? 'custom_template' : template || 'unknown',
+      subject: finalSubject,
       recipients: recipients,
       sent_by: user.id,
       status: failedCount === 0 ? 'sent' : 'partial',
       metadata: {
+        template_id: templateId,
         successCount,
         failedCount,
         customData,

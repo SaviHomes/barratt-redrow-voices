@@ -215,6 +215,101 @@ export type Database = {
         }
         Relationships: []
       }
+      email_templates: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          display_name: string
+          html_content: string
+          id: string
+          is_active: boolean | null
+          is_system: boolean | null
+          name: string
+          preview_data: Json | null
+          subject_template: string
+          updated_at: string | null
+          variables: Json | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          display_name: string
+          html_content: string
+          id?: string
+          is_active?: boolean | null
+          is_system?: boolean | null
+          name: string
+          preview_data?: Json | null
+          subject_template: string
+          updated_at?: string | null
+          variables?: Json | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          display_name?: string
+          html_content?: string
+          id?: string
+          is_active?: boolean | null
+          is_system?: boolean | null
+          name?: string
+          preview_data?: Json | null
+          subject_template?: string
+          updated_at?: string | null
+          variables?: Json | null
+        }
+        Relationships: []
+      }
+      email_triggers: {
+        Row: {
+          conditions: Json | null
+          created_at: string | null
+          delay_minutes: number | null
+          event_type: Database["public"]["Enums"]["trigger_event"]
+          id: string
+          is_enabled: boolean | null
+          recipient_config: Json | null
+          template_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          conditions?: Json | null
+          created_at?: string | null
+          delay_minutes?: number | null
+          event_type: Database["public"]["Enums"]["trigger_event"]
+          id?: string
+          is_enabled?: boolean | null
+          recipient_config?: Json | null
+          template_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          conditions?: Json | null
+          created_at?: string | null
+          delay_minutes?: number | null
+          event_type?: Database["public"]["Enums"]["trigger_event"]
+          id?: string
+          is_enabled?: boolean | null
+          recipient_config?: Json | null
+          template_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_triggers_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "email_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       evidence: {
         Row: {
           category: string
@@ -564,6 +659,14 @@ export type Database = {
       app_role: "admin" | "moderator" | "user"
       moderation_status: "pending" | "approved" | "rejected"
       rating_value: "1" | "2" | "3" | "4" | "5"
+      trigger_event:
+        | "user_registered"
+        | "evidence_approved"
+        | "evidence_rejected"
+        | "evidence_submitted"
+        | "claim_submitted"
+        | "glo_registered"
+        | "manual"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -694,6 +797,15 @@ export const Constants = {
       app_role: ["admin", "moderator", "user"],
       moderation_status: ["pending", "approved", "rejected"],
       rating_value: ["1", "2", "3", "4", "5"],
+      trigger_event: [
+        "user_registered",
+        "evidence_approved",
+        "evidence_rejected",
+        "evidence_submitted",
+        "claim_submitted",
+        "glo_registered",
+        "manual",
+      ],
     },
   },
 } as const

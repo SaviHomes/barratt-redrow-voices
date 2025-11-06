@@ -192,7 +192,19 @@ export default function AdminEmailManagement() {
         return;
       }
 
+      // Get current session to pass Authorization header
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        toast.error("You must be logged in to send emails");
+        setSendingEmail(false);
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke("send-admin-email", {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        },
         body: {
           template,
           recipients,
@@ -239,7 +251,19 @@ export default function AdminEmailManagement() {
       const template = templates.find(t => t.id === quickTestTemplate);
       if (!template) throw new Error("Template not found");
 
+      // Get current session to pass Authorization header
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        toast.error("You must be logged in to send test emails");
+        setSendingQuickTest(false);
+        return;
+      }
+
       const { error } = await supabase.functions.invoke('send-admin-email', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        },
         body: {
           templateId: quickTestTemplate,
           recipients: [quickTestEmail],
@@ -302,7 +326,21 @@ export default function AdminEmailManagement() {
     const loadingToast = toast.loading("Syncing templates from source files...");
 
     try {
-      const { data, error } = await supabase.functions.invoke("sync-email-templates");
+      // Get current session to pass Authorization header
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        toast.error("You must be logged in to sync templates");
+        setSyncing(false);
+        toast.dismiss(loadingToast);
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke("sync-email-templates", {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      });
 
       if (error) throw error;
 

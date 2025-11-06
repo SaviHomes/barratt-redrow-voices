@@ -95,22 +95,20 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error('Unauthorized');
     }
 
+    // Extract JWT token from Authorization header
+    const jwt = authHeader.replace('Bearer ', '');
+
     // Create auth client with ANON key to verify user and check role
     const authClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: authHeader },
-        },
-      }
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     );
 
-    // Verify user is authenticated
+    // Verify user is authenticated by passing JWT directly
     const {
       data: { user },
       error: userError,
-    } = await authClient.auth.getUser();
+    } = await authClient.auth.getUser(jwt);
 
     if (userError || !user) {
       throw new Error('Unauthorized');

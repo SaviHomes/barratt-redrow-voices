@@ -41,9 +41,9 @@ export default function Login() {
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Redirect authenticated users to home page
+        // Redirect authenticated users to dashboard
         if (session?.user) {
-          navigate("/");
+          navigate("/dashboard");
         }
       }
     );
@@ -55,7 +55,7 @@ export default function Login() {
       
       // Redirect if already logged in
       if (session?.user) {
-        navigate("/");
+        navigate("/dashboard");
       }
     });
 

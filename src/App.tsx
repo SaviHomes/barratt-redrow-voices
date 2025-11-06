@@ -17,6 +17,10 @@ import UserManagement from "./pages/UserManagement";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import Developments from "./pages/Developments";
+import UserDashboard from "./pages/UserDashboard";
+import MyEvidence from "./pages/MyEvidence";
+import MyClaims from "./pages/MyClaims";
+import MyProfile from "./pages/MyProfile";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +42,10 @@ const App = () => (
             <Route path="/upload-evidence" element={<UploadEvidence />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/developments" element={<Developments />} />
+            <Route path="/dashboard" element={<UserDashboard />} />
+            <Route path="/my-evidence" element={<MyEvidence />} />
+            <Route path="/my-claims" element={<MyClaims />} />
+            <Route path="/my-profile" element={<MyProfile />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/users" element={<UserManagement />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

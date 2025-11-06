@@ -65,6 +65,24 @@ export default function MobileNavigation() {
             >
               Developments
             </a>
+            {user && (
+              <a 
+                href="/dashboard" 
+                className="text-foreground hover:text-primary transition-colors py-2 text-lg"
+                onClick={closeMenu}
+              >
+                My Dashboard
+              </a>
+            )}
+            {user && (
+              <a 
+                href="/my-evidence" 
+                className="text-foreground hover:text-primary transition-colors py-2 text-lg"
+                onClick={closeMenu}
+              >
+                My Evidence
+              </a>
+            )}
             <a 
               href="/redrow-defects" 
               className="text-foreground hover:text-primary transition-colors py-2 text-lg"

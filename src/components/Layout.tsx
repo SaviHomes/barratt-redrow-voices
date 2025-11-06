@@ -36,6 +36,12 @@ export default function Layout({ children }: LayoutProps) {
                 Developments
               </a>
               <a 
+                href="/my-evidence" 
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
+                My Evidence
+              </a>
+              <a 
                 href="/redrow-defects" 
                 className="text-muted-foreground hover:text-primary transition-colors"
               >

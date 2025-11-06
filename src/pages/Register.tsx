@@ -104,7 +104,7 @@ export default function Register() {
         title: "Registration Successful!",
         description: "Welcome! You can now access all features."
       });
-      navigate("/");
+      navigate("/dashboard");
     } catch (error) {
       toast({
         title: "Registration Failed",

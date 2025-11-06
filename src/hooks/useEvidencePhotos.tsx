@@ -18,6 +18,9 @@ export interface EvidenceWithPhotos {
   created_at: string;
   user_id: string;
   photos: EvidencePhoto[];
+  is_public?: boolean;
+  view_count?: number;
+  featured_image_index?: number;
 }
 
 export function useEvidencePhotos(evidence: any[], userId: string | undefined) {

@@ -15,6 +15,7 @@ import Login from "./pages/Login";
 import AdminDashboard from "./pages/AdminDashboard";
 import UserManagement from "./pages/UserManagement";
 import AdminFAQManagement from "./pages/AdminFAQManagement";
+import PublicGallery from "./pages/PublicGallery";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import Developments from "./pages/Developments";
@@ -53,6 +54,7 @@ const App = () => (
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/users" element={<UserManagement />} />
             <Route path="/admin/faqs" element={<AdminFAQManagement />} />
+            <Route path="/gallery" element={<PublicGallery />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -148,33 +148,77 @@ export type Database = {
           category: string
           created_at: string
           description: string | null
+          featured_image_index: number | null
           id: string
+          is_public: boolean | null
           severity: string
           title: string
           updated_at: string
           user_id: string
+          view_count: number | null
         }
         Insert: {
           category: string
           created_at?: string
           description?: string | null
+          featured_image_index?: number | null
           id?: string
+          is_public?: boolean | null
           severity: string
           title: string
           updated_at?: string
           user_id: string
+          view_count?: number | null
         }
         Update: {
           category?: string
           created_at?: string
           description?: string | null
+          featured_image_index?: number | null
           id?: string
+          is_public?: boolean | null
           severity?: string
           title?: string
           updated_at?: string
           user_id?: string
+          view_count?: number | null
         }
         Relationships: []
+      }
+      evidence_photo_captions: {
+        Row: {
+          caption: string | null
+          created_at: string | null
+          evidence_id: string | null
+          id: string
+          order_index: number | null
+          photo_path: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string | null
+          evidence_id?: string | null
+          id?: string
+          order_index?: number | null
+          photo_path: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string | null
+          evidence_id?: string | null
+          id?: string
+          order_index?: number | null
+          photo_path?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evidence_photo_captions_evidence_id_fkey"
+            columns: ["evidence_id"]
+            isOneToOne: false
+            referencedRelation: "evidence"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       faqs: {
         Row: {

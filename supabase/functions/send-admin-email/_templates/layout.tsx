@@ -22,6 +22,25 @@ export const EmailLayout = ({ children, preview }: EmailLayoutProps) => (
     <Body style={main}>
       <Container style={container}>
         <div style={header}>
+          <div style={{ textAlign: 'center' as const, marginBottom: '16px' }}>
+            <svg 
+              width="48" 
+              height="48" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              xmlns="http://www.w3.org/2000/svg"
+              style={{ margin: '0 auto', display: 'block' }}
+            >
+              <path 
+                d="M12 2L4 6V11C4 16.55 7.84 21.74 13 23C18.16 21.74 22 16.55 22 11V6L12 2Z" 
+                fill="#ffffff"
+                stroke="#ffffff"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
           <Text style={headerTitle}>Redrow Exposed</Text>
         </div>
         {children}
@@ -62,7 +81,7 @@ const container = {
 
 const header = {
   padding: '32px 24px',
-  backgroundColor: 'hsl(222.2 47.4% 11.2%)',
+  backgroundColor: '#1e3a8a',
   borderRadius: '8px 8px 0 0',
 };
 

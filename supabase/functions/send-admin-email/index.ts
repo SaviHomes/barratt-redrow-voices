@@ -10,6 +10,7 @@ import { NewsletterEmail } from "./_templates/newsletter.tsx";
 import { GloUpdateEmail } from "./_templates/glo-update.tsx";
 import { CustomEmail } from "./_templates/custom.tsx";
 import { ContactAdminNotification } from "./_templates/contact-admin-notification.tsx";
+import { ContactUsEmail } from "./_templates/contact-us.tsx";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -21,7 +22,7 @@ const corsHeaders = {
 
 interface AdminEmailRequest {
   templateId?: string; // Use custom template from DB
-  template?: 'welcome' | 'evidence-approved' | 'evidence-rejected' | 'newsletter' | 'glo-update' | 'custom' | 'contact-admin-notification'; // Legacy
+  template?: 'welcome' | 'evidence-approved' | 'evidence-rejected' | 'newsletter' | 'glo-update' | 'custom' | 'contact-admin-notification' | 'contact-us'; // Legacy
   recipients: string[];
   subject?: string; // Optional override
   customData?: Record<string, any>; // Variables to replace
@@ -180,6 +181,14 @@ const handler = async (req: Request): Promise<Response> => {
             })
           );
           finalSubject = subject || 'New Contact Form Submission';
+          break;
+        case 'contact-us':
+          html = await renderAsync(
+            React.createElement(ContactUsEmail, {
+              userName: customData.userName || undefined
+            })
+          );
+          finalSubject = subject || 'Thank you for your email';
           break;
         default:
           throw new Error(`Unknown template: ${template}`);

@@ -11,6 +11,7 @@ import { NewsletterEmail } from './_templates/newsletter.tsx';
 import { GloUpdateEmail } from './_templates/glo-update.tsx';
 import { CustomEmail } from './_templates/custom.tsx';
 import { ContactAdminNotification } from './_templates/contact-admin-notification.tsx';
+import { ContactUsEmail } from './_templates/contact-us.tsx';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -90,6 +91,13 @@ const templates: TemplateConfig[] = [
       subject: 'Question about my claim',
       message: 'I would like to know more about the process for submitting evidence. I have several photos of defects in my property that I would like to share with the group.',
       submittedAt: '15 Nov 2025, 14:30'
+    }
+  },
+  {
+    name: 'contact-us',
+    component: ContactUsEmail,
+    previewData: {
+      userName: 'John Smith'
     }
   }
 ];

@@ -9,6 +9,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Loader2, X, Upload, GripVertical } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { arrayMove, SortableContext, useSortable, rectSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface EvidencePhoto {
   name: string;
@@ -34,6 +37,50 @@ interface EditEvidenceDialogProps {
   onUpdate: () => void;
 }
 
+function SortablePhotoItem({ photo, onDelete, loading }: { photo: EvidencePhoto; onDelete: () => void; loading: boolean }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({ id: photo.path });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className="relative group">
+      <div 
+        {...attributes} 
+        {...listeners}
+        className="absolute top-1 left-1 bg-black/50 text-white rounded p-1 cursor-grab active:cursor-grabbing z-10 opacity-0 group-hover:opacity-100 transition-opacity"
+      >
+        <GripVertical className="h-4 w-4" />
+      </div>
+      
+      <img
+        src={photo.url}
+        alt={photo.name}
+        className="w-full h-32 object-cover rounded border border-border"
+      />
+      
+      <button
+        type="button"
+        onClick={onDelete}
+        className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+        disabled={loading}
+      >
+        <X className="h-4 w-4" />
+      </button>
+    </div>
+  );
+}
+
 export function EditEvidenceDialog({ evidence, open, onOpenChange, onUpdate }: EditEvidenceDialogProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -43,6 +90,14 @@ export function EditEvidenceDialog({ evidence, open, onOpenChange, onUpdate }: E
   const [newFiles, setNewFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [deletePhotoPath, setDeletePhotoPath] = useState<string | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    })
+  );
 
   useEffect(() => {
     if (evidence) {
@@ -99,6 +154,18 @@ export function EditEvidenceDialog({ evidence, open, onOpenChange, onUpdate }: E
     setNewFiles(newFiles.filter((_, i) => i !== index));
   };
 
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (over && active.id !== over.id) {
+      setPhotos((items) => {
+        const oldIndex = items.findIndex((item) => item.path === active.id);
+        const newIndex = items.findIndex((item) => item.path === over.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
+
   const handleSave = async () => {
     if (!evidence) return;
     if (!title.trim()) {
@@ -121,6 +188,19 @@ export function EditEvidenceDialog({ evidence, open, onOpenChange, onUpdate }: E
         .eq("id", evidence.id);
 
       if (updateError) throw updateError;
+
+      // Update photo order
+      if (photos.length > 0) {
+        for (let i = 0; i < photos.length; i++) {
+          const { error: orderError } = await supabase
+            .from("evidence_photo_captions")
+            .update({ order_index: i })
+            .eq("evidence_id", evidence.id)
+            .eq("photo_path", photos[i].path);
+            
+          if (orderError) throw orderError;
+        }
+      }
 
       // Upload new photos if any
       if (newFiles.length > 0) {
@@ -235,25 +315,24 @@ export function EditEvidenceDialog({ evidence, open, onOpenChange, onUpdate }: E
 
             <div>
               <Label>Existing Photos ({photos.length})</Label>
-              <div className="grid grid-cols-3 gap-2 mt-2">
-                {photos.map((photo) => (
-                  <div key={photo.path} className="relative group">
-                    <img
-                      src={photo.url}
-                      alt={photo.name}
-                      className="w-full h-32 object-cover rounded border border-border"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setDeletePhotoPath(photo.path)}
-                      className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                      disabled={loading}
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
+              <DndContext 
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext items={photos.map(p => p.path)} strategy={rectSortingStrategy}>
+                  <div className="grid grid-cols-3 gap-2 mt-2">
+                    {photos.map((photo) => (
+                      <SortablePhotoItem
+                        key={photo.path}
+                        photo={photo}
+                        onDelete={() => setDeletePhotoPath(photo.path)}
+                        loading={loading}
+                      />
+                    ))}
                   </div>
-                ))}
-              </div>
+                </SortableContext>
+              </DndContext>
             </div>
 
             <div>

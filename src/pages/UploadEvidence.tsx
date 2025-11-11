@@ -422,9 +422,9 @@ const UploadEvidence = () => {
                         <SelectValue placeholder="Select severity" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="low">Low - Cosmetic issues</SelectItem>
-                        <SelectItem value="medium">Medium - Noticeable problems</SelectItem>
-                        <SelectItem value="high">High - Significant issues</SelectItem>
+                        <SelectItem value="minor">Minor - Cosmetic issues</SelectItem>
+                        <SelectItem value="moderate">Moderate - Noticeable problems</SelectItem>
+                        <SelectItem value="severe">Severe - Significant issues</SelectItem>
                         <SelectItem value="critical">Critical - Safety concerns</SelectItem>
                       </SelectContent>
                     </Select>

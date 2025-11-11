@@ -382,73 +382,82 @@ export default function MyEvidence() {
                   const photoIndex = filteredEvidence[evidenceIndex]?.photos.findIndex(p => p.path === photo.path) ?? 0;
                   
                   return (
-                    <div
-                      key={`${photo.evidenceId}-${photo.path}`}
-                      className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group border-2 border-border hover:border-primary transition-all"
-                      onClick={() => openLightbox(photo.evidenceId, photoIndex)}
-                    >
-                      {/* Label badge - top left, always visible if exists */}
-                      {photo.label && (
-                        <div className="absolute top-2 left-2 z-10">
-                          <Badge variant="secondary" className="text-xs px-2 py-1 bg-black/70 text-white backdrop-blur-sm border-none">
-                            {photo.label}
-                          </Badge>
-                        </div>
-                      )}
-                      
-                      {/* Caption indicator - top right */}
-                      {photo.caption && (
-                        <div className="absolute top-2 right-2 z-10">
-                          <Badge variant="outline" className="text-xs px-1.5 py-0.5 bg-blue-500/90 text-white border-blue-300">
-                            <MessageSquare className="h-3 w-3" />
-                          </Badge>
-                        </div>
-                      )}
-
-                      {isVideoFile(photo.name) ? (
-                        <>
-                          <video
-                            src={photo.url}
-                            className="w-full h-full object-cover"
-                            muted
-                            playsInline
-                            preload="metadata"
-                          />
-                          {/* Play icon overlay */}
-                          <div className="absolute inset-0 flex items-center justify-center pointer-events-none bg-black/20">
-                            <div className="bg-black/60 rounded-full p-3 backdrop-blur-sm">
-                              <Play className="h-6 w-6 text-white fill-white" />
-                            </div>
+                    <div key={`${photo.evidenceId}-${photo.path}`} className="space-y-2">
+                      {/* Photo/Video container */}
+                      <div
+                        className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group border-2 border-border hover:border-primary transition-all"
+                        onClick={() => openLightbox(photo.evidenceId, photoIndex)}
+                      >
+                        {/* Label badge - top left, always visible if exists */}
+                        {photo.label && (
+                          <div className="absolute top-2 left-2 z-10">
+                            <Badge variant="secondary" className="text-xs px-2 py-1 bg-black/70 text-white backdrop-blur-sm border-none">
+                              {photo.label}
+                            </Badge>
                           </div>
-                        </>
-                      ) : (
-                        <img
-                          src={photo.url}
-                          alt={photo.label || photo.evidenceTitle}
-                          className="w-full h-full object-cover transition-transform group-hover:scale-110"
-                        />
+                        )}
+                        
+                        {/* Caption indicator - top right */}
+                        {photo.caption && (
+                          <div className="absolute top-2 right-2 z-10">
+                            <Badge variant="outline" className="text-xs px-1.5 py-0.5 bg-blue-500/90 text-white border-blue-300">
+                              <MessageSquare className="h-3 w-3" />
+                            </Badge>
+                          </div>
+                        )}
+
+                        {isVideoFile(photo.name) ? (
+                          <>
+                            <video
+                              src={photo.url}
+                              className="w-full h-full object-cover"
+                              muted
+                              playsInline
+                              preload="metadata"
+                            />
+                            {/* Play icon overlay */}
+                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none bg-black/20">
+                              <div className="bg-black/60 rounded-full p-3 backdrop-blur-sm">
+                                <Play className="h-6 w-6 text-white fill-white" />
+                              </div>
+                            </div>
+                          </>
+                        ) : (
+                          <img
+                            src={photo.url}
+                            alt={photo.label || photo.evidenceTitle}
+                            className="w-full h-full object-cover transition-transform group-hover:scale-110"
+                          />
+                        )}
+                        
+                        {/* Edit button overlay - shows on hover */}
+                        <div className="absolute bottom-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEditPhotoCaption(photo, photo.evidenceId);
+                            }}
+                            className="h-7 px-2"
+                          >
+                            <Edit className="h-3 w-3 mr-1" />
+                            Edit
+                          </Button>
+                        </div>
+                        
+                        {/* Evidence title overlay on hover - bottom left */}
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity pr-20">
+                          <p className="text-white text-xs font-medium truncate">{photo.evidenceTitle}</p>
+                        </div>
+                      </div>
+                      
+                      {/* Caption text below photo - bold and visible */}
+                      {photo.caption && (
+                        <p className="text-sm font-semibold text-foreground line-clamp-2 px-1">
+                          {photo.caption}
+                        </p>
                       )}
-                      
-                      {/* Edit button overlay - shows on hover */}
-                      <div className="absolute bottom-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleEditPhotoCaption(photo, photo.evidenceId);
-                          }}
-                          className="h-7 px-2"
-                        >
-                          <Edit className="h-3 w-3 mr-1" />
-                          Edit
-                        </Button>
-                      </div>
-                      
-                      {/* Evidence title overlay on hover - bottom left */}
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity pr-20">
-                        <p className="text-white text-xs font-medium truncate">{photo.evidenceTitle}</p>
-                      </div>
                     </div>
                   );
                 })}

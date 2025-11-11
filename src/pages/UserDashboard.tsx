@@ -3,12 +3,14 @@ import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { useEvidencePhotos } from "@/hooks/useEvidencePhotos";
 import Layout from "@/components/Layout";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Upload, FileText, Star, User, Image as ImageIcon, AlertCircle } from "lucide-react";
+import { EditEvidenceDialog } from "@/components/evidence/EditEvidenceDialog";
 
 export default function UserDashboard() {
   const { user } = useAuth();
@@ -22,6 +24,10 @@ export default function UserDashboard() {
   const [recentEvidence, setRecentEvidence] = useState<any[]>([]);
   const [recentClaims, setRecentClaims] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [evidenceToEdit, setEvidenceToEdit] = useState<any | null>(null);
+
+  const { evidenceWithPhotos, loading: photosLoading, refetch: refetchPhotos } = useEvidencePhotos(recentEvidence, user?.id);
 
   useEffect(() => {
     if (user) {
@@ -98,7 +104,12 @@ export default function UserDashboard() {
     }
   };
 
-  if (loading) {
+  const handleEditEvidence = (evidence: any) => {
+    setEvidenceToEdit(evidence);
+    setEditDialogOpen(true);
+  };
+
+  if (loading || photosLoading) {
     return (
       <Layout>
         <div className="min-h-screen flex items-center justify-center">
@@ -230,8 +241,12 @@ export default function UserDashboard() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {recentEvidence.map((evidence) => (
-                      <div key={evidence.id} className="flex items-start gap-3 p-3 border rounded-lg">
+                    {evidenceWithPhotos.map((evidence) => (
+                      <div 
+                        key={evidence.id} 
+                        className="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-accent transition-colors"
+                        onClick={() => handleEditEvidence(evidence)}
+                      >
                         <ImageIcon className="h-5 w-5 text-muted-foreground mt-1" />
                         <div className="flex-1 min-w-0">
                           <p className="font-medium truncate">{evidence.title}</p>
@@ -295,6 +310,16 @@ export default function UserDashboard() {
             </Card>
           </div>
         </div>
+
+        <EditEvidenceDialog
+          evidence={evidenceToEdit}
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          onUpdate={() => {
+            fetchDashboardData();
+            refetchPhotos();
+          }}
+        />
       </Layout>
     </ProtectedRoute>
   );

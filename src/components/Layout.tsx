@@ -5,17 +5,19 @@ import { useAuth } from "@/hooks/useAuth";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-
 interface LayoutProps {
   children: React.ReactNode;
 }
-
-export default function Layout({ children }: LayoutProps) {
-  const { user } = useAuth();
-  const { developmentsEnabled } = useSiteSettings();
-  
-  return (
-    <div className="min-h-screen bg-background">
+export default function Layout({
+  children
+}: LayoutProps) {
+  const {
+    user
+  } = useAuth();
+  const {
+    developmentsEnabled
+  } = useSiteSettings();
+  return <div className="min-h-screen bg-background">
       {/* Development Notice */}
       <div className="bg-muted py-3 text-center border-b border-border">
         <p className="text-sm text-muted-foreground px-4">
@@ -29,70 +31,40 @@ export default function Layout({ children }: LayoutProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Shield className="h-8 w-8 text-primary" />
-              <Link to="/" className="text-2xl font-bold text-foreground hover:text-primary transition-colors">
-                RedrowExposed
-              </Link>
+              <Link to="/" className="text-2xl font-bold text-foreground hover:text-primary transition-colors">Redrow Exposed</Link>
             </div>
             
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-6">
-              <Link 
-                to="/" 
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
+              <Link to="/" className="text-muted-foreground hover:text-primary transition-colors">
                 Home
               </Link>
-              {developmentsEnabled && (
-                <Link 
-                  to="/developments" 
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
+              {developmentsEnabled && <Link to="/developments" className="text-muted-foreground hover:text-primary transition-colors">
                   Developments
-                </Link>
-              )}
-              <Link 
-                to="/redrow-defects" 
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
+                </Link>}
+              <Link to="/redrow-defects" className="text-muted-foreground hover:text-primary transition-colors">
                 Defects
               </Link>
-              <Link 
-                to="/redrow-complaints" 
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
+              <Link to="/redrow-complaints" className="text-muted-foreground hover:text-primary transition-colors">
                 Complaints
               </Link>
-              <Link 
-                to="/submit-claim" 
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
+              <Link to="/submit-claim" className="text-muted-foreground hover:text-primary transition-colors">
                 Submit Claim
               </Link>
-              <Link 
-                to="/upload-evidence" 
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
+              <Link to="/upload-evidence" className="text-muted-foreground hover:text-primary transition-colors">
                 Upload Evidence
               </Link>
-              <a 
-                href="/#faq" 
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
+              <a href="/#faq" className="text-muted-foreground hover:text-primary transition-colors">
                 FAQ
               </a>
-              <Link 
-                to="/contact" 
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
+              <Link to="/contact" className="text-muted-foreground hover:text-primary transition-colors">
                 Contact
               </Link>
-              {user && (
-                <Button asChild variant="default" size="sm">
+              {user && <Button asChild variant="default" size="sm">
                   <Link to="/dashboard">
                     Dashboard
                   </Link>
-                </Button>
-              )}
+                </Button>}
             </nav>
 
             <div className="flex items-center space-x-4">
@@ -105,6 +77,5 @@ export default function Layout({ children }: LayoutProps) {
 
       {/* Main Content */}
       {children}
-    </div>
-  );
+    </div>;
 }

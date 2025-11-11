@@ -61,7 +61,7 @@ const App = () => (
             <Route path="/admin/visitor-statistics" element={<AdminVisitorStatistics />} />
             <Route path="/admin/emails" element={<AdminEmailManagement />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
-            <Route path="/gallery" element={<PublicGallery />} />
+            <Route path="/public-gallery" element={<PublicGallery />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

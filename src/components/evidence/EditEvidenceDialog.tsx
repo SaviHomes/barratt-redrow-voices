@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Loader2, X, Upload, GripVertical } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, rectSortingStrategy } from '@dnd-kit/sortable';
@@ -19,6 +20,8 @@ interface EvidencePhoto {
   url: string;
   size: number;
   created_at: string;
+  caption?: string | null;
+  label?: string | null;
 }
 
 interface Evidence {
@@ -37,7 +40,23 @@ interface EditEvidenceDialogProps {
   onUpdate: () => void;
 }
 
-function SortablePhotoItem({ photo, onDelete, loading }: { photo: EvidencePhoto; onDelete: () => void; loading: boolean }) {
+function SortablePhotoItem({ 
+  photo, 
+  onDelete, 
+  onEdit,
+  onCaptionChange,
+  onLabelChange,
+  isEditing,
+  loading 
+}: { 
+  photo: EvidencePhoto; 
+  onDelete: () => void; 
+  onEdit: () => void;
+  onCaptionChange: (caption: string) => void;
+  onLabelChange: (label: string) => void;
+  isEditing: boolean;
+  loading: boolean;
+}) {
   const {
     attributes,
     listeners,
@@ -53,6 +72,8 @@ function SortablePhotoItem({ photo, onDelete, loading }: { photo: EvidencePhoto;
     opacity: isDragging ? 0.5 : 1,
   };
 
+  const hasCaption = !!(photo.caption || photo.label);
+
   return (
     <div ref={setNodeRef} style={style} className="relative group">
       <div 
@@ -63,20 +84,75 @@ function SortablePhotoItem({ photo, onDelete, loading }: { photo: EvidencePhoto;
         <GripVertical className="h-4 w-4" />
       </div>
       
-      <img
-        src={photo.url}
-        alt={photo.name}
-        className="w-full h-32 object-cover rounded border border-border"
-      />
+      <div 
+        onClick={onEdit}
+        className="cursor-pointer relative"
+      >
+        <img
+          src={photo.url}
+          alt={photo.label || photo.name}
+          className={cn(
+            "w-full h-32 object-cover rounded border transition-all",
+            isEditing ? "border-primary border-2" : "border-border",
+            hasCaption && "ring-2 ring-blue-400 ring-offset-2"
+          )}
+        />
+        
+        {hasCaption && !isEditing && (
+          <div className="absolute bottom-1 left-1 bg-blue-500 text-white text-xs px-2 py-0.5 rounded">
+            {photo.label || "Captioned"}
+          </div>
+        )}
+      </div>
       
       <button
         type="button"
-        onClick={onDelete}
-        className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+        onClick={(e) => {
+          e.stopPropagation();
+          onDelete();
+        }}
+        className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity z-10"
         disabled={loading}
       >
         <X className="h-4 w-4" />
       </button>
+      
+      {isEditing && (
+        <div className="mt-2 space-y-2 p-2 bg-muted rounded border border-border">
+          <div>
+            <Label className="text-xs">Label (optional)</Label>
+            <Input
+              value={photo.label || ""}
+              onChange={(e) => onLabelChange(e.target.value)}
+              placeholder="e.g., Front view, Close-up"
+              className="h-8 text-sm"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+          <div>
+            <Label className="text-xs">Caption (optional)</Label>
+            <Textarea
+              value={photo.caption || ""}
+              onChange={(e) => onCaptionChange(e.target.value)}
+              placeholder="Describe what's shown in this photo..."
+              className="min-h-[60px] text-sm"
+              rows={2}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit();
+            }}
+            className="w-full"
+          >
+            Done
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
@@ -90,6 +166,7 @@ export function EditEvidenceDialog({ evidence, open, onOpenChange, onUpdate }: E
   const [newFiles, setNewFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [deletePhotoPath, setDeletePhotoPath] = useState<string | null>(null);
+  const [editingPhotoPath, setEditingPhotoPath] = useState<string | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -105,10 +182,36 @@ export function EditEvidenceDialog({ evidence, open, onOpenChange, onUpdate }: E
       setDescription(evidence.description || "");
       setCategory(evidence.category);
       setSeverity(evidence.severity);
-      setPhotos(evidence.photos || []);
+      fetchPhotosWithCaptions(evidence.id);
       setNewFiles([]);
     }
   }, [evidence]);
+
+  const fetchPhotosWithCaptions = async (evidenceId: string) => {
+    try {
+      const { data: photoCaptions, error } = await supabase
+        .from("evidence_photo_captions")
+        .select("photo_path, caption, label, order_index")
+        .eq("evidence_id", evidenceId)
+        .order("order_index", { ascending: true });
+      
+      if (error) throw error;
+      
+      const photosWithCaptions = (evidence?.photos || []).map(photo => {
+        const captionData = photoCaptions?.find(c => c.photo_path === photo.path);
+        return {
+          ...photo,
+          caption: captionData?.caption || null,
+          label: captionData?.label || null,
+        };
+      });
+      
+      setPhotos(photosWithCaptions);
+    } catch (error) {
+      console.error("Error fetching captions:", error);
+      setPhotos(evidence?.photos || []);
+    }
+  };
 
   const handleDeletePhoto = async (photoPath: string) => {
     if (!evidence) return;
@@ -166,6 +269,22 @@ export function EditEvidenceDialog({ evidence, open, onOpenChange, onUpdate }: E
     }
   };
 
+  const handleCaptionChange = (photoPath: string, caption: string) => {
+    setPhotos(photos.map(p => 
+      p.path === photoPath ? { ...p, caption } : p
+    ));
+  };
+
+  const handleLabelChange = (photoPath: string, label: string) => {
+    setPhotos(photos.map(p => 
+      p.path === photoPath ? { ...p, label } : p
+    ));
+  };
+
+  const togglePhotoEditor = (photoPath: string) => {
+    setEditingPhotoPath(editingPhotoPath === photoPath ? null : photoPath);
+  };
+
   const handleSave = async () => {
     if (!evidence) return;
     if (!title.trim()) {
@@ -189,16 +308,20 @@ export function EditEvidenceDialog({ evidence, open, onOpenChange, onUpdate }: E
 
       if (updateError) throw updateError;
 
-      // Update photo order
+      // Update photo order, captions, and labels
       if (photos.length > 0) {
         for (let i = 0; i < photos.length; i++) {
-          const { error: orderError } = await supabase
+          const { error: updateError } = await supabase
             .from("evidence_photo_captions")
-            .update({ order_index: i })
+            .update({ 
+              order_index: i,
+              caption: photos[i].caption || null,
+              label: photos[i].label || null
+            })
             .eq("evidence_id", evidence.id)
             .eq("photo_path", photos[i].path);
             
-          if (orderError) throw orderError;
+          if (updateError) throw updateError;
         }
       }
 
@@ -314,7 +437,12 @@ export function EditEvidenceDialog({ evidence, open, onOpenChange, onUpdate }: E
             </div>
 
             <div>
-              <Label>Existing Photos ({photos.length})</Label>
+              <Label>
+                Existing Photos ({photos.length})
+                <span className="text-xs text-muted-foreground ml-2">
+                  Click on a photo to add captions
+                </span>
+              </Label>
               <DndContext 
                 sensors={sensors}
                 collisionDetection={closestCenter}
@@ -327,6 +455,10 @@ export function EditEvidenceDialog({ evidence, open, onOpenChange, onUpdate }: E
                         key={photo.path}
                         photo={photo}
                         onDelete={() => setDeletePhotoPath(photo.path)}
+                        onEdit={() => togglePhotoEditor(photo.path)}
+                        onCaptionChange={(caption) => handleCaptionChange(photo.path, caption)}
+                        onLabelChange={(label) => handleLabelChange(photo.path, label)}
+                        isEditing={editingPhotoPath === photo.path}
                         loading={loading}
                       />
                     ))}

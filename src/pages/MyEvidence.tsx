@@ -348,7 +348,7 @@ export default function MyEvidence() {
           ) : (
             <div className="space-y-6">
               {/* Gallery Grid - 5 columns, 2 rows */}
-              <div className="grid grid-cols-5 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 {paginatedPhotos.map((photo) => {
                   const evidenceIndex = filteredEvidence.findIndex(e => e.id === photo.evidenceId);
                   const photoIndex = filteredEvidence[evidenceIndex]?.photos.findIndex(p => p.path === photo.path) ?? 0;

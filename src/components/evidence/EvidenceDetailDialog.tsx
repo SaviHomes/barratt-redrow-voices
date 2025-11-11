@@ -146,7 +146,7 @@ export default function EvidenceDetailDialog({ evidence, open, onOpenChange }: E
           {/* Caption below current image */}
           {hasImages && currentCaption?.caption && (
             <div className="px-6 pt-4 pb-2 bg-muted/30 border-b">
-              <p className="text-sm text-muted-foreground italic">
+              <p className="text-sm text-foreground font-semibold">
                 "{currentCaption.caption}"
               </p>
             </div>

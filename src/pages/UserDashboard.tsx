@@ -244,17 +244,17 @@ export default function UserDashboard() {
                     {evidenceWithPhotos.map((evidence) => (
                       <div 
                         key={evidence.id} 
-                        className="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-accent transition-colors"
+                        className="group flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-accent transition-colors"
                         onClick={() => handleEditEvidence(evidence)}
                       >
-                        <ImageIcon className="h-5 w-5 text-muted-foreground mt-1" />
+                        <ImageIcon className="h-5 w-5 text-muted-foreground group-hover:text-white mt-1" />
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium truncate">{evidence.title}</p>
+                          <p className="font-medium truncate group-hover:text-white">{evidence.title}</p>
                           <div className="flex items-center gap-2 mt-1">
                             <Badge variant={getSeverityColor(evidence.severity)} className="text-xs">
                               {evidence.severity}
                             </Badge>
-                            <span className="text-xs text-muted-foreground">{evidence.category}</span>
+                            <span className="text-xs text-muted-foreground group-hover:text-white">{evidence.category}</span>
                           </div>
                         </div>
                       </div>

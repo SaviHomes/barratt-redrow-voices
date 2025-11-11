@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Globe, Users, MapPin, Clock, Scale, HelpCircle, ImageIcon, Mail, Settings } from "lucide-react";
+import { AlertTriangle, Globe, Users, MapPin, Clock, Scale, HelpCircle, ImageIcon, Mail, Settings, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
@@ -502,11 +502,12 @@ export default function AdminDashboard() {
                         <TableCell>
                           <div className="flex gap-2">
                             <Button 
-                              variant="ghost" 
+                              variant="outline" 
                               size="sm"
                               onClick={() => openPreview(evidence)}
                             >
-                              Preview
+                              <Eye className="h-4 w-4 mr-1" />
+                              View
                             </Button>
                             <Button 
                               variant="default" 

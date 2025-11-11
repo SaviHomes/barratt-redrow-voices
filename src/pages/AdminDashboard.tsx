@@ -235,28 +235,39 @@ export default function AdminDashboard() {
 
   const openPreview = async (evidence: PendingEvidence) => {
     try {
-      // Fetch photos for this evidence
-      const { data: files, error } = await supabase.storage
-        .from('evidence-photos')
-        .list(`${evidence.user_id}/${evidence.id}`);
+      // Fetch photo captions which contain the file paths
+      const { data: captions, error: captionsError } = await supabase
+        .from('evidence_photo_captions')
+        .select('*')
+        .eq('evidence_id', evidence.id)
+        .order('order_index', { ascending: true });
 
-      if (error) throw error;
+      if (captionsError) throw captionsError;
 
-      const photos = await Promise.all(
-        (files || []).map(async (file) => {
-          const { data: { publicUrl } } = supabase.storage
-            .from('evidence-photos')
-            .getPublicUrl(`${evidence.user_id}/${evidence.id}/${file.name}`);
+      // Build photo objects with public URLs
+      const photos = (captions || []).map(caption => {
+        const { data: { publicUrl } } = supabase.storage
+          .from('evidence-photos')
+          .getPublicUrl(caption.photo_path);
 
-          return {
-            name: file.name,
-            path: `${evidence.user_id}/${evidence.id}/${file.name}`,
-            url: publicUrl,
-            size: file.metadata?.size || 0,
-            created_at: file.created_at || new Date().toISOString(),
-          };
-        })
-      );
+        // Extract filename from path
+        const pathParts = caption.photo_path.split('/');
+        const fileName = pathParts[pathParts.length - 1];
+
+        return {
+          name: fileName,
+          path: caption.photo_path,
+          url: publicUrl,
+          size: 0, // Size not available from captions table
+          created_at: new Date().toISOString(),
+        };
+      });
+
+      console.log('Fetching photos for evidence:', evidence.id);
+      console.log('Number of photos found:', photos.length);
+      if (photos.length === 0) {
+        console.warn('No photos found for this evidence');
+      }
 
       setPreviewEvidence({
         ...evidence,

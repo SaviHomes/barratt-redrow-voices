@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -170,6 +170,9 @@ export function EditEvidenceDialog({ evidence, open, onOpenChange, onUpdate }: E
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Evidence</DialogTitle>
+            <DialogDescription>
+              Update the details of your evidence, manage photos, and modify categories.
+            </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">

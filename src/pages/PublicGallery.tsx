@@ -1,14 +1,17 @@
 import { useState, useEffect } from "react";
+import { useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/Layout";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import AdaptiveEvidenceCard from "@/components/evidence/AdaptiveEvidenceCard";
 import EvidenceDetailDialog from "@/components/evidence/EvidenceDetailDialog";
 import { useEvidencePhotos, EvidenceWithPhotos } from "@/hooks/useEvidencePhotos";
-import { Search, Filter, SortAsc } from "lucide-react";
+import { Search, Filter, SortAsc, Eye, ArrowLeft } from "lucide-react";
 import Masonry from "react-masonry-css";
 import SEOHead from "@/components/SEOHead";
 
@@ -36,6 +39,10 @@ const SORT_OPTIONS = [
 ];
 
 export default function PublicGallery() {
+  const [searchParams] = useSearchParams();
+  const isPreviewMode = searchParams.get('preview') === 'true';
+  const previewUserId = searchParams.get('userId');
+  
   const [evidence, setEvidence] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -48,7 +55,7 @@ export default function PublicGallery() {
 
   useEffect(() => {
     fetchPublicEvidence();
-  }, [categoryFilter, severityFilter, sortBy]);
+  }, [categoryFilter, severityFilter, sortBy, isPreviewMode, previewUserId]);
 
   const fetchPublicEvidence = async () => {
     setLoading(true);
@@ -57,6 +64,10 @@ export default function PublicGallery() {
         .from('evidence')
         .select('*')
         .eq('is_public', true);
+
+      if (isPreviewMode && previewUserId) {
+        query = query.eq('user_id', previewUserId);
+      }
 
       if (categoryFilter !== 'all') {
         query = query.eq('category', categoryFilter);
@@ -123,13 +134,35 @@ export default function PublicGallery() {
       />
 
       <div className="min-h-screen bg-background">
+        {/* Preview Mode Banner */}
+        {isPreviewMode && (
+          <Alert className="rounded-none border-l-4 border-l-primary bg-primary/5">
+            <Eye className="h-5 w-5 text-primary" />
+            <AlertDescription className="flex items-center justify-between">
+              <span className="font-medium">
+                Preview Mode - Viewing your published evidence as it appears to the public
+              </span>
+              <Button asChild variant="ghost" size="sm">
+                <Link to="/user-dashboard" className="flex items-center gap-2">
+                  <ArrowLeft className="h-4 w-4" />
+                  Back to Dashboard
+                </Link>
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Hero Section */}
         <section className="bg-gradient-to-b from-primary/5 to-background py-12 border-b">
           <div className="container max-w-7xl">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Evidence Gallery</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              {isPreviewMode ? "Your Published Evidence" : "Evidence Gallery"}
+            </h1>
             <p className="text-lg text-muted-foreground max-w-3xl">
-              Real homeowner experiences documenting defects and issues across Redrow developments.
-              Browse photos, descriptions, and severity levels to understand common problems.
+              {isPreviewMode 
+                ? "This is how your approved evidence appears on the public gallery. Only evidence marked as public by admins is shown here."
+                : "Real homeowner experiences documenting defects and issues across Redrow developments. Browse photos, descriptions, and severity levels to understand common problems."
+              }
             </p>
           </div>
         </section>
@@ -222,10 +255,20 @@ export default function PublicGallery() {
               </div>
             ) : filteredEvidence.length === 0 ? (
               <div className="text-center py-16">
-                <p className="text-xl text-muted-foreground mb-2">No evidence found</p>
-                <p className="text-sm text-muted-foreground">
-                  Try adjusting your filters or search criteria
+                <p className="text-xl text-muted-foreground mb-2">
+                  {isPreviewMode ? "You don't have any published evidence yet" : "No evidence found"}
                 </p>
+                <p className="text-sm text-muted-foreground mb-4">
+                  {isPreviewMode 
+                    ? "Evidence must be approved by an admin before appearing publicly" 
+                    : "Try adjusting your filters or search criteria"
+                  }
+                </p>
+                {isPreviewMode && (
+                  <Button asChild variant="outline">
+                    <Link to="/my-evidence">View All My Evidence</Link>
+                  </Button>
+                )}
               </div>
             ) : (
               <>

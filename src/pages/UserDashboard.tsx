@@ -9,7 +9,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Upload, FileText, Star, User, Image as ImageIcon, AlertCircle } from "lucide-react";
+import { Upload, FileText, Star, User, Image as ImageIcon, AlertCircle, Eye } from "lucide-react";
 import { EditEvidenceDialog } from "@/components/evidence/EditEvidenceDialog";
 
 export default function UserDashboard() {
@@ -179,7 +179,7 @@ export default function UserDashboard() {
               <CardDescription>Common tasks you might want to perform</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
                 <Button asChild variant="outline" className="h-auto py-4">
                   <Link to="/upload-evidence" className="flex flex-col items-center gap-2">
                     <Upload className="h-6 w-6" />
@@ -190,6 +190,12 @@ export default function UserDashboard() {
                   <Link to="/my-evidence" className="flex flex-col items-center gap-2">
                     <ImageIcon className="h-6 w-6" />
                     <span>My Evidence</span>
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" className="h-auto py-4">
+                  <Link to={`/public-gallery?userId=${user?.id}&preview=true`} className="flex flex-col items-center gap-2">
+                    <Eye className="h-6 w-6" />
+                    <span>Live View</span>
                   </Link>
                 </Button>
                 <Button asChild variant="outline" className="h-auto py-4">

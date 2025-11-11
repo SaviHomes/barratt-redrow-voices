@@ -13,6 +13,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, rectSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { VideoPlayerDialog } from "./VideoPlayerDialog";
 
 interface EvidencePhoto {
   name: string;
@@ -51,6 +52,7 @@ function SortablePhotoItem({
   onEdit,
   onCaptionChange,
   onLabelChange,
+  onVideoDoubleClick,
   isEditing,
   loading 
 }: { 
@@ -59,6 +61,7 @@ function SortablePhotoItem({
   onEdit: () => void;
   onCaptionChange: (caption: string) => void;
   onLabelChange: (label: string) => void;
+  onVideoDoubleClick?: () => void;
   isEditing: boolean;
   loading: boolean;
 }) {
@@ -105,6 +108,10 @@ function SortablePhotoItem({
             muted
             playsInline
             preload="metadata"
+            onDoubleClick={(e) => {
+              e.stopPropagation();
+              onVideoDoubleClick?.();
+            }}
           />
         ) : (
           <img
@@ -119,10 +126,17 @@ function SortablePhotoItem({
         )}
         
         {isVideoFile(photo.name) && !isEditing && (
-          <div className="absolute top-1 left-1 bg-black/70 text-white text-xs px-2 py-0.5 rounded flex items-center gap-1">
-            <Play className="h-3 w-3" />
-            Video
-          </div>
+          <>
+            <div className="absolute top-1 left-1 bg-black/70 text-white text-xs px-2 py-0.5 rounded flex items-center gap-1">
+              <Play className="h-3 w-3" />
+              Video
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="bg-black/50 rounded-full p-3 backdrop-blur-sm">
+                <Play className="h-6 w-6 text-white fill-white" />
+              </div>
+            </div>
+          </>
         )}
         
         {hasCaption && !isEditing && (
@@ -194,6 +208,8 @@ export function EditEvidenceDialog({ evidence, open, onOpenChange, onUpdate }: E
   const [loading, setLoading] = useState(false);
   const [deletePhotoPath, setDeletePhotoPath] = useState<string | null>(null);
   const [editingPhotoPath, setEditingPhotoPath] = useState<string | null>(null);
+  const [playingVideoUrl, setPlayingVideoUrl] = useState<string | null>(null);
+  const [playingVideoName, setPlayingVideoName] = useState<string>("");
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -310,6 +326,11 @@ export function EditEvidenceDialog({ evidence, open, onOpenChange, onUpdate }: E
 
   const togglePhotoEditor = (photoPath: string) => {
     setEditingPhotoPath(editingPhotoPath === photoPath ? null : photoPath);
+  };
+
+  const handleVideoDoubleClick = (photo: EvidencePhoto) => {
+    setPlayingVideoUrl(photo.url);
+    setPlayingVideoName(photo.name);
   };
 
   const handleSave = async () => {
@@ -467,7 +488,7 @@ export function EditEvidenceDialog({ evidence, open, onOpenChange, onUpdate }: E
               <Label>
                 Existing Photos ({photos.length})
                 <span className="text-xs text-muted-foreground ml-2">
-                  Click on a photo to add captions
+                  Click photos to add captions • Double-click videos to play
                 </span>
               </Label>
               <DndContext 
@@ -485,6 +506,7 @@ export function EditEvidenceDialog({ evidence, open, onOpenChange, onUpdate }: E
                         onEdit={() => togglePhotoEditor(photo.path)}
                         onCaptionChange={(caption) => handleCaptionChange(photo.path, caption)}
                         onLabelChange={(label) => handleLabelChange(photo.path, label)}
+                        onVideoDoubleClick={() => handleVideoDoubleClick(photo)}
                         isEditing={editingPhotoPath === photo.path}
                         loading={loading}
                       />
@@ -557,6 +579,13 @@ export function EditEvidenceDialog({ evidence, open, onOpenChange, onUpdate }: E
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <VideoPlayerDialog
+        videoUrl={playingVideoUrl || ""}
+        videoName={playingVideoName}
+        isOpen={!!playingVideoUrl}
+        onClose={() => setPlayingVideoUrl(null)}
+      />
     </>
   );
 }

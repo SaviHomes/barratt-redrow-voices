@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -34,12 +34,12 @@ export function PhotoCaptionEditor({
   const { toast } = useToast();
 
   // Update state when photo changes
-  useState(() => {
+  useEffect(() => {
     if (photo) {
       setLabel(photo.label || '');
       setCaption(photo.caption || '');
     }
-  });
+  }, [photo]);
 
   const handleSave = async () => {
     if (!photo || !evidenceId) return;

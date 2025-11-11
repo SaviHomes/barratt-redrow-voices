@@ -533,9 +533,9 @@ export default function MyEvidence() {
                         )}
                         
                         {/* Action buttons overlay - shows on hover */}
-                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20">
                           {/* Move buttons - top right */}
-                          <div className="absolute top-2 right-2 flex gap-1 pointer-events-auto">
+                          <div className="absolute top-2 right-2 flex gap-1 pointer-events-auto z-20" onClick={(e) => e.stopPropagation()}>
                             <Button
                               size="sm"
                               variant="secondary"
@@ -562,8 +562,8 @@ export default function MyEvidence() {
                             </Button>
                           </div>
                           
-                          {/* Edit and Delete buttons - bottom right */}
-                          <div className="absolute bottom-2 right-2 flex gap-1 pointer-events-auto">
+                    {/* Edit and Delete buttons - bottom right */}
+                    <div className="absolute bottom-2 right-2 flex gap-1 pointer-events-auto z-20" onClick={(e) => e.stopPropagation()}>
                             <Button
                               size="sm"
                               variant="secondary"

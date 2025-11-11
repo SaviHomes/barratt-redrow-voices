@@ -1,12 +1,17 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Calendar, Image as ImageIcon, ChevronLeft, ChevronRight, MapPin } from "lucide-react";
+import { Calendar, Image as ImageIcon, ChevronLeft, ChevronRight, MapPin, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { EvidenceWithPhotos } from "@/hooks/useEvidencePhotos";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+
+const isVideoFile = (filename: string): boolean => {
+  const videoExtensions = ['.mp4', '.mov', '.avi', '.webm', '.mkv', '.m4v'];
+  return videoExtensions.some(ext => filename.toLowerCase().endsWith(ext));
+};
 
 interface PhotoCaption {
   id: string;
@@ -58,6 +63,7 @@ export default function EvidenceDetailDialog({ evidence, open, onOpenChange }: E
   const hasImages = evidence.photos.length > 0;
   const currentPhoto = evidence.photos[currentImageIndex];
   const currentCaption = captions.find(c => c.photo_path === currentPhoto?.path);
+  const isCurrentVideo = currentPhoto ? isVideoFile(currentPhoto.name) : false;
 
   const handlePrevImage = () => {
     setCurrentImageIndex((prev) => (prev === 0 ? evidence.photos.length - 1 : prev - 1));
@@ -83,11 +89,20 @@ export default function EvidenceDetailDialog({ evidence, open, onOpenChange }: E
         <ScrollArea className="max-h-[90vh]">
           {hasImages && (
             <div className="relative w-full aspect-video bg-black">
-              <img
-                src={evidence.photos[currentImageIndex].url}
-                alt={`${evidence.title} - ${currentImageIndex + 1}`}
-                className="w-full h-full object-contain"
-              />
+              {isCurrentVideo ? (
+                <video
+                  src={currentPhoto.url}
+                  controls={true}
+                  className="w-full h-full object-contain"
+                  autoPlay={false}
+                />
+              ) : (
+                <img
+                  src={currentPhoto.url}
+                  alt={`${evidence.title} - ${currentImageIndex + 1}`}
+                  className="w-full h-full object-contain"
+                />
+              )}
               
               {evidence.photos.length > 1 && (
                 <>
@@ -113,8 +128,13 @@ export default function EvidenceDetailDialog({ evidence, open, onOpenChange }: E
                 </>
               )}
 
-              {/* Label overlay */}
-              {currentCaption?.label && (
+              {/* Label overlay or video badge */}
+              {isCurrentVideo ? (
+                <div className="absolute top-4 left-4 bg-black/70 text-white px-3 py-1 rounded-md text-sm flex items-center gap-1">
+                  <Play className="h-3 w-3" />
+                  Video
+                </div>
+              ) : currentCaption?.label && (
                 <div className="absolute top-4 left-4 bg-black/70 text-white px-3 py-1 rounded-md text-sm flex items-center gap-1">
                   <MapPin className="h-3 w-3" />
                   {currentCaption.label}
@@ -178,6 +198,7 @@ export default function EvidenceDetailDialog({ evidence, open, onOpenChange }: E
                 <div className="grid grid-cols-4 gap-2">
                   {evidence.photos.map((photo, idx) => {
                     const photoCaption = captions.find(c => c.photo_path === photo.path);
+                    const isThumbVideo = isVideoFile(photo.name);
                     return (
                       <button
                         key={photo.path}
@@ -187,12 +208,28 @@ export default function EvidenceDetailDialog({ evidence, open, onOpenChange }: E
                           idx === currentImageIndex ? "border-primary" : "border-transparent opacity-60 hover:opacity-100"
                         )}
                       >
-                        <img
-                          src={photo.url}
-                          alt={`Thumbnail ${idx + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                        {photoCaption?.label && (
+                        {isThumbVideo ? (
+                          <video
+                            src={photo.url}
+                            className="w-full h-full object-cover"
+                            muted
+                            playsInline
+                          />
+                        ) : (
+                          <img
+                            src={photo.url}
+                            alt={`Thumbnail ${idx + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        )}
+                        {isThumbVideo && (
+                          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <div className="bg-black/50 rounded-full p-2 backdrop-blur-sm">
+                              <Play className="h-4 w-4 text-white fill-white" />
+                            </div>
+                          </div>
+                        )}
+                        {photoCaption?.label && !isThumbVideo && (
                           <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs px-1 py-0.5 truncate">
                             {photoCaption.label}
                           </div>

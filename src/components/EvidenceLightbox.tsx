@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, ChevronLeft, ChevronRight, Download, Trash2, ZoomIn, ZoomOut } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Download, Trash2, ZoomIn, ZoomOut, Play } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   AlertDialog,
@@ -14,6 +14,11 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { EvidencePhoto } from "@/hooks/useEvidencePhotos";
+
+const isVideoFile = (filename: string): boolean => {
+  const videoExtensions = ['.mp4', '.mov', '.avi', '.webm', '.mkv', '.m4v'];
+  return videoExtensions.some(ext => filename.toLowerCase().endsWith(ext));
+};
 
 interface EvidenceLightboxProps {
   photos: EvidencePhoto[];
@@ -141,6 +146,7 @@ export default function EvidenceLightbox({
   if (photos.length === 0) return null;
 
   const currentPhoto = photos[currentIndex];
+  const isVideo = isVideoFile(currentPhoto.name);
 
   return (
     <>
@@ -164,24 +170,28 @@ export default function EvidenceLightbox({
 
             {/* Controls */}
             <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-50 flex gap-2 bg-black/50 p-2 rounded-lg">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleZoomOut}
-                disabled={zoom <= 1}
-                className="text-white hover:bg-white/20"
-              >
-                <ZoomOut className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleZoomIn}
-                disabled={zoom >= 3}
-                className="text-white hover:bg-white/20"
-              >
-                <ZoomIn className="h-5 w-5" />
-              </Button>
+              {!isVideo && (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleZoomOut}
+                    disabled={zoom <= 1}
+                    className="text-white hover:bg-white/20"
+                  >
+                    <ZoomOut className="h-5 w-5" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleZoomIn}
+                    disabled={zoom >= 3}
+                    className="text-white hover:bg-white/20"
+                  >
+                    <ZoomIn className="h-5 w-5" />
+                  </Button>
+                </>
+              )}
               <Button
                 variant="ghost"
                 size="icon"
@@ -224,14 +234,23 @@ export default function EvidenceLightbox({
               </Button>
             )}
 
-            {/* Image */}
+            {/* Image or Video */}
             <div className="w-full h-full flex items-center justify-center p-16 overflow-auto">
-              <img
-                src={currentPhoto.url}
-                alt={`${evidenceTitle} - Photo ${currentIndex + 1}`}
-                className="max-w-full max-h-full object-contain transition-transform duration-200"
-                style={{ transform: `scale(${zoom})` }}
-              />
+              {isVideo ? (
+                <video
+                  src={currentPhoto.url}
+                  controls={true}
+                  autoPlay={true}
+                  className="max-w-full max-h-[85vh] w-auto h-auto rounded shadow-2xl"
+                />
+              ) : (
+                <img
+                  src={currentPhoto.url}
+                  alt={`${evidenceTitle} - Photo ${currentIndex + 1}`}
+                  className="max-w-full max-h-full object-contain transition-transform duration-200"
+                  style={{ transform: `scale(${zoom})` }}
+                />
+              )}
             </div>
           </div>
         </DialogContent>

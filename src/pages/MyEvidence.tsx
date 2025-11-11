@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Image as ImageIcon, Search, Trash2, Download, Images, Play, Edit, MessageSquare } from "lucide-react";
+import { Image as ImageIcon, Search, Trash2, Download, Images, Play, Edit, MessageSquare, ArrowUp, ArrowDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -62,6 +62,7 @@ export default function MyEvidence() {
   const [captionEditorOpen, setCaptionEditorOpen] = useState(false);
   const [photoToEdit, setPhotoToEdit] = useState<any | null>(null);
   const [editPhotoEvidenceId, setEditPhotoEvidenceId] = useState<string | null>(null);
+  const [photoToDelete, setPhotoToDelete] = useState<{ path: string, evidenceId: string } | null>(null);
 
   const { evidenceWithPhotos, loading: photosLoading, deletePhoto, refetch: refetchPhotos } = useEvidencePhotos(evidence, user?.id);
 
@@ -261,6 +262,106 @@ export default function MyEvidence() {
     }))
   );
 
+  // Helper function to determine photo position within its evidence group
+  const getPhotoPosition = (photo: any) => {
+    // Get all photos for this evidence item
+    const evidencePhotos = allPhotos.filter(p => p.evidenceId === photo.evidenceId);
+    const currentIndex = evidencePhotos.findIndex(p => p.path === photo.path);
+    
+    return {
+      isFirst: currentIndex === 0,
+      isLast: currentIndex === evidencePhotos.length - 1,
+      currentIndex,
+      evidencePhotos
+    };
+  };
+
+  // Delete single photo from gallery
+  const handleDeleteSinglePhoto = async (photoPath: string, evidenceId: string) => {
+    try {
+      // Delete from storage
+      const { error: storageError } = await supabase.storage
+        .from('evidence-photos')
+        .remove([photoPath]);
+      
+      if (storageError) throw storageError;
+      
+      // Delete caption record
+      const { error: dbError } = await supabase
+        .from('evidence_photo_captions')
+        .delete()
+        .eq('photo_path', photoPath);
+      
+      if (dbError) throw dbError;
+      
+      toast({ 
+        title: "Photo deleted", 
+        description: "Photo has been removed successfully." 
+      });
+      
+      refetchPhotos();
+      fetchEvidence();
+    } catch (error) {
+      console.error('Error deleting photo:', error);
+      toast({ 
+        title: "Error", 
+        description: "Failed to delete photo", 
+        variant: "destructive" 
+      });
+    } finally {
+      setPhotoToDelete(null);
+    }
+  };
+
+  // Move photo up or down
+  const handleMovePhoto = async (photo: any, direction: 'up' | 'down') => {
+    const { evidencePhotos, currentIndex } = getPhotoPosition(photo);
+    const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+    
+    if (targetIndex < 0 || targetIndex >= evidencePhotos.length) return;
+    
+    const currentPhoto = evidencePhotos[currentIndex];
+    const targetPhoto = evidencePhotos[targetIndex];
+    
+    try {
+      // Swap order_index values
+      const { error } = await supabase
+        .from('evidence_photo_captions')
+        .upsert([
+          { 
+            photo_path: currentPhoto.path, 
+            order_index: targetPhoto.order_index, 
+            evidence_id: photo.evidenceId,
+            caption: currentPhoto.caption,
+            label: currentPhoto.label
+          },
+          { 
+            photo_path: targetPhoto.path, 
+            order_index: currentPhoto.order_index, 
+            evidence_id: photo.evidenceId,
+            caption: targetPhoto.caption,
+            label: targetPhoto.label
+          }
+        ]);
+      
+      if (error) throw error;
+      
+      toast({ 
+        title: "Photo moved", 
+        description: `Photo moved ${direction}` 
+      });
+      
+      refetchPhotos();
+    } catch (error) {
+      console.error('Error moving photo:', error);
+      toast({ 
+        title: "Error", 
+        description: "Failed to move photo", 
+        variant: "destructive" 
+      });
+    }
+  };
+
   // Filter by media type
   const filteredPhotos = allPhotos.filter(photo => {
     if (mediaTypeFilter === "photos") return !isVideoFile(photo.name);
@@ -380,6 +481,7 @@ export default function MyEvidence() {
                 {paginatedPhotos.map((photo) => {
                   const evidenceIndex = filteredEvidence.findIndex(e => e.id === photo.evidenceId);
                   const photoIndex = filteredEvidence[evidenceIndex]?.photos.findIndex(p => p.path === photo.path) ?? 0;
+                  const { isFirst, isLast } = getPhotoPosition(photo);
                   
                   return (
                     <div key={`${photo.evidenceId}-${photo.path}`} className="space-y-2">
@@ -397,9 +499,9 @@ export default function MyEvidence() {
                           </div>
                         )}
                         
-                        {/* Caption indicator - top right */}
+                        {/* Caption indicator - top right when not hovering */}
                         {photo.caption && (
-                          <div className="absolute top-2 right-2 z-10">
+                          <div className="absolute top-2 right-2 z-10 opacity-100 group-hover:opacity-0 transition-opacity">
                             <Badge variant="outline" className="text-xs px-1.5 py-0.5 bg-blue-500/90 text-white border-blue-300">
                               <MessageSquare className="h-3 w-3" />
                             </Badge>
@@ -430,20 +532,62 @@ export default function MyEvidence() {
                           />
                         )}
                         
-                        {/* Edit button overlay - shows on hover */}
-                        <div className="absolute bottom-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleEditPhotoCaption(photo, photo.evidenceId);
-                            }}
-                            className="h-7 px-2"
-                          >
-                            <Edit className="h-3 w-3 mr-1" />
-                            Edit
-                          </Button>
+                        {/* Action buttons overlay - shows on hover */}
+                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                          {/* Move buttons - top right */}
+                          <div className="absolute top-2 right-2 flex gap-1 pointer-events-auto">
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleMovePhoto(photo, 'up');
+                              }}
+                              disabled={isFirst}
+                              className="h-7 w-7 p-0"
+                            >
+                              <ArrowUp className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleMovePhoto(photo, 'down');
+                              }}
+                              disabled={isLast}
+                              className="h-7 w-7 p-0"
+                            >
+                              <ArrowDown className="h-3 w-3" />
+                            </Button>
+                          </div>
+                          
+                          {/* Edit and Delete buttons - bottom right */}
+                          <div className="absolute bottom-2 right-2 flex gap-1 pointer-events-auto">
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditPhotoCaption(photo, photo.evidenceId);
+                              }}
+                              className="h-7 px-2"
+                            >
+                              <Edit className="h-3 w-3 mr-1" />
+                              Edit
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setPhotoToDelete({ path: photo.path, evidenceId: photo.evidenceId });
+                              }}
+                              className="h-7 w-7 p-0"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </div>
                         </div>
                         
                         {/* Evidence title overlay on hover - bottom left */}
@@ -512,6 +656,27 @@ export default function MyEvidence() {
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
+          {/* Delete Single Photo Confirmation Dialog */}
+          <AlertDialog open={!!photoToDelete} onOpenChange={(open) => !open && setPhotoToDelete(null)}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete Photo?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will permanently delete this photo. This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={() => photoToDelete && handleDeleteSinglePhoto(photoToDelete.path, photoToDelete.evidenceId)}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
                   Delete
                 </AlertDialogAction>
               </AlertDialogFooter>

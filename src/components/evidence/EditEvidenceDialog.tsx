@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, X, Upload, GripVertical } from "lucide-react";
+import { Loader2, X, Upload, GripVertical, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
@@ -40,7 +40,12 @@ interface EditEvidenceDialogProps {
   onUpdate: () => void;
 }
 
-function SortablePhotoItem({ 
+const isVideoFile = (filename: string): boolean => {
+  const videoExtensions = ['.mp4', '.mov', '.avi', '.webm', '.mkv', '.m4v'];
+  return videoExtensions.some(ext => filename.toLowerCase().endsWith(ext));
+};
+
+function SortablePhotoItem({
   photo, 
   onDelete, 
   onEdit,
@@ -88,15 +93,37 @@ function SortablePhotoItem({
         onClick={onEdit}
         className="cursor-pointer relative"
       >
-        <img
-          src={photo.url}
-          alt={photo.label || photo.name}
-          className={cn(
-            "w-full h-32 object-cover rounded border transition-all",
-            isEditing ? "border-primary border-2" : "border-border",
-            hasCaption && "ring-2 ring-blue-400 ring-offset-2"
-          )}
-        />
+        {isVideoFile(photo.name) ? (
+          <video
+            src={photo.url}
+            className={cn(
+              "w-full h-32 object-cover rounded border transition-all",
+              isEditing ? "border-primary border-2" : "border-border",
+              hasCaption && "ring-2 ring-blue-400 ring-offset-2"
+            )}
+            controls={false}
+            muted
+            playsInline
+            preload="metadata"
+          />
+        ) : (
+          <img
+            src={photo.url}
+            alt={photo.label || photo.name}
+            className={cn(
+              "w-full h-32 object-cover rounded border transition-all",
+              isEditing ? "border-primary border-2" : "border-border",
+              hasCaption && "ring-2 ring-blue-400 ring-offset-2"
+            )}
+          />
+        )}
+        
+        {isVideoFile(photo.name) && !isEditing && (
+          <div className="absolute top-1 left-1 bg-black/70 text-white text-xs px-2 py-0.5 rounded flex items-center gap-1">
+            <Play className="h-3 w-3" />
+            Video
+          </div>
+        )}
         
         {hasCaption && !isEditing && (
           <div className="absolute bottom-1 left-1 bg-blue-500 text-white text-xs px-2 py-0.5 rounded">

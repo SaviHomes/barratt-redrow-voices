@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Image as ImageIcon, Search, Trash2, Download, Images } from "lucide-react";
+import { Image as ImageIcon, Search, Trash2, Download, Images, Play } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -21,11 +21,24 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { useEvidencePhotos } from "@/hooks/useEvidencePhotos";
 import EvidenceLightbox from "@/components/EvidenceLightbox";
 import JSZip from "jszip";
 import BackToDashboard from "@/components/BackToDashboard";
 import { EditEvidenceDialog } from "@/components/evidence/EditEvidenceDialog";
+
+const isVideoFile = (filename: string): boolean => {
+  const videoExtensions = ['.mp4', '.mov', '.avi', '.webm', '.mkv', '.m4v'];
+  return videoExtensions.some(ext => filename.toLowerCase().endsWith(ext));
+};
 
 export default function MyEvidence() {
   const { user } = useAuth();
@@ -42,6 +55,8 @@ export default function MyEvidence() {
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [evidenceToEdit, setEvidenceToEdit] = useState<any | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10; // 2 rows × 5 columns
 
   const { evidenceWithPhotos, loading: photosLoading, deletePhoto, refetch: refetchPhotos } = useEvidencePhotos(evidence, user?.id);
 
@@ -54,6 +69,11 @@ export default function MyEvidence() {
   useEffect(() => {
     filterEvidence();
   }, [evidenceWithPhotos, searchTerm, categoryFilter, severityFilter]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, categoryFilter, severityFilter]);
 
   const fetchEvidence = async () => {
     if (!user) return;
@@ -219,6 +239,21 @@ export default function MyEvidence() {
 
   const selectedEvidence = evidenceWithPhotos.find(e => e.id === selectedEvidenceId);
 
+  // Flatten all photos into a single paginated array
+  const allPhotos = filteredEvidence.flatMap(item =>
+    item.photos.map(photo => ({
+      ...photo,
+      evidenceId: item.id,
+      evidenceTitle: item.title,
+      evidenceCategory: item.category,
+      evidenceSeverity: item.severity
+    }))
+  );
+
+  const totalPages = Math.ceil(allPhotos.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedPhotos = allPhotos.slice(startIndex, startIndex + itemsPerPage);
+
   if (loading || photosLoading) {
     return (
       <Layout>
@@ -292,16 +327,16 @@ export default function MyEvidence() {
             </CardContent>
           </Card>
 
-          {/* Evidence Grid */}
-          {filteredEvidence.length === 0 ? (
+          {/* Photo Gallery Grid */}
+          {allPhotos.length === 0 ? (
             <Card>
               <CardContent className="py-12 text-center">
                 <ImageIcon className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
-                <h3 className="text-lg font-semibold mb-2">No evidence found</h3>
+                <h3 className="text-lg font-semibold mb-2">No photos found</h3>
                 <p className="text-muted-foreground mb-4">
                   {evidence.length === 0
                     ? "You haven't uploaded any evidence yet."
-                    : "No evidence matches your search criteria."}
+                    : "No photos match your search criteria."}
                 </p>
                 {evidence.length === 0 && (
                   <Button asChild>
@@ -311,120 +346,92 @@ export default function MyEvidence() {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredEvidence.map((item) => (
-                <Card 
-                  key={item.id} 
-                  className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-                  onClick={() => handleEditEvidence(item)}
-                >
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1 min-w-0">
-                        <CardTitle className="text-lg truncate">{item.title}</CardTitle>
-                        <CardDescription className="mt-1">
-                          {new Date(item.created_at).toLocaleDateString()}
-                        </CardDescription>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setDeleteId(item.id);
-                        }}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex gap-2 mb-3">
-                      <Badge variant={getSeverityColor(item.severity)}>
-                        {item.severity}
-                      </Badge>
-                      <Badge variant="outline">{item.category}</Badge>
-                    </div>
-                    {item.description && (
-                      <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                        {item.description}
-                      </p>
-                    )}
-
-                    {/* Photo Gallery */}
-                    {item.photos && item.photos.length > 0 ? (
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Images className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm font-medium">
-                              {item.photos.length} {item.photos.length === 1 ? 'photo' : 'photos'}
-                            </span>
-                          </div>
-                          {item.photos.length > 1 && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleBulkDownload(item.id, item.title);
-                              }}
-                            >
-                              <Download className="h-4 w-4 mr-1" />
-                              Download All
-                            </Button>
-                          )}
-                        </div>
-
-                        {/* Photo Thumbnails Grid */}
-                        <div className="grid grid-cols-4 gap-2">
-                          {item.photos.slice(0, 4).map((photo, index) => (
-                            <div
-                              key={photo.path}
-                              className="relative aspect-square rounded-md overflow-hidden cursor-pointer group border border-border hover:border-primary transition-colors"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                openLightbox(item.id, index);
-                              }}
-                            >
-                              <img
-                                src={photo.url}
-                                alt={`${item.title} - Photo ${index + 1}`}
-                                className="w-full h-full object-cover transition-transform group-hover:scale-110"
-                              />
-                              {index === 3 && item.photos.length > 4 && (
-                                <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white font-semibold">
-                                  +{item.photos.length - 4}
-                                </div>
-                              )}
+            <div className="space-y-6">
+              {/* Gallery Grid - 5 columns, 2 rows */}
+              <div className="grid grid-cols-5 gap-4">
+                {paginatedPhotos.map((photo) => {
+                  const evidenceIndex = filteredEvidence.findIndex(e => e.id === photo.evidenceId);
+                  const photoIndex = filteredEvidence[evidenceIndex]?.photos.findIndex(p => p.path === photo.path) ?? 0;
+                  
+                  return (
+                    <div
+                      key={`${photo.evidenceId}-${photo.path}`}
+                      className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group border-2 border-border hover:border-primary transition-all"
+                      onClick={() => openLightbox(photo.evidenceId, photoIndex)}
+                    >
+                      {isVideoFile(photo.name) ? (
+                        <>
+                          <video
+                            src={photo.url}
+                            className="w-full h-full object-cover"
+                            muted
+                            playsInline
+                            preload="metadata"
+                          />
+                          {/* Play icon overlay */}
+                          <div className="absolute inset-0 flex items-center justify-center pointer-events-none bg-black/20">
+                            <div className="bg-black/60 rounded-full p-3 backdrop-blur-sm">
+                              <Play className="h-6 w-6 text-white fill-white" />
                             </div>
-                          ))}
+                          </div>
+                        </>
+                      ) : (
+                        <img
+                          src={photo.url}
+                          alt={photo.evidenceTitle}
+                          className="w-full h-full object-cover transition-transform group-hover:scale-110"
+                        />
+                      )}
+                      
+                      {/* Evidence info overlay on hover */}
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <p className="text-white text-xs font-medium truncate">{photo.evidenceTitle}</p>
+                        <div className="flex gap-1 mt-1">
+                          <Badge variant="secondary" className="text-xs px-1 py-0">{photo.evidenceCategory}</Badge>
+                          <Badge variant={getSeverityColor(photo.evidenceSeverity)} className="text-xs px-1 py-0">
+                            {photo.evidenceSeverity}
+                          </Badge>
                         </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
 
-                        {item.photos.length > 4 && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="w-full"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openLightbox(item.id, 0);
-                            }}
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-2 pt-4">
+                  <Pagination>
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious 
+                          onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                          className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                        />
+                      </PaginationItem>
+                      
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                        <PaginationItem key={page}>
+                          <PaginationLink
+                            onClick={() => setCurrentPage(page)}
+                            isActive={currentPage === page}
+                            className="cursor-pointer"
                           >
-                            View All {item.photos.length} Photos
-                          </Button>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="text-center py-4 border border-dashed border-border rounded-md">
-                        <ImageIcon className="h-8 w-8 mx-auto mb-2 text-muted-foreground opacity-50" />
-                        <p className="text-sm text-muted-foreground">No photos uploaded</p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
+                            {page}
+                          </PaginationLink>
+                        </PaginationItem>
+                      ))}
+                      
+                      <PaginationItem>
+                        <PaginationNext 
+                          onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                          className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                </div>
+              )}
             </div>
           )}
 

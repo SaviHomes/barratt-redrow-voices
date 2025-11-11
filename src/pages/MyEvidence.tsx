@@ -49,6 +49,7 @@ export default function MyEvidence() {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [severityFilter, setSeverityFilter] = useState("all");
+  const [mediaTypeFilter, setMediaTypeFilter] = useState("all");
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [selectedEvidenceId, setSelectedEvidenceId] = useState<string | null>(null);
@@ -73,7 +74,7 @@ export default function MyEvidence() {
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, categoryFilter, severityFilter]);
+  }, [searchTerm, categoryFilter, severityFilter, mediaTypeFilter]);
 
   const fetchEvidence = async () => {
     if (!user) return;
@@ -250,9 +251,16 @@ export default function MyEvidence() {
     }))
   );
 
-  const totalPages = Math.ceil(allPhotos.length / itemsPerPage);
+  // Filter by media type
+  const filteredPhotos = allPhotos.filter(photo => {
+    if (mediaTypeFilter === "photos") return !isVideoFile(photo.name);
+    if (mediaTypeFilter === "videos") return isVideoFile(photo.name);
+    return true; // "all"
+  });
+
+  const totalPages = Math.ceil(filteredPhotos.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedPhotos = allPhotos.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedPhotos = filteredPhotos.slice(startIndex, startIndex + itemsPerPage);
 
   if (loading || photosLoading) {
     return (
@@ -287,7 +295,7 @@ export default function MyEvidence() {
           {/* Filters */}
           <Card className="mb-6">
             <CardContent className="pt-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="relative">
                   <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -323,12 +331,22 @@ export default function MyEvidence() {
                     <SelectItem value="critical">Critical</SelectItem>
                   </SelectContent>
                 </Select>
+                <Select value={mediaTypeFilter} onValueChange={setMediaTypeFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Filter by media type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Media</SelectItem>
+                    <SelectItem value="photos">Photos Only</SelectItem>
+                    <SelectItem value="videos">Videos Only</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </CardContent>
           </Card>
 
           {/* Photo Gallery Grid */}
-          {allPhotos.length === 0 ? (
+          {filteredPhotos.length === 0 ? (
             <Card>
               <CardContent className="py-12 text-center">
                 <ImageIcon className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />

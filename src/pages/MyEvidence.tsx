@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Image as ImageIcon, Search, Trash2, Download, Images, Play } from "lucide-react";
+import { Image as ImageIcon, Search, Trash2, Download, Images, Play, Edit, MessageSquare } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -34,6 +34,7 @@ import EvidenceLightbox from "@/components/EvidenceLightbox";
 import JSZip from "jszip";
 import BackToDashboard from "@/components/BackToDashboard";
 import { EditEvidenceDialog } from "@/components/evidence/EditEvidenceDialog";
+import { PhotoCaptionEditor } from "@/components/evidence/PhotoCaptionEditor";
 
 const isVideoFile = (filename: string): boolean => {
   const videoExtensions = ['.mp4', '.mov', '.avi', '.webm', '.mkv', '.m4v'];
@@ -58,6 +59,9 @@ export default function MyEvidence() {
   const [evidenceToEdit, setEvidenceToEdit] = useState<any | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10; // 2 rows × 5 columns
+  const [captionEditorOpen, setCaptionEditorOpen] = useState(false);
+  const [photoToEdit, setPhotoToEdit] = useState<any | null>(null);
+  const [editPhotoEvidenceId, setEditPhotoEvidenceId] = useState<string | null>(null);
 
   const { evidenceWithPhotos, loading: photosLoading, deletePhoto, refetch: refetchPhotos } = useEvidencePhotos(evidence, user?.id);
 
@@ -182,6 +186,12 @@ export default function MyEvidence() {
   const handleEditEvidence = (item: any) => {
     setEvidenceToEdit(item);
     setEditDialogOpen(true);
+  };
+
+  const handleEditPhotoCaption = (photo: any, evidenceId: string) => {
+    setPhotoToEdit(photo);
+    setEditPhotoEvidenceId(evidenceId);
+    setCaptionEditorOpen(true);
   };
 
   const handleDeletePhoto = async (photoPath: string) => {
@@ -377,6 +387,24 @@ export default function MyEvidence() {
                       className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group border-2 border-border hover:border-primary transition-all"
                       onClick={() => openLightbox(photo.evidenceId, photoIndex)}
                     >
+                      {/* Label badge - top left, always visible if exists */}
+                      {photo.label && (
+                        <div className="absolute top-2 left-2 z-10">
+                          <Badge variant="secondary" className="text-xs px-2 py-1 bg-black/70 text-white backdrop-blur-sm border-none">
+                            {photo.label}
+                          </Badge>
+                        </div>
+                      )}
+                      
+                      {/* Caption indicator - top right */}
+                      {photo.caption && (
+                        <div className="absolute top-2 right-2 z-10">
+                          <Badge variant="outline" className="text-xs px-1.5 py-0.5 bg-blue-500/90 text-white border-blue-300">
+                            <MessageSquare className="h-3 w-3" />
+                          </Badge>
+                        </div>
+                      )}
+
                       {isVideoFile(photo.name) ? (
                         <>
                           <video
@@ -396,20 +424,30 @@ export default function MyEvidence() {
                       ) : (
                         <img
                           src={photo.url}
-                          alt={photo.evidenceTitle}
+                          alt={photo.label || photo.evidenceTitle}
                           className="w-full h-full object-cover transition-transform group-hover:scale-110"
                         />
                       )}
                       
-                      {/* Evidence info overlay on hover */}
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {/* Edit button overlay - shows on hover */}
+                      <div className="absolute bottom-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditPhotoCaption(photo, photo.evidenceId);
+                          }}
+                          className="h-7 px-2"
+                        >
+                          <Edit className="h-3 w-3 mr-1" />
+                          Edit
+                        </Button>
+                      </div>
+                      
+                      {/* Evidence title overlay on hover - bottom left */}
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity pr-20">
                         <p className="text-white text-xs font-medium truncate">{photo.evidenceTitle}</p>
-                        <div className="flex gap-1 mt-1">
-                          <Badge variant="secondary" className="text-xs px-1 py-0">{photo.evidenceCategory}</Badge>
-                          <Badge variant={getSeverityColor(photo.evidenceSeverity)} className="text-xs px-1 py-0">
-                            {photo.evidenceSeverity}
-                          </Badge>
-                        </div>
                       </div>
                     </div>
                   );
@@ -493,6 +531,15 @@ export default function MyEvidence() {
               evidenceTitle={selectedEvidence.title}
             />
           )}
+
+          {/* Photo Caption Editor Dialog */}
+          <PhotoCaptionEditor
+            photo={photoToEdit}
+            evidenceId={editPhotoEvidenceId}
+            open={captionEditorOpen}
+            onOpenChange={setCaptionEditorOpen}
+            onSave={refetchPhotos}
+          />
         </div>
       </Layout>
     </ProtectedRoute>

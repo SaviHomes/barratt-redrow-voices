@@ -7,6 +7,9 @@ export interface EvidencePhoto {
   url: string;
   size: number;
   created_at: string;
+  caption?: string;
+  label?: string;
+  captionId?: string;
 }
 
 export interface EvidenceWithPhotos {
@@ -41,6 +44,13 @@ export function useEvidencePhotos(evidence: any[], userId: string | undefined) {
     
     setLoading(true);
     try {
+      // Fetch captions for all evidence items
+      const evidenceIds = evidence.map(e => e.id);
+      const { data: captions } = await supabase
+        .from('evidence_photo_captions')
+        .select('*')
+        .in('evidence_id', evidenceIds);
+
       const evidenceWithPhotosData = await Promise.all(
         evidence.map(async (item) => {
           const { data: files, error } = await supabase.storage
@@ -60,12 +70,18 @@ export function useEvidencePhotos(evidence: any[], userId: string | undefined) {
                   .from('evidence-photos')
                   .getPublicUrl(path);
 
+                // Find caption data for this photo
+                const captionData = captions?.find(c => c.photo_path === path);
+
                 return {
                   name: file.name,
                   path: path,
                   url: data.publicUrl,
                   size: file.metadata?.size || 0,
                   created_at: file.created_at || new Date().toISOString(),
+                  caption: captionData?.caption,
+                  label: captionData?.label,
+                  captionId: captionData?.id,
                 };
               })
           );

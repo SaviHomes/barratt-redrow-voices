@@ -25,6 +25,7 @@ import { useEvidencePhotos } from "@/hooks/useEvidencePhotos";
 import EvidenceLightbox from "@/components/EvidenceLightbox";
 import JSZip from "jszip";
 import BackToDashboard from "@/components/BackToDashboard";
+import { EditEvidenceDialog } from "@/components/evidence/EditEvidenceDialog";
 
 export default function MyEvidence() {
   const { user } = useAuth();
@@ -39,6 +40,8 @@ export default function MyEvidence() {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [selectedEvidenceId, setSelectedEvidenceId] = useState<string | null>(null);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [evidenceToEdit, setEvidenceToEdit] = useState<any | null>(null);
 
   const { evidenceWithPhotos, loading: photosLoading, deletePhoto, refetch: refetchPhotos } = useEvidencePhotos(evidence, user?.id);
 
@@ -153,6 +156,11 @@ export default function MyEvidence() {
     setSelectedEvidenceId(evidenceId);
     setSelectedPhotoIndex(photoIndex);
     setLightboxOpen(true);
+  };
+
+  const handleEditEvidence = (item: any) => {
+    setEvidenceToEdit(item);
+    setEditDialogOpen(true);
   };
 
   const handleDeletePhoto = async (photoPath: string) => {
@@ -305,7 +313,11 @@ export default function MyEvidence() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredEvidence.map((item) => (
-                <Card key={item.id} className="overflow-hidden">
+                <Card 
+                  key={item.id} 
+                  className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                  onClick={() => handleEditEvidence(item)}
+                >
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
@@ -317,7 +329,10 @@ export default function MyEvidence() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => setDeleteId(item.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeleteId(item.id);
+                        }}
                         className="text-destructive hover:text-destructive"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -351,7 +366,10 @@ export default function MyEvidence() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleBulkDownload(item.id, item.title)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleBulkDownload(item.id, item.title);
+                              }}
                             >
                               <Download className="h-4 w-4 mr-1" />
                               Download All
@@ -365,7 +383,10 @@ export default function MyEvidence() {
                             <div
                               key={photo.path}
                               className="relative aspect-square rounded-md overflow-hidden cursor-pointer group border border-border hover:border-primary transition-colors"
-                              onClick={() => openLightbox(item.id, index)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openLightbox(item.id, index);
+                              }}
                             >
                               <img
                                 src={photo.url}
@@ -386,7 +407,10 @@ export default function MyEvidence() {
                             variant="outline"
                             size="sm"
                             className="w-full"
-                            onClick={() => openLightbox(item.id, 0)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openLightbox(item.id, 0);
+                            }}
                           >
                             View All {item.photos.length} Photos
                           </Button>
@@ -421,6 +445,17 @@ export default function MyEvidence() {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+
+          {/* Edit Evidence Dialog */}
+          <EditEvidenceDialog
+            evidence={evidenceToEdit}
+            open={editDialogOpen}
+            onOpenChange={setEditDialogOpen}
+            onUpdate={() => {
+              fetchEvidence();
+              refetchPhotos();
+            }}
+          />
 
           {/* Lightbox */}
           {selectedEvidence && (

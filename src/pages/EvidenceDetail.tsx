@@ -7,7 +7,7 @@ import Layout from "@/components/Layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Calendar, Play, MessageSquare } from "lucide-react";
+import { ArrowLeft, Calendar, Play, MessageSquare, ChevronDown, ChevronUp } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { VideoPlayerDialog } from "@/components/evidence/VideoPlayerDialog";
 import { CommentsSection } from "@/components/comments/CommentsSection";
@@ -23,6 +23,7 @@ export default function EvidenceDetail() {
   const [currentVideoName, setCurrentVideoName] = useState("");
   const [photoCommentsOpen, setPhotoCommentsOpen] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<any>(null);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -189,13 +190,34 @@ export default function EvidenceDetail() {
             {evidenceData.title}
           </h1>
 
-          {/* Full Description */}
+          {/* Description with Expand/Collapse */}
           {evidenceData.description && (
             <Card className="p-8 bg-muted/30">
               <h2 className="text-xl font-semibold mb-4 text-foreground">Description</h2>
               <p className="text-foreground leading-relaxed whitespace-pre-wrap text-lg">
-                {evidenceData.description}
+                {isDescriptionExpanded || evidenceData.description.length <= 300
+                  ? evidenceData.description
+                  : `${evidenceData.description.slice(0, 300)}...`}
               </p>
+              {evidenceData.description.length > 300 && (
+                <Button
+                  variant="ghost"
+                  onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                  className="mt-4 text-primary hover:text-primary/80"
+                >
+                  {isDescriptionExpanded ? (
+                    <>
+                      <ChevronUp className="h-4 w-4 mr-2" />
+                      Show less
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="h-4 w-4 mr-2" />
+                      Show more
+                    </>
+                  )}
+                </Button>
+              )}
             </Card>
           )}
         </div>

@@ -132,26 +132,37 @@ export default function Register() {
       if (authData.user) {
         try {
           console.log('Sending welcome email to:', data.email);
-          await supabase.functions.invoke('send-admin-email', {
+          const { data: welcomeData, error: welcomeError } = await supabase.functions.invoke('send-welcome-email', {
             body: {
-              template: 'welcome',
-              recipients: [data.email],
-              subject: 'Welcome to Redrow Exposed',
-              customData: {
-                userName: data.firstName,
-                dashboardUrl: 'https://www.redrowexposed.co.uk/dashboard'
-              }
+              email: data.email,
+              userName: data.firstName,
+              dashboardUrl: 'https://www.redrowexposed.co.uk/dashboard'
             }
           });
-          console.log('Welcome email sent successfully');
+          
+          if (welcomeError) {
+            console.error('Welcome email error:', welcomeError);
+            toast({
+              title: "Email Warning",
+              description: "Welcome email could not be sent. Please check your inbox manually.",
+              variant: "destructive"
+            });
+          } else {
+            console.log('Welcome email sent successfully:', welcomeData);
+          }
         } catch (emailError) {
           console.error('Failed to send welcome email:', emailError);
+          toast({
+            title: "Email Error",
+            description: "An error occurred while sending the welcome email.",
+            variant: "destructive"
+          });
         }
 
         // Trigger admin notification email
         try {
           console.log('Triggering admin notification email');
-          await triggerEventEmail('user_registered', {
+          const result = await triggerEventEmail('user_registered', {
             userName: `${data.firstName} ${data.lastName}`,
             userEmail: data.email,
             propertyAddress: `${data.propertyNumber || ''} ${data.streetName}, ${data.townCity}, ${data.county}, ${data.postcode}`.trim(),
@@ -169,7 +180,12 @@ export default function Register() {
             buildStyle: data.buildStyle || null,
             viewProfileUrl: 'https://www.redrowexposed.co.uk/admin/user-management'
           });
-          console.log('Admin notification email triggered successfully');
+          
+          if (result.success) {
+            console.log('Admin notification email triggered successfully');
+          } else {
+            console.error('Failed to trigger admin notification:', result.error);
+          }
         } catch (emailError) {
           console.error('Failed to trigger admin notification:', emailError);
         }

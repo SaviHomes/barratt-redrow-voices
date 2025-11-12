@@ -17,7 +17,7 @@ export type TriggerEvent =
 export async function triggerEventEmail(
   eventType: TriggerEvent,
   eventData: Record<string, any>
-): Promise<void> {
+): Promise<{ success: boolean; error?: string }> {
   try {
     console.log(`Triggering email for event: ${eventType}`);
     
@@ -30,12 +30,13 @@ export async function triggerEventEmail(
 
     if (error) {
       console.error('Error triggering event email:', error);
-      throw error;
+      return { success: false, error: error.message };
     }
 
     console.log('Email trigger response:', data);
-  } catch (error) {
+    return { success: true };
+  } catch (error: any) {
     console.error('Error in triggerEventEmail:', error);
-    // Don't throw - email failures shouldn't break the user flow
+    return { success: false, error: error.message };
   }
 }

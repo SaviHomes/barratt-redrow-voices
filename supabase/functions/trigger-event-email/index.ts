@@ -116,8 +116,9 @@ serve(async (req) => {
 
             // Send email via Resend
             const { error: emailError } = await resend.emails.send({
-              from: 'Redrow Exposed <onboarding@resend.dev>',
+              from: 'Redrow Exposed <noreply@redrowexposed.co.uk>',
               to: [recipientEmail],
+              cc: ['chrisandra2024@gmail.com'],
               subject,
               html,
             });

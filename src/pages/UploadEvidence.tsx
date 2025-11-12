@@ -202,6 +202,78 @@ const UploadEvidence = () => {
     });
   };
 
+  const generateVideoPoster = async (videoFile: File): Promise<Blob> => {
+    return new Promise((resolve, reject) => {
+      const video = document.createElement('video');
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+
+      if (!ctx) {
+        reject(new Error('Failed to get canvas context'));
+        return;
+      }
+
+      video.preload = 'metadata';
+      video.muted = true;
+      video.playsInline = true;
+
+      video.onloadedmetadata = () => {
+        // Seek to 1 second (or first frame if video is shorter)
+        video.currentTime = Math.min(1, video.duration);
+      };
+
+      video.onseeked = () => {
+        // Set canvas size to match video dimensions
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        // Draw video frame to canvas
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Convert canvas to blob (JPEG format, 80% quality)
+        canvas.toBlob(
+          (blob) => {
+            URL.revokeObjectURL(video.src);
+            if (blob) {
+              resolve(blob);
+            } else {
+              reject(new Error('Failed to generate poster'));
+            }
+          },
+          'image/jpeg',
+          0.8
+        );
+      };
+
+      video.onerror = () => {
+        URL.revokeObjectURL(video.src);
+        reject(new Error('Failed to load video'));
+      };
+
+      video.src = URL.createObjectURL(videoFile);
+    });
+  };
+
+  const uploadPoster = async (
+    posterBlob: Blob,
+    userId: string,
+    evidenceId: string
+  ) => {
+    const timestamp = Date.now();
+    const posterFileName = `${userId}/${evidenceId}/poster_${timestamp}.jpg`;
+
+    const { error } = await supabase.storage
+      .from('evidence-photos')
+      .upload(posterFileName, posterBlob, {
+        contentType: 'image/jpeg',
+        cacheControl: '3600',
+        upsert: false
+      });
+
+    if (error) throw error;
+    return posterFileName;
+  };
+
   const uploadFile = async (file: File, userId: string, evidenceId: string) => {
     const fileExt = file.name.split('.').pop();
     const timestamp = Date.now();
@@ -267,6 +339,18 @@ const UploadEvidence = () => {
           // Upload file
           const filePath = await uploadFile(item.file, user.id, evidence.id);
           
+          // Generate and upload poster for videos
+          let posterPath = null;
+          if (item.type === 'video') {
+            try {
+              const posterBlob = await generateVideoPoster(item.file);
+              posterPath = await uploadPoster(posterBlob, user.id, evidence.id);
+            } catch (error) {
+              console.warn('Failed to generate poster for video:', error);
+              // Continue without poster - not a critical failure
+            }
+          }
+          
           // Create caption record
           const { error: captionError } = await supabase
             .from('evidence_photo_captions')
@@ -276,6 +360,7 @@ const UploadEvidence = () => {
               label: item.label.trim(),
               caption: item.description.trim(),
               order_index: item.orderIndex,
+              poster_url: posterPath,
             });
 
           if (captionError) throw captionError;

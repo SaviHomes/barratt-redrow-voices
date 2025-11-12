@@ -1,6 +1,7 @@
+import { useState, useRef } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Calendar, Image as ImageIcon, Play } from "lucide-react";
+import { Calendar, Image as ImageIcon, Volume2, VolumeX } from "lucide-react";
 import { EvidenceWithPhotos } from "@/hooks/useEvidencePhotos";
 
 interface EvidencePreviewCardProps {
@@ -10,6 +11,8 @@ interface EvidencePreviewCardProps {
 
 export default function EvidencePreviewCard({ evidence, onClick }: EvidencePreviewCardProps) {
   const imageCount = evidence.photos.length;
+  const [isMuted, setIsMuted] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const isVideo = (filename: string) => {
     const videoExtensions = ['.mp4', '.mov', '.avi', '.webm', '.mkv', '.m4v'];
@@ -42,6 +45,14 @@ export default function EvidencePreviewCard({ evidence, onClick }: EvidencePrevi
     return icons[category.toLowerCase()] || '📋';
   };
 
+  const handleToggleMute = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsMuted(!isMuted);
+    if (videoRef.current) {
+      videoRef.current.muted = !isMuted;
+    }
+  };
+
   return (
     <Card
       className="overflow-hidden cursor-pointer transition-all hover:shadow-lg hover:border-primary/50"
@@ -54,11 +65,12 @@ export default function EvidencePreviewCard({ evidence, onClick }: EvidencePrevi
             <>
               {isThumbnailVideo ? (
                 <video
+                  ref={videoRef}
                   src={thumbnailPhoto.url}
                   className="w-full h-full object-cover"
                   autoPlay
                   loop
-                  muted
+                  muted={isMuted}
                   playsInline
                   preload="metadata"
                 />
@@ -69,6 +81,21 @@ export default function EvidencePreviewCard({ evidence, onClick }: EvidencePrevi
                   className="w-full h-full object-cover"
                   loading="lazy"
                 />
+              )}
+              
+              {isThumbnailVideo && (
+                <button
+                  onClick={handleToggleMute}
+                  className="absolute bottom-2 left-2 bg-black/70 hover:bg-black/80 text-white p-2 rounded-full backdrop-blur-sm transition-all z-10"
+                  title={isMuted ? "Unmute video" : "Mute video"}
+                  aria-label={isMuted ? "Unmute video" : "Mute video"}
+                >
+                  {isMuted ? (
+                    <VolumeX className="h-4 w-4" />
+                  ) : (
+                    <Volume2 className="h-4 w-4" />
+                  )}
+                </button>
               )}
               
               {imageCount > 1 && (

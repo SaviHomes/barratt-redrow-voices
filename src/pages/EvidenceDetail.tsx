@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useEvidencePhotos, EvidenceWithPhotos } from "@/hooks/useEvidencePhotos";
@@ -46,7 +46,12 @@ export default function EvidenceDetail() {
     }
   };
 
-  const { evidenceWithPhotos } = useEvidencePhotos(evidence ? [evidence] : [], evidence?.user_id);
+  const evidenceArray = useMemo(() => 
+    evidence ? [evidence] : [], 
+    [evidence?.id]
+  );
+  
+  const { evidenceWithPhotos } = useEvidencePhotos(evidenceArray, evidence?.user_id);
   const evidenceData: EvidenceWithPhotos | undefined = evidenceWithPhotos[0];
 
   const getSeverityColor = (severity: string) => {

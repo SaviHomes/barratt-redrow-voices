@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext, PaginationEllipsis } from "@/components/ui/pagination";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { Globe, MapPin, Clock, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -41,6 +43,7 @@ export default function AdminVisitorStatistics() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [hideInternalReferrers, setHideInternalReferrers] = useState(false);
 
   useEffect(() => {
     checkAdminStatus();
@@ -150,11 +153,18 @@ export default function AdminVisitorStatistics() {
     }
   };
 
-  // Calculate pagination
-  const totalPages = analytics ? Math.ceil(analytics.allVisitors.length / ITEMS_PER_PAGE) : 0;
+  // Filter and calculate pagination
+  const filteredVisitors = hideInternalReferrers && analytics
+    ? analytics.allVisitors.filter(visitor => 
+        visitor.referrer !== 'https://lovable.dev/' && 
+        visitor.referrer !== 'https://lovable.dev'
+      )
+    : analytics?.allVisitors || [];
+  
+  const totalPages = Math.ceil(filteredVisitors.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentVisitors = analytics?.allVisitors.slice(startIndex, endIndex) || [];
+  const currentVisitors = filteredVisitors.slice(startIndex, endIndex);
 
   // Generate page numbers for pagination
   const getPageNumbers = () => {
@@ -279,13 +289,27 @@ export default function AdminVisitorStatistics() {
               </Card>
 
               {/* Recent Visitors Table */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Recent Visitors</CardTitle>
-                  <CardDescription>
-                    Latest visitor activity with IP addresses and locations (Page {currentPage} of {totalPages})
-                  </CardDescription>
-                </CardHeader>
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Visitors</CardTitle>
+              <CardDescription>
+                Latest visitor activity with IP addresses and locations (Page {currentPage} of {totalPages})
+              </CardDescription>
+              
+              <div className="flex items-center space-x-2 mt-4">
+                <Switch
+                  id="hide-internal"
+                  checked={hideInternalReferrers}
+                  onCheckedChange={(checked) => {
+                    setHideInternalReferrers(checked);
+                    setCurrentPage(1);
+                  }}
+                />
+                <Label htmlFor="hide-internal" className="cursor-pointer">
+                  Hide internal referrers (lovable.dev)
+                </Label>
+              </div>
+            </CardHeader>
                 <CardContent>
                   <Table>
                     <TableHeader>

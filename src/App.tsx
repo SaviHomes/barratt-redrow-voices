@@ -29,6 +29,7 @@ import MyClaims from "./pages/MyClaims";
 import MyProfile from "./pages/MyProfile";
 import GroupLitigationInfo from "./pages/GroupLitigationInfo";
 import EvidenceDetail from "./pages/EvidenceDetail";
+import AdminCommentModeration from "./pages/AdminCommentModeration";
 
 const queryClient = new QueryClient();
 
@@ -61,6 +62,7 @@ const App = () => (
             <Route path="/admin/faqs" element={<AdminFAQManagement />} />
             <Route path="/admin/visitor-statistics" element={<AdminVisitorStatistics />} />
             <Route path="/admin/emails" element={<AdminEmailManagement />} />
+            <Route path="/admin/comments" element={<AdminCommentModeration />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
             <Route path="/public-gallery" element={<PublicGallery />} />
             <Route path="/evidence/:id" element={<EvidenceDetail />} />

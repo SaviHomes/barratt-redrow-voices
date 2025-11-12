@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { ArrowLeft, Calendar, Play } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { VideoPlayerDialog } from "@/components/evidence/VideoPlayerDialog";
+import { CommentsSection } from "@/components/comments/CommentsSection";
 
 export default function EvidenceDetail() {
   const { id } = useParams();
@@ -168,7 +169,7 @@ export default function EvidenceDetail() {
 
         {/* Photos & Videos */}
         {evidenceData.photos.length > 0 && (
-          <div>
+          <div className="mb-12">
             <h2 className="text-2xl font-bold mb-6 text-foreground">
               Photos & Videos ({evidenceData.photos.length})
             </h2>
@@ -224,6 +225,9 @@ export default function EvidenceDetail() {
             </div>
           </div>
         )}
+
+        {/* Comments Section */}
+        <CommentsSection evidenceId={id!} />
       </div>
 
       {/* Video Player */}

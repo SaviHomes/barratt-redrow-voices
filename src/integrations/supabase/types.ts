@@ -463,6 +463,65 @@ export type Database = {
         }
         Relationships: []
       }
+      evidence_comments: {
+        Row: {
+          comment_text: string
+          commenter_email: string
+          commenter_name: string
+          created_at: string | null
+          evidence_id: string
+          id: string
+          ip_address: unknown
+          moderated_at: string | null
+          moderated_by: string | null
+          moderation_status: string
+          rejection_reason: string | null
+          updated_at: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          comment_text: string
+          commenter_email: string
+          commenter_name: string
+          created_at?: string | null
+          evidence_id: string
+          id?: string
+          ip_address?: unknown
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_status?: string
+          rejection_reason?: string | null
+          updated_at?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          comment_text?: string
+          commenter_email?: string
+          commenter_name?: string
+          created_at?: string | null
+          evidence_id?: string
+          id?: string
+          ip_address?: unknown
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_status?: string
+          rejection_reason?: string | null
+          updated_at?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evidence_comments_evidence_id_fkey"
+            columns: ["evidence_id"]
+            isOneToOne: false
+            referencedRelation: "evidence"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       evidence_photo_captions: {
         Row: {
           caption: string | null

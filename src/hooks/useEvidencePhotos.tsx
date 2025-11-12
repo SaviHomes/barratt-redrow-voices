@@ -49,46 +49,36 @@ export function useEvidencePhotos(evidence: any[], userId: string | undefined) {
       const { data: captions } = await supabase
         .from('evidence_photo_captions')
         .select('*')
-        .in('evidence_id', evidenceIds);
+        .in('evidence_id', evidenceIds)
+        .order('order_index', { ascending: true });
 
-      const evidenceWithPhotosData = await Promise.all(
-        evidence.map(async (item) => {
-          const { data: files, error } = await supabase.storage
+      const evidenceWithPhotosData = evidence.map((item) => {
+        // Get captions for this evidence item
+        const itemCaptions = captions?.filter(c => c.evidence_id === item.id) || [];
+        
+        // Build photos array from captions
+        const photos: EvidencePhoto[] = itemCaptions.map((captionData) => {
+          const { data } = supabase.storage
             .from('evidence-photos')
-            .list(`${userId}/${item.id}`);
+            .getPublicUrl(captionData.photo_path);
 
-          if (error || !files || files.length === 0) {
-            return { ...item, photos: [] };
-          }
+          // Extract filename from path
+          const filename = captionData.photo_path.split('/').pop() || '';
 
-          const photos: EvidencePhoto[] = await Promise.all(
-            files
-              .filter(file => file.name !== '.emptyFolderPlaceholder')
-              .map(async (file) => {
-                const path = `${userId}/${item.id}/${file.name}`;
-                const { data } = supabase.storage
-                  .from('evidence-photos')
-                  .getPublicUrl(path);
+          return {
+            name: filename,
+            path: captionData.photo_path,
+            url: data.publicUrl,
+            size: 0, // We don't have size from captions, but it's not critical
+            created_at: captionData.created_at,
+            caption: captionData.caption,
+            label: captionData.label,
+            captionId: captionData.id,
+          };
+        });
 
-                // Find caption data for this photo
-                const captionData = captions?.find(c => c.photo_path === path);
-
-                return {
-                  name: file.name,
-                  path: path,
-                  url: data.publicUrl,
-                  size: file.metadata?.size || 0,
-                  created_at: file.created_at || new Date().toISOString(),
-                  caption: captionData?.caption,
-                  label: captionData?.label,
-                  captionId: captionData?.id,
-                };
-              })
-          );
-
-          return { ...item, photos };
-        })
-      );
+        return { ...item, photos };
+      });
 
       setEvidenceWithPhotos(evidenceWithPhotosData);
     } catch (error) {

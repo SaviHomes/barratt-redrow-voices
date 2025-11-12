@@ -86,8 +86,9 @@ serve(async (req) => {
         }
 
         // Prepare template data
-        const templateData = await prepareTemplateData(supabase, eventType, eventData, requestId);
-        console.log(`[${requestId}] Template data prepared with ${Object.keys(templateData).length} fields`);
+      const templateData = await prepareTemplateData(supabase, eventType, eventData, requestId);
+      console.log(`[${requestId}] Template data prepared with ${Object.keys(templateData).length} fields`);
+      console.log(`[${requestId}] Full template data:`, JSON.stringify(templateData));
 
         // Send emails to each recipient using Resend directly
         const resend = new Resend(Deno.env.get('RESEND_API_KEY'));

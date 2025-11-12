@@ -26,6 +26,7 @@ serve(async (req: Request): Promise<Response> => {
   try {
     const { email, userName, dashboardUrl }: WelcomeEmailRequest = await req.json();
     console.log(`[${requestId}] Sending welcome email to: ${email}`);
+    console.log(`[${requestId}] Request body:`, JSON.stringify({ email, userName, dashboardUrl }));
 
     if (!email || !userName) {
       throw new Error('email and userName are required');
@@ -39,6 +40,9 @@ serve(async (req: Request): Promise<Response> => {
     );
 
     const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+    console.log(`[${requestId}] Sending via Resend API...`);
+    console.log(`[${requestId}] From: Redrow Exposed <noreply@redrowexposed.co.uk>, To: ${email}`);
+    
     const { data, error } = await resend.emails.send({
       from: "Redrow Exposed <noreply@redrowexposed.co.uk>",
       to: [email],
@@ -52,6 +56,7 @@ serve(async (req: Request): Promise<Response> => {
     }
 
     console.log(`[${requestId}] Welcome email sent successfully:`, data?.id);
+    console.log(`[${requestId}] Full Resend response:`, JSON.stringify(data));
 
     return new Response(
       JSON.stringify({ success: true, messageId: data?.id }),

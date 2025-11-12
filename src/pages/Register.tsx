@@ -128,26 +128,51 @@ export default function Register() {
         }
       }
 
-      // Trigger admin notification email
+      // Send welcome email to new user
       if (authData.user) {
-        await triggerEventEmail('user_registered', {
-          userName: `${data.firstName} ${data.lastName}`,
-          userEmail: data.email,
-          propertyAddress: `${data.propertyNumber || ''} ${data.streetName}, ${data.townCity}, ${data.county}, ${data.postcode}`.trim(),
-          developmentName: data.developmentName || null,
-          registeredAt: new Date().toLocaleString('en-GB', {
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-          }),
-          phone: data.mobileTel || data.homeTel || null,
-          whatsappConsent: data.whatsappConsent,
-          gloConsent: data.gloUpdatesConsent,
-          buildStyle: data.buildStyle || null,
-          viewProfileUrl: 'https://www.redrowexposed.co.uk/admin/user-management'
-        });
+        try {
+          console.log('Sending welcome email to:', data.email);
+          await supabase.functions.invoke('send-admin-email', {
+            body: {
+              template: 'welcome',
+              recipients: [data.email],
+              subject: 'Welcome to Redrow Exposed',
+              customData: {
+                userName: data.firstName,
+                dashboardUrl: 'https://www.redrowexposed.co.uk/dashboard'
+              }
+            }
+          });
+          console.log('Welcome email sent successfully');
+        } catch (emailError) {
+          console.error('Failed to send welcome email:', emailError);
+        }
+
+        // Trigger admin notification email
+        try {
+          console.log('Triggering admin notification email');
+          await triggerEventEmail('user_registered', {
+            userName: `${data.firstName} ${data.lastName}`,
+            userEmail: data.email,
+            propertyAddress: `${data.propertyNumber || ''} ${data.streetName}, ${data.townCity}, ${data.county}, ${data.postcode}`.trim(),
+            developmentName: data.developmentName || null,
+            registeredAt: new Date().toLocaleString('en-GB', {
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            }),
+            phone: data.mobileTel || data.homeTel || null,
+            whatsappConsent: data.whatsappConsent,
+            gloConsent: data.gloUpdatesConsent,
+            buildStyle: data.buildStyle || null,
+            viewProfileUrl: 'https://www.redrowexposed.co.uk/admin/user-management'
+          });
+          console.log('Admin notification email triggered successfully');
+        } catch (emailError) {
+          console.error('Failed to trigger admin notification:', emailError);
+        }
       }
 
       toast({

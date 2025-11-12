@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Calendar, Image as ImageIcon, Volume2, VolumeX } from "lucide-react";
@@ -12,7 +12,33 @@ interface EvidencePreviewCardProps {
 export default function EvidencePreviewCard({ evidence, onClick }: EvidencePreviewCardProps) {
   const imageCount = evidence.photos.length;
   const [isMuted, setIsMuted] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Intersection Observer for lazy loading videos
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => {
+      if (containerRef.current) {
+        observer.unobserve(containerRef.current);
+      }
+    };
+  }, []);
 
   const isVideo = (filename: string) => {
     const videoExtensions = ['.mp4', '.mov', '.avi', '.webm', '.mkv', '.m4v'];
@@ -55,6 +81,7 @@ export default function EvidencePreviewCard({ evidence, onClick }: EvidencePrevi
 
   return (
     <Card
+      ref={containerRef}
       className="overflow-hidden cursor-pointer transition-all hover:shadow-lg hover:border-primary/50"
       onClick={onClick}
     >
@@ -67,8 +94,9 @@ export default function EvidencePreviewCard({ evidence, onClick }: EvidencePrevi
                 <video
                   ref={videoRef}
                   src={thumbnailPhoto.url}
+                  poster={thumbnailPhoto.poster_url || undefined}
                   className="w-full h-full object-cover"
-                  autoPlay
+                  autoPlay={isVisible}
                   loop
                   muted={isMuted}
                   playsInline

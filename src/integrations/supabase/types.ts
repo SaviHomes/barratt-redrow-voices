@@ -472,6 +472,7 @@ export type Database = {
           label: string | null
           order_index: number | null
           photo_path: string
+          poster_url: string | null
         }
         Insert: {
           caption?: string | null
@@ -481,6 +482,7 @@ export type Database = {
           label?: string | null
           order_index?: number | null
           photo_path: string
+          poster_url?: string | null
         }
         Update: {
           caption?: string | null
@@ -490,6 +492,7 @@ export type Database = {
           label?: string | null
           order_index?: number | null
           photo_path?: string
+          poster_url?: string | null
         }
         Relationships: [
           {

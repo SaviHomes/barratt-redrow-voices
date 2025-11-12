@@ -11,6 +11,7 @@ export interface EvidencePhoto {
   label?: string;
   captionId?: string;
   order_index?: number;
+  poster_url?: string;
 }
 
 export interface EvidenceWithPhotos {
@@ -62,6 +63,15 @@ export function useEvidencePhotos(evidence: any[]) {
             .from('evidence-photos')
             .getPublicUrl(captionData.photo_path);
 
+          // Get poster URL if available
+          let posterUrl = undefined;
+          if (captionData.poster_url) {
+            const { data: posterData } = supabase.storage
+              .from('evidence-photos')
+              .getPublicUrl(captionData.poster_url);
+            posterUrl = posterData.publicUrl;
+          }
+
           // Extract filename from path
           const filename = captionData.photo_path.split('/').pop() || '';
 
@@ -75,6 +85,7 @@ export function useEvidencePhotos(evidence: any[]) {
             label: captionData.label,
             captionId: captionData.id,
             order_index: captionData.order_index,
+            poster_url: posterUrl,
           };
         });
 

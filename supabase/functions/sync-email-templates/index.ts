@@ -183,14 +183,12 @@ const handler = async (req: Request): Promise<Response> => {
 
         console.log(`Rendered HTML for ${template.name}, length: ${html.length}`);
 
-        // Update the database record using admin client
+        // Update the database record using RPC function that bypasses RLS
         const { error: updateError } = await adminClient
-          .from('email_templates')
-          .update({
-            html_content: html,
-            updated_at: new Date().toISOString()
-          })
-          .eq('name', template.name);
+          .rpc('update_email_template_html', {
+            template_name: template.name,
+            new_html_content: html
+          });
 
         if (updateError) {
           console.error(`Error updating template ${template.name}:`, updateError);

@@ -902,6 +902,10 @@ export type Database = {
         Args: { backup_id: string; restore_as_new?: boolean }
         Returns: string
       }
+      update_email_template_html: {
+        Args: { new_html_content: string; template_name: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

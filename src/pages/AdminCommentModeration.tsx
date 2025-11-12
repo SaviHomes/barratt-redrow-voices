@@ -30,7 +30,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { formatDistanceToNow } from "date-fns";
-import { Eye, CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { Eye, CheckCircle, XCircle, Loader2, Trash2 } from "lucide-react";
 import { CommentViewDialog } from "@/components/comments/CommentViewDialog";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -65,6 +65,7 @@ const AdminCommentModeration = () => {
   const [selectedComment, setSelectedComment] = useState<Comment | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [declineDialogOpen, setDeclineDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
 
   const { data: comments, isLoading } = useQuery({
@@ -168,6 +169,37 @@ const AdminCommentModeration = () => {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: async ({ commentId, isPhotoComment }: { 
+      commentId: string; 
+      isPhotoComment: boolean;
+    }) => {
+      const table = isPhotoComment ? 'photo_comments' : 'evidence_comments';
+      const { error } = await supabase
+        .from(table)
+        .delete()
+        .eq('id', commentId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-comments'] });
+      toast({
+        title: "Success",
+        description: "Comment deleted successfully.",
+      });
+      setDeleteDialogOpen(false);
+    },
+    onError: (error) => {
+      console.error('Error deleting comment:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete comment. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleApprove = (commentId: string, isPhotoComment: boolean) => {
     moderateMutation.mutate({ commentId, status: 'approved', isPhotoComment });
   };
@@ -192,6 +224,21 @@ const AdminCommentModeration = () => {
   const handleViewClick = (comment: Comment) => {
     setSelectedComment(comment);
     setViewDialogOpen(true);
+  };
+
+  const handleDeleteClick = (comment: Comment) => {
+    setSelectedComment(comment);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (selectedComment) {
+      const isPhotoComment = !!selectedComment.photo_caption_id;
+      deleteMutation.mutate({
+        commentId: selectedComment.id,
+        isPhotoComment,
+      });
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -343,6 +390,14 @@ const AdminCommentModeration = () => {
                                 </Button>
                               </>
                             )}
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => handleDeleteClick(comment)}
+                              disabled={deleteMutation.isPending}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -383,6 +438,39 @@ const AdminCommentModeration = () => {
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction onClick={handleDeclineConfirm}>
                 Decline Comment
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Comment Permanently?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will permanently delete this comment. This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            {selectedComment && (
+              <div className="py-4 space-y-2">
+                <div>
+                  <span className="font-semibold">Commenter:</span> {selectedComment.commenter_name}
+                </div>
+                <div>
+                  <span className="font-semibold">Comment:</span>
+                  <p className="text-sm text-muted-foreground mt-1 line-clamp-3">
+                    {selectedComment.comment_text}
+                  </p>
+                </div>
+              </div>
+            )}
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={handleDeleteConfirm}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                Delete Comment
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

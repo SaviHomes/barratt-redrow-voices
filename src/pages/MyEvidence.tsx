@@ -326,27 +326,21 @@ export default function MyEvidence() {
     const targetPhoto = evidencePhotos[targetIndex];
     
     try {
-      // Swap order_index values
-      const { error } = await supabase
+      // Update the current photo's order_index
+      const { error: error1 } = await supabase
         .from('evidence_photo_captions')
-        .upsert([
-          { 
-            photo_path: currentPhoto.path, 
-            order_index: targetPhoto.order_index, 
-            evidence_id: photo.evidenceId,
-            caption: currentPhoto.caption,
-            label: currentPhoto.label
-          },
-          { 
-            photo_path: targetPhoto.path, 
-            order_index: currentPhoto.order_index, 
-            evidence_id: photo.evidenceId,
-            caption: targetPhoto.caption,
-            label: targetPhoto.label
-          }
-        ]);
+        .update({ order_index: targetPhoto.order_index })
+        .eq('id', currentPhoto.captionId);
       
-      if (error) throw error;
+      if (error1) throw error1;
+      
+      // Update the target photo's order_index
+      const { error: error2 } = await supabase
+        .from('evidence_photo_captions')
+        .update({ order_index: currentPhoto.order_index })
+        .eq('id', targetPhoto.captionId);
+      
+      if (error2) throw error2;
       
       toast({ 
         title: "Photo moved", 

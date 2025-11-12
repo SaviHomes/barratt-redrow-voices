@@ -42,7 +42,7 @@ serve(async (req) => {
         )
       `)
       .eq('event_type', eventType)
-      .eq('is_active', true);
+      .eq('is_enabled', true);
 
     if (triggersError) {
       console.error(`[${requestId}] Error fetching triggers:`, triggersError);

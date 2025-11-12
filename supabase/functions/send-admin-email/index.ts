@@ -12,6 +12,7 @@ import { CustomEmail } from "./_templates/custom.tsx";
 import { ContactAdminNotification } from "./_templates/contact-admin-notification.tsx";
 import { ContactUsEmail } from "./_templates/contact-us.tsx";
 import { CommentAdminNotification } from "./_templates/comment-admin-notification.tsx";
+import { UserRegistrationNotification } from "./_templates/user-registration-notification.tsx";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -23,7 +24,7 @@ const corsHeaders = {
 
 interface AdminEmailRequest {
   templateId?: string; // Use custom template from DB
-  template?: 'welcome' | 'evidence-approved' | 'evidence-rejected' | 'newsletter' | 'glo-update' | 'custom' | 'contact-admin-notification' | 'contact-us' | 'comment-admin-notification'; // Legacy
+  template?: 'welcome' | 'evidence-approved' | 'evidence-rejected' | 'newsletter' | 'glo-update' | 'custom' | 'contact-admin-notification' | 'contact-us' | 'comment-admin-notification' | 'user-registration-notification'; // Legacy
   recipients: string[];
   subject?: string; // Optional override
   customData?: Record<string, any>; // Variables to replace
@@ -208,6 +209,23 @@ const handler = async (req: Request): Promise<Response> => {
             })
           );
           finalSubject = subject || 'Admin, a new comment needs your approval!';
+          break;
+        case 'user-registration-notification':
+          html = await renderAsync(
+            React.createElement(UserRegistrationNotification, {
+              userName: customData.userName || 'New User',
+              userEmail: customData.userEmail || 'user@example.com',
+              propertyAddress: customData.propertyAddress || '',
+              developmentName: customData.developmentName,
+              registeredAt: customData.registeredAt || new Date().toLocaleString(),
+              phone: customData.phone,
+              whatsappConsent: customData.whatsappConsent || false,
+              gloConsent: customData.gloConsent || false,
+              buildStyle: customData.buildStyle,
+              viewProfileUrl: customData.viewProfileUrl || 'https://www.redrowexposed.co.uk/admin/user-management'
+            })
+          );
+          finalSubject = subject || 'Admin, a new user has registered';
           break;
         default:
           throw new Error(`Unknown template: ${template}`);

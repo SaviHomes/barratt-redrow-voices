@@ -4,6 +4,7 @@ import { Resend } from "https://esm.sh/resend@4.0.0";
 import React from "https://esm.sh/react@18.3.1";
 import { renderAsync } from "https://esm.sh/@react-email/render@0.0.12";
 import { CommentAdminNotification } from "./_templates/comment-admin-notification.tsx";
+import { UserRegistrationNotification } from "./_templates/user-registration-notification.tsx";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -104,6 +105,11 @@ serve(async (req) => {
                 React.createElement(CommentAdminNotification, templateData as any)
               );
               subject = `New ${templateData.commentType === 'photo' ? 'Photo' : 'Evidence'} Comment Awaiting Moderation`;
+            } else if (eventType === 'user_registered') {
+              html = await renderAsync(
+                React.createElement(UserRegistrationNotification, templateData as any)
+              );
+              subject = 'Admin, a new user has registered';
             } else {
               console.warn(`[${requestId}] No email template configured for event type: ${eventType}`);
               emailResults.push({ 
@@ -329,8 +335,21 @@ async function prepareTemplateData(
     case 'user_registered':
       return {
         userName: eventData.userName || 'New User',
-        registrationDate: eventData.registrationDate || new Date().toISOString(),
-        dashboardUrl: `${baseUrl}/user-dashboard`,
+        userEmail: eventData.userEmail || 'user@example.com',
+        propertyAddress: eventData.propertyAddress || '',
+        developmentName: eventData.developmentName,
+        registeredAt: eventData.registeredAt || new Date().toLocaleString('en-GB', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        }),
+        phone: eventData.phone,
+        whatsappConsent: eventData.whatsappConsent || false,
+        gloConsent: eventData.gloConsent || false,
+        buildStyle: eventData.buildStyle,
+        viewProfileUrl: eventData.viewProfileUrl || `${baseUrl}/admin/user-management`,
       };
     
     case 'comment_submitted':

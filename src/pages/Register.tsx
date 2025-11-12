@@ -16,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import Layout from "@/components/Layout";
+import { triggerEventEmail } from "@/lib/emailTriggers";
 const registerSchema = z.object({
   firstName: z.string().min(1, "First name is required").max(50, "First name must be less than 50 characters"),
   lastName: z.string().min(1, "Last name is required").max(50, "Last name must be less than 50 characters"),
@@ -125,6 +126,28 @@ export default function Register() {
           console.error('Error creating GLO interest record:', gloError);
           // Don't block registration if this fails
         }
+      }
+
+      // Trigger admin notification email
+      if (authData.user) {
+        await triggerEventEmail('user_registered', {
+          userName: `${data.firstName} ${data.lastName}`,
+          userEmail: data.email,
+          propertyAddress: `${data.propertyNumber || ''} ${data.streetName}, ${data.townCity}, ${data.county}, ${data.postcode}`.trim(),
+          developmentName: data.developmentName || null,
+          registeredAt: new Date().toLocaleString('en-GB', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          }),
+          phone: data.mobileTel || data.homeTel || null,
+          whatsappConsent: data.whatsappConsent,
+          gloConsent: data.gloUpdatesConsent,
+          buildStyle: data.buildStyle || null,
+          viewProfileUrl: 'https://www.redrowexposed.co.uk/admin/user-management'
+        });
       }
 
       toast({

@@ -13,6 +13,7 @@ import { CustomEmail } from './_templates/custom.tsx';
 import { ContactAdminNotification } from './_templates/contact-admin-notification.tsx';
 import { ContactUsEmail } from './_templates/contact-us.tsx';
 import { CommentAdminNotification } from './_templates/comment-admin-notification.tsx';
+import { UserRegistrationNotification } from './_templates/user-registration-notification.tsx';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -116,6 +117,22 @@ const templates: TemplateConfig[] = [
       approveUrl: 'https://www.redrowexposed.co.uk/admin/comments?action=approve&id=123',
       declineUrl: 'https://www.redrowexposed.co.uk/admin/comments?action=decline&id=123',
       viewUrl: 'https://www.redrowexposed.co.uk/evidence/abc-123'
+    }
+  },
+  {
+    name: 'user-registration-notification',
+    component: UserRegistrationNotification,
+    previewData: {
+      userName: 'Sarah Johnson',
+      userEmail: 'sarah.johnson@example.com',
+      propertyAddress: '42 Oak Avenue, Manchester, Greater Manchester, M15 4XX',
+      developmentName: 'Heritage Park',
+      registeredAt: '12 Nov 2025, 10:30 AM',
+      phone: '+44 7700 900123',
+      whatsappConsent: true,
+      gloConsent: true,
+      buildStyle: 'New Build - Help to Buy',
+      viewProfileUrl: 'https://www.redrowexposed.co.uk/admin/user-management'
     }
   }
 ];

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Image as ImageIcon, Search, Trash2, Download, Images, Play, Edit, MessageSquare, ArrowUp, ArrowDown, Star } from "lucide-react";
+import { Image as ImageIcon, Search, Trash2, Download, Images, Play, Edit, MessageSquare, ArrowUp, ArrowDown, Star, ChevronUp, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -63,6 +63,7 @@ export default function MyEvidence() {
   const [photoToEdit, setPhotoToEdit] = useState<any | null>(null);
   const [editPhotoEvidenceId, setEditPhotoEvidenceId] = useState<string | null>(null);
   const [photoToDelete, setPhotoToDelete] = useState<{ path: string, evidenceId: string } | null>(null);
+  const [expandedCaptions, setExpandedCaptions] = useState<Set<string>>(new Set());
 
   const { evidenceWithPhotos, loading: photosLoading, deletePhoto, refetch: refetchPhotos } = useEvidencePhotos(evidence);
 
@@ -386,6 +387,22 @@ export default function MyEvidence() {
     }
   };
 
+  const isCaptionExpanded = (photoPath: string) => {
+    return expandedCaptions.has(photoPath);
+  };
+
+  const toggleCaption = (photoPath: string) => {
+    setExpandedCaptions(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(photoPath)) {
+        newSet.delete(photoPath);
+      } else {
+        newSet.add(photoPath);
+      }
+      return newSet;
+    });
+  };
+
   // Filter by media type
   const filteredPhotos = allPhotos.filter(photo => {
     if (mediaTypeFilter === "photos") return !isVideoFile(photo.name);
@@ -637,11 +654,36 @@ export default function MyEvidence() {
                         </div>
                       </div>
                       
-                      {/* Caption text below photo - bold and visible */}
+                      {/* Caption text below photo - expandable */}
                       {photo.caption && (
-                        <p className="text-sm font-semibold text-foreground line-clamp-2 px-1">
-                          {photo.caption}
-                        </p>
+                        <div className="space-y-1 px-1">
+                          <p className="text-sm font-semibold text-foreground">
+                            {isCaptionExpanded(photo.path) || photo.caption.length <= 150
+                              ? photo.caption
+                              : `${photo.caption.slice(0, 150)}...`}
+                          </p>
+                          {photo.caption.length > 150 && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleCaption(photo.path);
+                              }}
+                              className="text-xs text-primary hover:text-primary/80 font-medium flex items-center gap-1"
+                            >
+                              {isCaptionExpanded(photo.path) ? (
+                                <>
+                                  <ChevronUp className="h-3 w-3" />
+                                  See less
+                                </>
+                              ) : (
+                                <>
+                                  <ChevronDown className="h-3 w-3" />
+                                  See more
+                                </>
+                              )}
+                            </button>
+                          )}
+                        </div>
                       )}
                     </div>
                   );

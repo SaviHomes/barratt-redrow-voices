@@ -240,6 +240,7 @@ export default function EvidenceDetail() {
                       <>
                         <video
                           src={photo.url}
+                          poster={photo.poster_url || undefined}
                           className="w-full h-full object-cover"
                           preload="metadata"
                         />

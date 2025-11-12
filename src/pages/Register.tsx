@@ -404,7 +404,7 @@ export default function Register() {
                   }) => <FormItem>
                         <FormLabel>What build style did you buy?</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="e.g., New Build, Help to Buy, Off Plan, etc." />
+                          <Input {...field} placeholder="e.g., The Oxford Lifestyle, The Leamington Lifestyle, etc." />
                         </FormControl>
                         <FormMessage />
                       </FormItem>} />

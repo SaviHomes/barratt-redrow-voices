@@ -7,7 +7,26 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Users, Mail, Phone, MapPin, Home, MessageSquare } from "lucide-react";
+import { ArrowLeft, Users, Mail, Phone, MapPin, Home, MessageSquare, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { useToast } from "@/hooks/use-toast";
 import EditDevelopmentName from "@/components/EditDevelopmentName";
 
@@ -41,6 +60,8 @@ const UserManagement = () => {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [users, setUsers] = useState<UserProfile[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 10;
 
   const checkAdminStatus = async () => {
     if (!user) {
@@ -144,6 +165,50 @@ const UserManagement = () => {
     return phones.join(" / ") || "Not provided";
   };
 
+  const handleDeleteUser = async (userId: string, firstName: string, lastName: string) => {
+    try {
+      const { data, error } = await supabase
+        .rpc('delete_user_by_admin', { target_user_id: userId });
+      
+      if (error) {
+        console.error('Error deleting user:', error);
+        toast({
+          title: "Deletion Failed",
+          description: error.message || "Failed to delete user account",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      toast({
+        title: "User Deleted",
+        description: `Successfully deleted user account for ${firstName} ${lastName}`,
+      });
+      
+      // Refresh user list
+      await fetchUsers();
+      
+      // Reset to page 1 if current page becomes empty
+      const newTotalPages = Math.ceil((users.length - 1) / usersPerPage);
+      if (currentPage > newTotalPages && newTotalPages > 0) {
+        setCurrentPage(newTotalPages);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Pagination calculations
+  const totalPages = Math.ceil(users.length / usersPerPage);
+  const startIndex = (currentPage - 1) * usersPerPage;
+  const endIndex = startIndex + usersPerPage;
+  const currentUsers = users.slice(startIndex, endIndex);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -181,7 +246,9 @@ const UserManagement = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Registered Users ({users.length})</CardTitle>
+          <CardTitle>
+            Registered Users ({users.length} total{users.length > 0 && `, showing ${startIndex + 1}-${Math.min(endIndex, users.length)}`})
+          </CardTitle>
           <CardDescription>
             All users who have registered on the platform with their details
           </CardDescription>
@@ -194,9 +261,38 @@ const UserManagement = () => {
             </div>
           ) : (
             <div className="space-y-6">
-              {users.map((user) => (
+              {currentUsers.map((user) => (
                 <Card key={user.id} className="border-l-4 border-l-primary">
                   <CardContent className="p-6">
+                    <div className="flex justify-end mb-4">
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="destructive" size="sm">
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete User
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete User Account</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete {user.first_name} {user.last_name}'s account?
+                              This will permanently delete their profile, evidence uploads, claims, and all associated data.
+                              This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDeleteUser(user.user_id, user.first_name, user.last_name)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Delete Account
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {/* Personal Information */}
                       <div className="space-y-3">
@@ -298,6 +394,41 @@ const UserManagement = () => {
                   </CardContent>
                 </Card>
               ))}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {users.length > usersPerPage && (
+            <div className="mt-6 flex justify-center">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    />
+                  </PaginationItem>
+                  
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <PaginationItem key={page}>
+                      <PaginationLink
+                        onClick={() => setCurrentPage(page)}
+                        isActive={currentPage === page}
+                        className="cursor-pointer"
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+                  
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                      className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
             </div>
           )}
         </CardContent>

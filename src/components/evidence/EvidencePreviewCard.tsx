@@ -11,6 +11,14 @@ interface EvidencePreviewCardProps {
 export default function EvidencePreviewCard({ evidence, onClick }: EvidencePreviewCardProps) {
   const imageCount = evidence.photos.length;
 
+  const isVideo = (filename: string) => {
+    const videoExtensions = ['.mp4', '.mov', '.avi', '.webm', '.mkv', '.m4v'];
+    return videoExtensions.some(ext => filename.toLowerCase().endsWith(ext));
+  };
+
+  // Find first image (not video) for thumbnail
+  const thumbnailPhoto = evidence.photos.find(photo => !isVideo(photo.name));
+
   const getSeverityColor = (severity: string) => {
     switch (severity.toLowerCase()) {
       case 'critical': return 'bg-destructive text-destructive-foreground';
@@ -40,10 +48,10 @@ export default function EvidencePreviewCard({ evidence, onClick }: EvidencePrevi
       <div className="grid md:grid-cols-[240px_1fr] gap-0">
         {/* Thumbnail */}
         <div className="relative w-full aspect-square md:aspect-auto overflow-hidden bg-muted flex items-center justify-center">
-          {imageCount > 0 ? (
+          {thumbnailPhoto ? (
             <>
               <img
-                src={evidence.photos[0].url}
+                src={thumbnailPhoto.url}
                 alt={evidence.title}
                 className="w-full h-full object-cover"
                 loading="lazy"

@@ -4,7 +4,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Globe, MapPin, Clock } from "lucide-react";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext, PaginationEllipsis } from "@/components/ui/pagination";
+import { Globe, MapPin, Clock, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
@@ -27,8 +28,10 @@ interface Analytics {
   totalVisitors: number;
   uniqueCountries: number;
   topCountries: { country: string; count: number }[];
-  recentVisitors: VisitorData[];
+  allVisitors: VisitorData[];
 }
+
+const ITEMS_PER_PAGE = 20;
 
 export default function AdminVisitorStatistics() {
   const { user } = useAuth();
@@ -37,6 +40,7 @@ export default function AdminVisitorStatistics() {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     checkAdminStatus();
@@ -95,7 +99,7 @@ export default function AdminVisitorStatistics() {
         .from('visitor_analytics')
         .select('*')
         .order('visited_at', { ascending: false })
-        .limit(100);
+        .limit(500);
 
       if (error) throw error;
 
@@ -119,7 +123,7 @@ export default function AdminVisitorStatistics() {
         totalVisitors,
         uniqueCountries,
         topCountries,
-        recentVisitors: visitors?.slice(0, 20) || [],
+        allVisitors: visitors || [],
       });
     } catch (error) {
       console.error('Error fetching analytics:', error);
@@ -138,6 +142,51 @@ export default function AdminVisitorStatistics() {
   const getLocationString = (visitor: VisitorData) => {
     const parts = [visitor.city, visitor.region, visitor.country].filter(Boolean);
     return parts.length > 0 ? parts.join(', ') : 'Unknown';
+  };
+
+  const openReferrerPopup = (url: string) => {
+    if (url && url !== 'Direct') {
+      window.open(url, '_blank', 'width=1000,height=700,scrollbars=yes,resizable=yes');
+    }
+  };
+
+  // Calculate pagination
+  const totalPages = analytics ? Math.ceil(analytics.allVisitors.length / ITEMS_PER_PAGE) : 0;
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const currentVisitors = analytics?.allVisitors.slice(startIndex, endIndex) || [];
+
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pages: (number | 'ellipsis')[] = [];
+    const maxVisible = 5;
+    
+    if (totalPages <= maxVisible) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
+    pages.push(1);
+    
+    if (currentPage > 3) {
+      pages.push('ellipsis');
+    }
+
+    const start = Math.max(2, currentPage - 1);
+    const end = Math.min(totalPages - 1, currentPage + 1);
+    
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+
+    if (currentPage < totalPages - 2) {
+      pages.push('ellipsis');
+    }
+
+    if (totalPages > 1) {
+      pages.push(totalPages);
+    }
+
+    return pages;
   };
 
   if (loading) {
@@ -233,7 +282,9 @@ export default function AdminVisitorStatistics() {
               <Card>
                 <CardHeader>
                   <CardTitle>Recent Visitors</CardTitle>
-                  <CardDescription>Latest visitor activity with IP addresses and locations</CardDescription>
+                  <CardDescription>
+                    Latest visitor activity with IP addresses and locations (Page {currentPage} of {totalPages})
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Table>
@@ -247,7 +298,7 @@ export default function AdminVisitorStatistics() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {analytics.recentVisitors.map((visitor) => (
+                      {currentVisitors.map((visitor) => (
                         <TableRow key={visitor.id}>
                           <TableCell className="font-mono text-sm">
                             {String(visitor.ip_address)}
@@ -258,8 +309,19 @@ export default function AdminVisitorStatistics() {
                           <TableCell>
                             {visitor.page_path || '/'}
                           </TableCell>
-                          <TableCell className="max-w-xs truncate">
-                            {visitor.referrer || 'Direct'}
+                          <TableCell className="max-w-xs">
+                            {visitor.referrer && visitor.referrer !== 'Direct' ? (
+                              <button
+                                onClick={() => openReferrerPopup(visitor.referrer!)}
+                                className="flex items-center gap-1 text-primary hover:underline truncate max-w-full"
+                                aria-label={`Open referrer: ${visitor.referrer}`}
+                              >
+                                <span className="truncate">{visitor.referrer}</span>
+                                <ExternalLink className="h-3 w-3 flex-shrink-0" />
+                              </button>
+                            ) : (
+                              <span className="text-muted-foreground">Direct</span>
+                            )}
                           </TableCell>
                           <TableCell>
                             {formatDate(visitor.visited_at)}
@@ -268,6 +330,45 @@ export default function AdminVisitorStatistics() {
                       ))}
                     </TableBody>
                   </Table>
+
+                  {/* Pagination Controls */}
+                  {totalPages > 1 && (
+                    <div className="mt-6">
+                      <Pagination>
+                        <PaginationContent>
+                          <PaginationItem>
+                            <PaginationPrevious
+                              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                              className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                            />
+                          </PaginationItem>
+
+                          {getPageNumbers().map((page, index) => (
+                            <PaginationItem key={index}>
+                              {page === 'ellipsis' ? (
+                                <PaginationEllipsis />
+                              ) : (
+                                <PaginationLink
+                                  onClick={() => setCurrentPage(page)}
+                                  isActive={currentPage === page}
+                                  className="cursor-pointer"
+                                >
+                                  {page}
+                                </PaginationLink>
+                              )}
+                            </PaginationItem>
+                          ))}
+
+                          <PaginationItem>
+                            <PaginationNext
+                              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                              className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                            />
+                          </PaginationItem>
+                        </PaginationContent>
+                      </Pagination>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </>

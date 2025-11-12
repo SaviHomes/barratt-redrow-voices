@@ -307,17 +307,13 @@ export default function NewsArticles() {
               {filteredArticles.map((article) => (
                 <Card key={article.id} className="overflow-hidden hover:shadow-lg transition-shadow">
                   {/* Thumbnail */}
-                  {article.thumbnail_url ? (
-                    <img
-                      src={article.thumbnail_url}
-                      alt={article.title}
-                      className="w-full h-48 object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-48 bg-muted flex items-center justify-center">
-                      <Newspaper className="h-16 w-16 text-muted-foreground opacity-50" />
-                    </div>
-                  )}
+                {article.thumbnail_url && (
+                  <img
+                    src={article.thumbnail_url}
+                    alt={article.title}
+                    className="w-full h-48 object-cover"
+                  />
+                )}
 
                   <CardHeader>
                     <CardTitle className="line-clamp-2 text-lg">{article.title}</CardTitle>

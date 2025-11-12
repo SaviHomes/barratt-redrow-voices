@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/Layout";
+import SocialShareButtons from "@/components/evidence/SocialShareButtons";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -333,6 +334,15 @@ export default function NewsArticles() {
                         <Calendar className="h-3 w-3" />
                         {format(new Date(article.article_date), 'dd MMM yyyy')}
                       </Badge>
+                    </div>
+
+                    {/* Social Sharing Buttons */}
+                    <div className="mb-4">
+                      <SocialShareButtons
+                        url={article.article_url}
+                        title={article.title}
+                        description={article.description}
+                      />
                     </div>
 
                     {/* View Article Button */}

@@ -8,11 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import AdaptiveEvidenceCard from "@/components/evidence/AdaptiveEvidenceCard";
+import EvidencePreviewCard from "@/components/evidence/EvidencePreviewCard";
 import EvidenceDetailDialog from "@/components/evidence/EvidenceDetailDialog";
 import { useEvidencePhotos, EvidenceWithPhotos } from "@/hooks/useEvidencePhotos";
 import { Search, Filter, SortAsc, Eye, ArrowLeft } from "lucide-react";
-import Masonry from "react-masonry-css";
 import SEOHead from "@/components/SEOHead";
 
 const CATEGORIES = [
@@ -121,11 +120,6 @@ export default function PublicGallery() {
       .eq('id', item.id);
   };
 
-  const breakpointColumns = {
-    default: 3,
-    1024: 2,
-    640: 1,
-  };
 
   return (
     <Layout>
@@ -277,20 +271,15 @@ export default function PublicGallery() {
                 <div className="mb-4 text-sm text-muted-foreground">
                   Showing {filteredEvidence.length} {filteredEvidence.length === 1 ? 'item' : 'items'}
                 </div>
-                <Masonry
-                  breakpointCols={breakpointColumns}
-                  className="flex -ml-6 w-auto"
-                  columnClassName="pl-6 bg-clip-padding"
-                >
+                <div className="space-y-6">
                   {filteredEvidence.map((item) => (
-                    <div key={item.id} className="mb-6">
-                      <AdaptiveEvidenceCard
-                        evidence={item}
-                        onClick={() => handleEvidenceClick(item)}
-                      />
-                    </div>
+                    <EvidencePreviewCard
+                      key={item.id}
+                      evidence={item}
+                      onClick={() => handleEvidenceClick(item)}
+                    />
                   ))}
-                </Masonry>
+                </div>
               </>
             )}
           </div>

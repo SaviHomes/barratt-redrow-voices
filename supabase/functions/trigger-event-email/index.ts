@@ -101,7 +101,7 @@ serve(async (req) => {
 
             if (eventType === 'comment_submitted') {
               html = await renderAsync(
-                React.createElement(CommentAdminNotification, templateData)
+                React.createElement(CommentAdminNotification, templateData as any)
               );
               subject = `New ${templateData.commentType === 'photo' ? 'Photo' : 'Evidence'} Comment Awaiting Moderation`;
             } else {

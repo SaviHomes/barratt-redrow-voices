@@ -26,21 +26,20 @@ export interface EvidenceWithPhotos {
   featured_image_index?: number;
 }
 
-export function useEvidencePhotos(evidence: any[], userId: string | undefined) {
+export function useEvidencePhotos(evidence: any[]) {
   const [evidenceWithPhotos, setEvidenceWithPhotos] = useState<EvidenceWithPhotos[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!userId || evidence.length === 0) {
+    if (evidence.length === 0) {
       setEvidenceWithPhotos(evidence.map(e => ({ ...e, photos: [] })));
       return;
     }
 
     fetchPhotosForEvidence();
-  }, [evidence, userId]);
+  }, [evidence]);
 
   const fetchPhotosForEvidence = async () => {
-    if (!userId) return;
     
     setLoading(true);
     try {

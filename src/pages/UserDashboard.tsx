@@ -27,7 +27,7 @@ export default function UserDashboard() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [evidenceToEdit, setEvidenceToEdit] = useState<any | null>(null);
 
-  const { evidenceWithPhotos, loading: photosLoading, refetch: refetchPhotos } = useEvidencePhotos(recentEvidence, user?.id);
+  const { evidenceWithPhotos, loading: photosLoading, refetch: refetchPhotos } = useEvidencePhotos(recentEvidence);
 
   useEffect(() => {
     if (user) {

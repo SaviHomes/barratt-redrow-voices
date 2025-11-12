@@ -51,7 +51,7 @@ export default function PublicGallery() {
   const [sortBy, setSortBy] = useState("recent");
   const [selectedEvidence, setSelectedEvidence] = useState<EvidenceWithPhotos | null>(null);
 
-  const { evidenceWithPhotos, loading: photosLoading } = useEvidencePhotos(evidence, 'public');
+  const { evidenceWithPhotos, loading: photosLoading } = useEvidencePhotos(evidence);
 
   useEffect(() => {
     fetchPublicEvidence();

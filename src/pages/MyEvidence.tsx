@@ -64,7 +64,7 @@ export default function MyEvidence() {
   const [editPhotoEvidenceId, setEditPhotoEvidenceId] = useState<string | null>(null);
   const [photoToDelete, setPhotoToDelete] = useState<{ path: string, evidenceId: string } | null>(null);
 
-  const { evidenceWithPhotos, loading: photosLoading, deletePhoto, refetch: refetchPhotos } = useEvidencePhotos(evidence, user?.id);
+  const { evidenceWithPhotos, loading: photosLoading, deletePhoto, refetch: refetchPhotos } = useEvidencePhotos(evidence);
 
   useEffect(() => {
     if (user) {

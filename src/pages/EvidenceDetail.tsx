@@ -51,7 +51,7 @@ export default function EvidenceDetail() {
     [evidence?.id]
   );
   
-  const { evidenceWithPhotos } = useEvidencePhotos(evidenceArray, evidence?.user_id);
+  const { evidenceWithPhotos } = useEvidencePhotos(evidenceArray);
   const evidenceData: EvidenceWithPhotos | undefined = evidenceWithPhotos[0];
 
   const getSeverityColor = (severity: string) => {

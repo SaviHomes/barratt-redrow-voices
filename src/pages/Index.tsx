@@ -37,7 +37,7 @@ const Index = () => {
   useVisitorTracking();
 
   // Fetch photos for recent evidence
-  const { evidenceWithPhotos: recentEvidenceWithPhotos } = useEvidencePhotos(recentEvidence, 'public');
+  const { evidenceWithPhotos: recentEvidenceWithPhotos } = useEvidencePhotos(recentEvidence);
 
   useEffect(() => {
     fetchFAQs();

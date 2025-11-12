@@ -56,6 +56,8 @@ export default function EvidencePreviewCard({ evidence, onClick }: EvidencePrevi
                 <video
                   src={thumbnailPhoto.url}
                   className="w-full h-full object-cover"
+                  autoPlay
+                  loop
                   muted
                   playsInline
                   preload="metadata"
@@ -67,14 +69,6 @@ export default function EvidencePreviewCard({ evidence, onClick }: EvidencePrevi
                   className="w-full h-full object-cover"
                   loading="lazy"
                 />
-              )}
-              
-              {isThumbnailVideo && (
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="bg-black/50 rounded-full p-3 backdrop-blur-sm">
-                    <Play className="h-8 w-8 text-white fill-white" />
-                  </div>
-                </div>
               )}
               
               {imageCount > 1 && (

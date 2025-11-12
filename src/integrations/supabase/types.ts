@@ -647,6 +647,57 @@ export type Database = {
         }
         Relationships: []
       }
+      news_articles: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          article_date: string
+          article_url: string
+          created_at: string | null
+          created_by: string
+          description: string
+          id: string
+          is_approved: boolean | null
+          order_index: number | null
+          source: string
+          thumbnail_url: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          article_date: string
+          article_url: string
+          created_at?: string | null
+          created_by: string
+          description: string
+          id?: string
+          is_approved?: boolean | null
+          order_index?: number | null
+          source: string
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          article_date?: string
+          article_url?: string
+          created_at?: string | null
+          created_by?: string
+          description?: string
+          id?: string
+          is_approved?: boolean | null
+          order_index?: number | null
+          source?: string
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       photo_comments: {
         Row: {
           comment_text: string

@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Globe, Users, MapPin, Clock, Scale, HelpCircle, ImageIcon, Mail, Settings, Eye, MessageSquare } from "lucide-react";
+import { AlertTriangle, Globe, Users, MapPin, Clock, Scale, HelpCircle, ImageIcon, Mail, Settings, Eye, MessageSquare, Newspaper } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
@@ -81,6 +81,7 @@ export default function AdminDashboard() {
   const [rejectEvidenceId, setRejectEvidenceId] = useState<string | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
   const [pendingCommentsCount, setPendingCommentsCount] = useState(0);
+  const [pendingArticlesCount, setPendingArticlesCount] = useState(0);
 
   useEffect(() => {
     checkAdminStatus();
@@ -92,6 +93,7 @@ export default function AdminDashboard() {
       fetchGLORegistrations();
       fetchPendingEvidence();
       fetchPendingComments();
+      fetchPendingArticles();
     }
   }, [isAdmin]);
 
@@ -380,6 +382,20 @@ export default function AdminDashboard() {
     }
   };
 
+  const fetchPendingArticles = async () => {
+    try {
+      const { count, error } = await supabase
+        .from('news_articles')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_approved', false);
+
+      if (error) throw error;
+      setPendingArticlesCount(count || 0);
+    } catch (error) {
+      console.error('Error fetching pending articles count:', error);
+    }
+  };
+
   const getSeverityVariant = (severity: string): "default" | "secondary" | "destructive" | "outline" => {
     switch (severity.toLowerCase()) {
       case 'critical':
@@ -501,6 +517,18 @@ export default function AdminDashboard() {
                 <p className="text-xs text-muted-foreground mt-1">Awaiting review</p>
               </CardContent>
             </Card>
+
+            <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate("/admin/articles")}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">News Articles</CardTitle>
+                <Newspaper className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{pendingArticlesCount}</div>
+                <p className="text-xs text-muted-foreground mt-1">Pending approval</p>
+              </CardContent>
+            </Card>
+
 
             <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate("/admin/settings")}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

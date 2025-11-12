@@ -48,6 +48,9 @@ export default function Layout({
               <Link to="/redrow-complaints" className="text-muted-foreground hover:text-primary transition-colors">
                 Complaints
               </Link>
+              <Link to="/news-articles" className="text-muted-foreground hover:text-primary transition-colors">
+                News Articles
+              </Link>
               <Link to="/submit-claim" className="text-muted-foreground hover:text-primary transition-colors">
                 Submit Claim
               </Link>

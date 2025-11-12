@@ -30,6 +30,8 @@ import MyProfile from "./pages/MyProfile";
 import GroupLitigationInfo from "./pages/GroupLitigationInfo";
 import EvidenceDetail from "./pages/EvidenceDetail";
 import AdminCommentModeration from "./pages/AdminCommentModeration";
+import NewsArticles from "./pages/NewsArticles";
+import AdminArticles from "./pages/AdminArticles";
 
 const queryClient = new QueryClient();
 
@@ -64,7 +66,9 @@ const App = () => (
             <Route path="/admin/emails" element={<AdminEmailManagement />} />
             <Route path="/admin/comments" element={<AdminCommentModeration />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
+            <Route path="/admin/articles" element={<AdminArticles />} />
             <Route path="/public-gallery" element={<PublicGallery />} />
+            <Route path="/news-articles" element={<NewsArticles />} />
             <Route path="/evidence/:id" element={<EvidenceDetail />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

@@ -100,6 +100,13 @@ export default function MobileNavigation() {
               Complaints
             </Link>
             <Link 
+              to="/news-articles" 
+              className="text-foreground hover:text-primary transition-colors py-2 text-lg"
+              onClick={closeMenu}
+            >
+              News Articles
+            </Link>
+            <Link 
               to="/submit-claim" 
               className="text-foreground hover:text-primary transition-colors py-2 text-lg"
               onClick={closeMenu}

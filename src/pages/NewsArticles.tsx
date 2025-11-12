@@ -195,7 +195,7 @@ export default function NewsArticles() {
                           {dateFrom ? format(dateFrom, "dd/MM/yy") : "From"}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 bg-background z-50" align="start">
+                      <PopoverContent className="w-auto p-0 bg-background z-[100] shadow-lg" align="start">
                         <Calendar
                           mode="single"
                           selected={dateFrom}
@@ -220,7 +220,7 @@ export default function NewsArticles() {
                           {dateTo ? format(dateTo, "dd/MM/yy") : "To"}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 bg-background z-50" align="start">
+                      <PopoverContent className="w-auto p-0 bg-background z-[100] shadow-lg" align="start">
                         <Calendar
                           mode="single"
                           selected={dateTo}

@@ -12,6 +12,7 @@ import { GloUpdateEmail } from './_templates/glo-update.tsx';
 import { CustomEmail } from './_templates/custom.tsx';
 import { ContactAdminNotification } from './_templates/contact-admin-notification.tsx';
 import { ContactUsEmail } from './_templates/contact-us.tsx';
+import { CommentAdminNotification } from './_templates/comment-admin-notification.tsx';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -98,6 +99,23 @@ const templates: TemplateConfig[] = [
     component: ContactUsEmail,
     previewData: {
       userName: 'John Smith'
+    }
+  },
+  {
+    name: 'comment-admin-notification',
+    component: CommentAdminNotification,
+    previewData: {
+      commenterName: 'Jane Doe',
+      commenterEmail: 'jane.doe@example.com',
+      commentText: 'This is exactly what happened to us! We had the same cracks appearing within 6 months. The quality is absolutely shocking and Redrow refused to acknowledge the problems.',
+      commentType: 'photo',
+      evidenceTitle: 'Severe Wall Cracks in Living Room',
+      photoLabel: 'Close-up of crack near window',
+      photoUrl: 'https://fypibednjongfztfjvbp.supabase.co/storage/v1/object/public/evidence-photos/sample-crack.jpg',
+      submittedAt: '15 Nov 2025, 16:45',
+      approveUrl: 'https://www.redrowexposed.co.uk/admin/comments?action=approve&id=123',
+      declineUrl: 'https://www.redrowexposed.co.uk/admin/comments?action=decline&id=123',
+      viewUrl: 'https://www.redrowexposed.co.uk/evidence/abc-123'
     }
   }
 ];

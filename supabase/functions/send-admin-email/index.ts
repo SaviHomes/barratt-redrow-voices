@@ -11,6 +11,7 @@ import { GloUpdateEmail } from "./_templates/glo-update.tsx";
 import { CustomEmail } from "./_templates/custom.tsx";
 import { ContactAdminNotification } from "./_templates/contact-admin-notification.tsx";
 import { ContactUsEmail } from "./_templates/contact-us.tsx";
+import { CommentAdminNotification } from "./_templates/comment-admin-notification.tsx";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -22,7 +23,7 @@ const corsHeaders = {
 
 interface AdminEmailRequest {
   templateId?: string; // Use custom template from DB
-  template?: 'welcome' | 'evidence-approved' | 'evidence-rejected' | 'newsletter' | 'glo-update' | 'custom' | 'contact-admin-notification' | 'contact-us'; // Legacy
+  template?: 'welcome' | 'evidence-approved' | 'evidence-rejected' | 'newsletter' | 'glo-update' | 'custom' | 'contact-admin-notification' | 'contact-us' | 'comment-admin-notification'; // Legacy
   recipients: string[];
   subject?: string; // Optional override
   customData?: Record<string, any>; // Variables to replace
@@ -189,6 +190,24 @@ const handler = async (req: Request): Promise<Response> => {
             })
           );
           finalSubject = subject || 'Thank you for your email';
+          break;
+        case 'comment-admin-notification':
+          html = await renderAsync(
+            React.createElement(CommentAdminNotification, {
+              commenterName: customData.commenterName || 'Anonymous',
+              commenterEmail: customData.commenterEmail || 'unknown@example.com',
+              commentText: customData.commentText || '',
+              commentType: customData.commentType || 'evidence',
+              evidenceTitle: customData.evidenceTitle || 'Untitled Evidence',
+              photoLabel: customData.photoLabel,
+              photoUrl: customData.photoUrl,
+              submittedAt: customData.submittedAt || new Date().toLocaleString(),
+              approveUrl: customData.approveUrl || '#',
+              declineUrl: customData.declineUrl || '#',
+              viewUrl: customData.viewUrl || '#'
+            })
+          );
+          finalSubject = subject || 'Admin, a new comment needs your approval!';
           break;
         default:
           throw new Error(`Unknown template: ${template}`);

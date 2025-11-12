@@ -143,9 +143,16 @@ export default function EvidenceLightbox({
     setZoom((prev) => Math.max(prev - 0.5, 1));
   };
 
+  // Safety check: ensure we have photos and valid index
   if (photos.length === 0) return null;
-
-  const currentPhoto = photos[currentIndex];
+  
+  // Ensure currentIndex is within bounds
+  const safeIndex = Math.min(currentIndex, photos.length - 1);
+  const currentPhoto = photos[safeIndex];
+  
+  // Guard against undefined photo
+  if (!currentPhoto) return null;
+  
   const isVideo = isVideoFile(currentPhoto.name);
 
   return (

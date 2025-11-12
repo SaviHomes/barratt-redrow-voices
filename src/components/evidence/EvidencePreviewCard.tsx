@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Calendar, Image as ImageIcon } from "lucide-react";
+import { Calendar, Image as ImageIcon, Play } from "lucide-react";
 import { EvidenceWithPhotos } from "@/hooks/useEvidencePhotos";
 
 interface EvidencePreviewCardProps {
@@ -16,8 +16,10 @@ export default function EvidencePreviewCard({ evidence, onClick }: EvidencePrevi
     return videoExtensions.some(ext => filename.toLowerCase().endsWith(ext));
   };
 
-  // Find first image (not video) for thumbnail
-  const thumbnailPhoto = evidence.photos.find(photo => !isVideo(photo.name));
+  // Use featured_image_index to select thumbnail, with fallback
+  const featuredIndex = evidence.featured_image_index || 0;
+  const thumbnailPhoto = evidence.photos[featuredIndex] || evidence.photos[0];
+  const isThumbnailVideo = thumbnailPhoto && isVideo(thumbnailPhoto.name);
 
   const getSeverityColor = (severity: string) => {
     switch (severity.toLowerCase()) {
@@ -50,12 +52,31 @@ export default function EvidencePreviewCard({ evidence, onClick }: EvidencePrevi
         <div className="relative w-full aspect-square md:aspect-auto overflow-hidden bg-muted flex items-center justify-center">
           {thumbnailPhoto ? (
             <>
-              <img
-                src={thumbnailPhoto.url}
-                alt={evidence.title}
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
+              {isThumbnailVideo ? (
+                <video
+                  src={thumbnailPhoto.url}
+                  className="w-full h-full object-cover"
+                  muted
+                  playsInline
+                  preload="metadata"
+                />
+              ) : (
+                <img
+                  src={thumbnailPhoto.url}
+                  alt={evidence.title}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+              )}
+              
+              {isThumbnailVideo && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="bg-black/50 rounded-full p-3 backdrop-blur-sm">
+                    <Play className="h-8 w-8 text-white fill-white" />
+                  </div>
+                </div>
+              )}
+              
               {imageCount > 1 && (
                 <div className="absolute bottom-2 right-2 bg-black/70 text-white px-2 py-1 rounded-md text-xs font-medium flex items-center gap-1">
                   <ImageIcon className="h-3 w-3" />

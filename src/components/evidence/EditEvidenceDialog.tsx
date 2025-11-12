@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, X, Upload, GripVertical, Play } from "lucide-react";
+import { Loader2, X, Upload, GripVertical, Play, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
@@ -32,6 +32,7 @@ interface Evidence {
   category: string;
   severity: string;
   photos: EvidencePhoto[];
+  featured_image_index: number;
 }
 
 interface EditEvidenceDialogProps {
@@ -53,6 +54,8 @@ function SortablePhotoItem({
   onCaptionChange,
   onLabelChange,
   onVideoDoubleClick,
+  onSetThumbnail,
+  isThumbnail,
   isEditing,
   loading 
 }: { 
@@ -62,6 +65,8 @@ function SortablePhotoItem({
   onCaptionChange: (caption: string) => void;
   onLabelChange: (label: string) => void;
   onVideoDoubleClick?: () => void;
+  onSetThumbnail: () => void;
+  isThumbnail: boolean;
   isEditing: boolean;
   loading: boolean;
 }) {
@@ -150,6 +155,24 @@ function SortablePhotoItem({
         type="button"
         onClick={(e) => {
           e.stopPropagation();
+          onSetThumbnail();
+        }}
+        className={cn(
+          "absolute top-1 right-8 rounded-full p-1 transition-all z-10",
+          isThumbnail 
+            ? "bg-yellow-500 text-white opacity-100" 
+            : "bg-black/50 text-white opacity-0 group-hover:opacity-100"
+        )}
+        disabled={loading}
+        title={isThumbnail ? "Current thumbnail" : "Set as thumbnail"}
+      >
+        <Star className={cn("h-4 w-4", isThumbnail && "fill-white")} />
+      </button>
+      
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
           onDelete();
         }}
         className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity z-10"
@@ -210,6 +233,7 @@ export function EditEvidenceDialog({ evidence, open, onOpenChange, onUpdate }: E
   const [editingPhotoPath, setEditingPhotoPath] = useState<string | null>(null);
   const [playingVideoUrl, setPlayingVideoUrl] = useState<string | null>(null);
   const [playingVideoName, setPlayingVideoName] = useState<string>("");
+  const [thumbnailIndex, setThumbnailIndex] = useState(0);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -225,6 +249,7 @@ export function EditEvidenceDialog({ evidence, open, onOpenChange, onUpdate }: E
       setDescription(evidence.description || "");
       setCategory(evidence.category);
       setSeverity(evidence.severity);
+      setThumbnailIndex(evidence.featured_image_index || 0);
       fetchPhotosWithCaptions(evidence.id);
       setNewFiles([]);
     }
@@ -333,6 +358,10 @@ export function EditEvidenceDialog({ evidence, open, onOpenChange, onUpdate }: E
     setPlayingVideoName(photo.name);
   };
 
+  const handleSetThumbnail = (photoIndex: number) => {
+    setThumbnailIndex(photoIndex);
+  };
+
   const handleSave = async () => {
     if (!evidence) return;
     if (!title.trim()) {
@@ -350,6 +379,7 @@ export function EditEvidenceDialog({ evidence, open, onOpenChange, onUpdate }: E
           description: description.trim() || null,
           category,
           severity,
+          featured_image_index: thumbnailIndex,
           updated_at: new Date().toISOString()
         })
         .eq("id", evidence.id);
@@ -498,7 +528,7 @@ export function EditEvidenceDialog({ evidence, open, onOpenChange, onUpdate }: E
               >
                 <SortableContext items={photos.map(p => p.path)} strategy={rectSortingStrategy}>
                   <div className="grid grid-cols-3 gap-2 mt-2">
-                    {photos.map((photo) => (
+                    {photos.map((photo, index) => (
                       <SortablePhotoItem
                         key={photo.path}
                         photo={photo}
@@ -507,6 +537,8 @@ export function EditEvidenceDialog({ evidence, open, onOpenChange, onUpdate }: E
                         onCaptionChange={(caption) => handleCaptionChange(photo.path, caption)}
                         onLabelChange={(label) => handleLabelChange(photo.path, label)}
                         onVideoDoubleClick={() => handleVideoDoubleClick(photo)}
+                        onSetThumbnail={() => handleSetThumbnail(index)}
+                        isThumbnail={index === thumbnailIndex}
                         isEditing={editingPhotoPath === photo.path}
                         loading={loading}
                       />

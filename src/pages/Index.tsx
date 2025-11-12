@@ -12,8 +12,9 @@ import DevelopmentFilter from "@/components/DevelopmentFilter";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
-import AdaptiveEvidenceCard from "@/components/evidence/AdaptiveEvidenceCard";
+import EvidencePreviewCard from "@/components/evidence/EvidencePreviewCard";
 import { useEvidencePhotos } from "@/hooks/useEvidencePhotos";
+import { useNavigate } from "react-router-dom";
 
 interface FAQ {
   id: string;
@@ -26,6 +27,7 @@ interface FAQ {
 
 const Index = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [faqs, setFaqs] = useState<FAQ[]>([]);
   const { customerExperiencesEnabled } = useSiteSettings();
   const [recentEvidence, setRecentEvidence] = useState<any[]>([]);
@@ -353,12 +355,12 @@ const Index = () => {
             </div>
           ) : recentEvidenceWithPhotos.length > 0 ? (
             <>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+              <div className="space-y-6 mb-10">
                 {recentEvidenceWithPhotos.map(evidence => (
-                  <AdaptiveEvidenceCard
+                  <EvidencePreviewCard
                     key={evidence.id}
                     evidence={evidence}
-                    onClick={() => window.location.href = '/public-gallery'}
+                    onClick={() => navigate(`/evidence/${evidence.id}`)}
                   />
                 ))}
               </div>

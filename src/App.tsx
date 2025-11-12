@@ -28,6 +28,7 @@ import MyEvidence from "./pages/MyEvidence";
 import MyClaims from "./pages/MyClaims";
 import MyProfile from "./pages/MyProfile";
 import GroupLitigationInfo from "./pages/GroupLitigationInfo";
+import EvidenceDetail from "./pages/EvidenceDetail";
 
 const queryClient = new QueryClient();
 
@@ -62,6 +63,7 @@ const App = () => (
             <Route path="/admin/emails" element={<AdminEmailManagement />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
             <Route path="/public-gallery" element={<PublicGallery />} />
+            <Route path="/evidence/:id" element={<EvidenceDetail />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

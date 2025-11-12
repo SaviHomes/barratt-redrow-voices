@@ -46,7 +46,7 @@ export default function EvidenceDetail() {
     }
   };
 
-  const { evidenceWithPhotos } = useEvidencePhotos(evidence ? [evidence] : [], 'public');
+  const { evidenceWithPhotos } = useEvidencePhotos(evidence ? [evidence] : [], evidence?.user_id);
   const evidenceData: EvidenceWithPhotos | undefined = evidenceWithPhotos[0];
 
   const getSeverityColor = (severity: string) => {

@@ -36,6 +36,7 @@ const eventTypes = [
   { value: 'evidence_submitted', label: 'Evidence Submitted' },
   { value: 'claim_submitted', label: 'Claim Submitted' },
   { value: 'glo_registered', label: 'GLO Registered' },
+  { value: 'comment_submitted', label: 'Comment Submitted' },
 ];
 
 const recipientTypes = [

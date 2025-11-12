@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { triggerEventEmail } from "@/lib/emailTriggers";
 
 const photoCommentSchema = z.object({
   commenter_name: z.string()
@@ -96,6 +97,33 @@ export default function PhotoCommentForm({
         });
 
       if (error) throw error;
+
+      // Fetch photo caption and evidence details for email notification
+      const { data: photoCaption } = await supabase
+        .from('evidence_photo_captions')
+        .select('label, photo_path, evidence_id, evidence(title)')
+        .eq('id', photoCaptionId)
+        .single();
+
+      if (photoCaption) {
+        const photoUrl = supabase.storage
+          .from('evidence-photos')
+          .getPublicUrl(photoCaption.photo_path).data.publicUrl;
+
+        // Trigger admin notification email
+        await triggerEventEmail('comment_submitted', {
+          commenterName: data.commenter_name,
+          commenterEmail: data.commenter_email,
+          commentText: data.comment_text,
+          commentType: 'photo',
+          photoCaptionId,
+          photoLabel: photoCaption.label || 'Photo',
+          photoUrl,
+          evidenceTitle: (photoCaption.evidence as any)?.title || 'Evidence',
+          submittedAt: new Date().toISOString(),
+          viewUrl: `${window.location.origin}/evidence/${photoCaption.evidence_id}`,
+        });
+      }
 
       toast({
         title: "Comment submitted!",

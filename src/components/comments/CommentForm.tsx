@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { triggerEventEmail } from "@/lib/emailTriggers";
 
 const commentSchema = z.object({
   commenter_name: z.string()
@@ -98,6 +99,25 @@ export const CommentForm = ({ evidenceId, onCommentSubmitted }: CommentFormProps
         });
 
       if (error) throw error;
+
+      // Fetch evidence details for email notification
+      const { data: evidence } = await supabase
+        .from('evidence')
+        .select('title')
+        .eq('id', evidenceId)
+        .single();
+
+      // Trigger admin notification email
+      await triggerEventEmail('comment_submitted', {
+        commenterName: data.commenter_name,
+        commenterEmail: data.commenter_email,
+        commentText: data.comment_text,
+        commentType: 'evidence',
+        evidenceId,
+        evidenceTitle: evidence?.title || 'Evidence',
+        submittedAt: new Date().toISOString(),
+        viewUrl: `${window.location.origin}/evidence/${evidenceId}`,
+      });
 
       toast({
         title: "Comment Submitted",

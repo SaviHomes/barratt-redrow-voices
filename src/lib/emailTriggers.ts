@@ -7,6 +7,7 @@ export type TriggerEvent =
   | 'evidence_submitted'
   | 'claim_submitted'
   | 'glo_registered'
+  | 'comment_submitted'
   | 'manual';
 
 interface TriggerEventData {
@@ -96,6 +97,21 @@ async function prepareTemplateData(
       return {
         userName: eventData.userName || 'User',
         dashboardUrl: `${baseUrl}/user-dashboard`,
+      };
+    
+    case 'comment_submitted':
+      return {
+        commenterName: eventData.commenterName || 'Anonymous',
+        commenterEmail: eventData.commenterEmail || '',
+        commentText: eventData.commentText || '',
+        commentType: eventData.commentType || 'evidence',
+        evidenceTitle: eventData.evidenceTitle || 'Evidence',
+        photoLabel: eventData.photoLabel,
+        photoUrl: eventData.photoUrl,
+        submittedAt: eventData.submittedAt || new Date().toISOString(),
+        approveUrl: `${baseUrl}/admin/comments`,
+        declineUrl: `${baseUrl}/admin/comments`,
+        viewUrl: eventData.viewUrl || `${baseUrl}/public-gallery`,
       };
     
     default:

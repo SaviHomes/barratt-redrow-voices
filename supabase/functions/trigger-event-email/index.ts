@@ -1,5 +1,9 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
+import { Resend } from "npm:resend@4.0.0";
+import React from "npm:react@18.3.1";
+import { renderAsync } from "https://esm.sh/@react-email/render@0.0.12";
+import { CommentAdminNotification } from "./_templates/comment-admin-notification.tsx";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -84,30 +88,60 @@ serve(async (req) => {
         const templateData = await prepareTemplateData(supabase, eventType, eventData, requestId);
         console.log(`[${requestId}] Template data prepared with ${Object.keys(templateData).length} fields`);
 
-        // Send emails to each recipient
+        // Send emails to each recipient using Resend directly
+        const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
+        
         for (const recipientEmail of recipients) {
           console.log(`[${requestId}] Sending email to: ${recipientEmail}`);
 
-          const { error: emailError } = await supabase.functions.invoke('send-admin-email', {
-            body: {
-              to: [recipientEmail],
-              templateId: trigger.template_id,
-              templateData,
-            },
-          });
+          try {
+            // Render the appropriate email template based on event type
+            let html = '';
+            let subject = '';
 
-          if (emailError) {
-            console.error(`[${requestId}] Error sending email to ${recipientEmail}:`, emailError);
+            if (eventType === 'comment_submitted') {
+              html = await renderAsync(
+                React.createElement(CommentAdminNotification, templateData)
+              );
+              subject = `New ${templateData.commentType === 'photo' ? 'Photo' : 'Evidence'} Comment Awaiting Moderation`;
+            } else {
+              console.warn(`[${requestId}] No email template configured for event type: ${eventType}`);
+              emailResults.push({ 
+                recipient: recipientEmail, 
+                success: false, 
+                error: `No template for event type: ${eventType}` 
+              });
+              continue;
+            }
+
+            // Send email via Resend
+            const { error: emailError } = await resend.emails.send({
+              from: 'Redrow Exposed <onboarding@resend.dev>',
+              to: [recipientEmail],
+              subject,
+              html,
+            });
+
+            if (emailError) {
+              console.error(`[${requestId}] Error sending email to ${recipientEmail}:`, emailError);
+              emailResults.push({ 
+                recipient: recipientEmail, 
+                success: false, 
+                error: emailError.message 
+              });
+            } else {
+              console.log(`[${requestId}] Email sent successfully to ${recipientEmail}`);
+              emailResults.push({ 
+                recipient: recipientEmail, 
+                success: true 
+              });
+            }
+          } catch (renderError: any) {
+            console.error(`[${requestId}] Error rendering/sending email:`, renderError);
             emailResults.push({ 
               recipient: recipientEmail, 
               success: false, 
-              error: emailError.message 
-            });
-          } else {
-            console.log(`[${requestId}] Email sent successfully to ${recipientEmail}`);
-            emailResults.push({ 
-              recipient: recipientEmail, 
-              success: true 
+              error: renderError.message 
             });
           }
         }

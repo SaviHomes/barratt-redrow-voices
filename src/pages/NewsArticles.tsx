@@ -8,11 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { ExternalLink, Newspaper, Calendar as CalendarIcon, Search, X } from "lucide-react";
+import { ExternalLink, Newspaper, Calendar, Search, X } from "lucide-react";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
 import SEOHead from "@/components/SEOHead";
 
 interface NewsArticle {
@@ -32,8 +29,6 @@ export default function NewsArticles() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSource, setSelectedSource] = useState<string>("all");
-  const [dateFrom, setDateFrom] = useState<Date | undefined>();
-  const [dateTo, setDateTo] = useState<Date | undefined>();
 
   useEffect(() => {
     fetchArticles();
@@ -80,27 +75,16 @@ export default function NewsArticles() {
         return false;
       }
 
-      // Date range filter
-      const articleDate = new Date(article.article_date);
-      if (dateFrom && articleDate < dateFrom) {
-        return false;
-      }
-      if (dateTo && articleDate > dateTo) {
-        return false;
-      }
-
       return true;
     });
-  }, [articles, searchQuery, selectedSource, dateFrom, dateTo]);
+  }, [articles, searchQuery, selectedSource]);
 
   const clearFilters = () => {
     setSearchQuery("");
     setSelectedSource("all");
-    setDateFrom(undefined);
-    setDateTo(undefined);
   };
 
-  const hasActiveFilters = searchQuery || selectedSource !== "all" || dateFrom || dateTo;
+  const hasActiveFilters = searchQuery || selectedSource !== "all";
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -140,11 +124,11 @@ export default function NewsArticles() {
                 Search & Filter Articles
               </CardTitle>
               <CardDescription>
-                Find specific articles by keyword, source, or date range
+                Find specific articles by keyword or source publication
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {/* Search Input */}
                 <div className="lg:col-span-2">
                   <Label htmlFor="search">Search Keywords</Label>
@@ -177,62 +161,6 @@ export default function NewsArticles() {
                     </SelectContent>
                   </Select>
                 </div>
-
-                {/* Date Range Filters */}
-                <div>
-                  <Label>Date Range</Label>
-                  <div className="flex gap-2">
-                    {/* From Date */}
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "w-full justify-start text-left font-normal",
-                            !dateFrom && "text-muted-foreground"
-                          )}
-                        >
-                          <CalendarIcon className="h-4 w-4" />
-                          {dateFrom ? format(dateFrom, "dd/MM/yy") : "From"}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 bg-background z-[100] shadow-lg" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={dateFrom}
-                          onSelect={setDateFrom}
-                          initialFocus
-                          className={cn("p-3 pointer-events-auto")}
-                        />
-                      </PopoverContent>
-                    </Popover>
-
-                    {/* To Date */}
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "w-full justify-start text-left font-normal",
-                            !dateTo && "text-muted-foreground"
-                          )}
-                        >
-                          <CalendarIcon className="h-4 w-4" />
-                          {dateTo ? format(dateTo, "dd/MM/yy") : "To"}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 bg-background z-[100] shadow-lg" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={dateTo}
-                          onSelect={setDateTo}
-                          initialFocus
-                          className={cn("p-3 pointer-events-auto")}
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                </div>
               </div>
 
               {/* Active Filters Display & Clear Button */}
@@ -247,16 +175,6 @@ export default function NewsArticles() {
                   {selectedSource !== "all" && (
                     <Badge variant="secondary">
                       Source: {selectedSource}
-                    </Badge>
-                  )}
-                  {dateFrom && (
-                    <Badge variant="secondary">
-                      From: {format(dateFrom, "dd MMM yyyy")}
-                    </Badge>
-                  )}
-                  {dateTo && (
-                    <Badge variant="secondary">
-                      To: {format(dateTo, "dd MMM yyyy")}
                     </Badge>
                   )}
                   <Button

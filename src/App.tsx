@@ -32,6 +32,8 @@ import EvidenceDetail from "./pages/EvidenceDetail";
 import AdminCommentModeration from "./pages/AdminCommentModeration";
 import NewsArticles from "./pages/NewsArticles";
 import AdminArticles from "./pages/AdminArticles";
+import Socials from "./pages/Socials";
+import AdminSocials from "./pages/AdminSocials";
 
 const queryClient = new QueryClient();
 
@@ -67,8 +69,10 @@ const App = () => (
             <Route path="/admin/comments" element={<AdminCommentModeration />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
             <Route path="/admin/articles" element={<AdminArticles />} />
+            <Route path="/admin/socials" element={<AdminSocials />} />
             <Route path="/public-gallery" element={<PublicGallery />} />
             <Route path="/news-articles" element={<NewsArticles />} />
+            <Route path="/socials" element={<Socials />} />
             <Route path="/evidence/:id" element={<EvidenceDetail />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

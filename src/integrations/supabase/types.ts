@@ -856,6 +856,66 @@ export type Database = {
         }
         Relationships: []
       }
+      social_posts: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          company: string
+          created_at: string | null
+          created_by: string
+          creator_handle: string | null
+          creator_name: string
+          description: string
+          id: string
+          is_approved: boolean | null
+          order_index: number | null
+          platform: string
+          post_date: string
+          post_url: string
+          thumbnail_url: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          company: string
+          created_at?: string | null
+          created_by: string
+          creator_handle?: string | null
+          creator_name: string
+          description: string
+          id?: string
+          is_approved?: boolean | null
+          order_index?: number | null
+          platform: string
+          post_date: string
+          post_url: string
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          company?: string
+          created_at?: string | null
+          created_by?: string
+          creator_handle?: string | null
+          creator_name?: string
+          description?: string
+          id?: string
+          is_approved?: boolean | null
+          order_index?: number | null
+          platform?: string
+          post_date?: string
+          post_url?: string
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string

@@ -51,6 +51,9 @@ export default function Layout({
               <Link to="/news-articles" className="text-muted-foreground hover:text-primary transition-colors">
                 News Articles
               </Link>
+              <Link to="/socials" className="text-muted-foreground hover:text-primary transition-colors">
+                Socials
+              </Link>
               <Link to="/submit-claim" className="text-muted-foreground hover:text-primary transition-colors">
                 Submit Claim
               </Link>

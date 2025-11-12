@@ -647,6 +647,65 @@ export type Database = {
         }
         Relationships: []
       }
+      photo_comments: {
+        Row: {
+          comment_text: string
+          commenter_email: string
+          commenter_name: string
+          created_at: string | null
+          id: string
+          ip_address: unknown
+          moderated_at: string | null
+          moderated_by: string | null
+          moderation_status: string
+          photo_caption_id: string
+          rejection_reason: string | null
+          updated_at: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          comment_text: string
+          commenter_email: string
+          commenter_name: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_status?: string
+          photo_caption_id: string
+          rejection_reason?: string | null
+          updated_at?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          comment_text?: string
+          commenter_email?: string
+          commenter_name?: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_status?: string
+          photo_caption_id?: string
+          rejection_reason?: string | null
+          updated_at?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "photo_comments_photo_caption_id_fkey"
+            columns: ["photo_caption_id"]
+            isOneToOne: false
+            referencedRelation: "evidence_photo_captions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           advice_to_others: string | null

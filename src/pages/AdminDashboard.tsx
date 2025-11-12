@@ -359,13 +359,22 @@ export default function AdminDashboard() {
 
   const fetchPendingComments = async () => {
     try {
-      const { count, error } = await supabase
+      // Fetch evidence comments
+      const { count: evidenceCount, error: evidenceError } = await supabase
         .from('evidence_comments')
         .select('*', { count: 'exact', head: true })
         .eq('moderation_status', 'pending');
 
-      if (error) throw error;
-      setPendingCommentsCount(count || 0);
+      // Fetch photo comments
+      const { count: photoCount, error: photoError } = await supabase
+        .from('photo_comments')
+        .select('*', { count: 'exact', head: true })
+        .eq('moderation_status', 'pending');
+
+      if (evidenceError) throw evidenceError;
+      if (photoError) throw photoError;
+      
+      setPendingCommentsCount((evidenceCount || 0) + (photoCount || 0));
     } catch (error) {
       console.error('Error fetching pending comments count:', error);
     }

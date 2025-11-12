@@ -27,6 +27,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { formatDistanceToNow } from "date-fns";
 import { Eye, CheckCircle, XCircle, Loader2 } from "lucide-react";
@@ -35,7 +36,8 @@ import { useAuth } from "@/hooks/useAuth";
 
 interface Comment {
   id: string;
-  evidence_id: string;
+  evidence_id?: string;
+  photo_caption_id?: string;
   commenter_name: string;
   commenter_email: string;
   comment_text: string;
@@ -46,6 +48,11 @@ interface Comment {
   evidence?: {
     title: string;
   };
+  evidence_photo_captions?: {
+    label?: string;
+    photo_path: string;
+    evidence_id: string;
+  };
 }
 
 const AdminCommentModeration = () => {
@@ -54,15 +61,17 @@ const AdminCommentModeration = () => {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("pending");
+  const [commentType, setCommentType] = useState<"all" | "evidence" | "photo">("all");
   const [selectedComment, setSelectedComment] = useState<Comment | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [declineDialogOpen, setDeclineDialogOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
 
   const { data: comments, isLoading } = useQuery({
-    queryKey: ['admin-comments', activeTab, searchTerm],
+    queryKey: ['admin-comments', activeTab, searchTerm, commentType],
     queryFn: async () => {
-      let query = supabase
+      // Fetch evidence comments
+      let evidenceQuery = supabase
         .from('evidence_comments')
         .select(`
           *,
@@ -71,23 +80,65 @@ const AdminCommentModeration = () => {
         .order('created_at', { ascending: false });
 
       if (activeTab !== 'all') {
-        query = query.eq('moderation_status', activeTab);
+        evidenceQuery = evidenceQuery.eq('moderation_status', activeTab);
       }
 
       if (searchTerm) {
-        query = query.or(`commenter_name.ilike.%${searchTerm}%,commenter_email.ilike.%${searchTerm}%`);
+        evidenceQuery = evidenceQuery.or(`commenter_name.ilike.%${searchTerm}%,commenter_email.ilike.%${searchTerm}%`);
       }
 
-      const { data, error } = await query;
-      if (error) throw error;
-      return data as Comment[];
+      // Fetch photo comments
+      let photoQuery = supabase
+        .from('photo_comments')
+        .select(`
+          *,
+          evidence_photo_captions:photo_caption_id (
+            label,
+            photo_path,
+            evidence_id
+          )
+        `)
+        .order('created_at', { ascending: false });
+
+      if (activeTab !== 'all') {
+        photoQuery = photoQuery.eq('moderation_status', activeTab);
+      }
+
+      if (searchTerm) {
+        photoQuery = photoQuery.or(`commenter_name.ilike.%${searchTerm}%,commenter_email.ilike.%${searchTerm}%`);
+      }
+
+      let allComments: Comment[] = [];
+
+      if (commentType === 'all' || commentType === 'evidence') {
+        const { data: evidenceData, error: evidenceError } = await evidenceQuery;
+        if (evidenceError) throw evidenceError;
+        allComments = [...allComments, ...(evidenceData as Comment[])];
+      }
+
+      if (commentType === 'all' || commentType === 'photo') {
+        const { data: photoData, error: photoError } = await photoQuery;
+        if (photoError) throw photoError;
+        allComments = [...allComments, ...(photoData as Comment[])];
+      }
+
+      // Sort by created_at descending
+      allComments.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+      return allComments;
     },
   });
 
   const moderateMutation = useMutation({
-    mutationFn: async ({ commentId, status, reason }: { commentId: string; status: string; reason?: string }) => {
+    mutationFn: async ({ commentId, status, reason, isPhotoComment }: { 
+      commentId: string; 
+      status: string; 
+      reason?: string;
+      isPhotoComment?: boolean;
+    }) => {
+      const table = isPhotoComment ? 'photo_comments' : 'evidence_comments';
       const { error } = await supabase
-        .from('evidence_comments')
+        .from(table)
         .update({
           moderation_status: status,
           moderated_at: new Date().toISOString(),
@@ -117,8 +168,8 @@ const AdminCommentModeration = () => {
     },
   });
 
-  const handleApprove = (commentId: string) => {
-    moderateMutation.mutate({ commentId, status: 'approved' });
+  const handleApprove = (commentId: string, isPhotoComment: boolean) => {
+    moderateMutation.mutate({ commentId, status: 'approved', isPhotoComment });
   };
 
   const handleDeclineClick = (comment: Comment) => {
@@ -128,10 +179,12 @@ const AdminCommentModeration = () => {
 
   const handleDeclineConfirm = () => {
     if (selectedComment) {
+      const isPhotoComment = !!selectedComment.photo_caption_id;
       moderateMutation.mutate({
         commentId: selectedComment.id,
         status: 'rejected',
         reason: rejectionReason,
+        isPhotoComment,
       });
     }
   };
@@ -169,13 +222,23 @@ const AdminCommentModeration = () => {
           </p>
         </div>
 
-        <div className="mb-6">
+        <div className="mb-6 flex gap-4">
           <Input
             placeholder="Search by name or email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="max-w-md"
           />
+          <Select value={commentType} onValueChange={(value: any) => setCommentType(value)}>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Filter by type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Comments</SelectItem>
+              <SelectItem value="evidence">Evidence Only</SelectItem>
+              <SelectItem value="photo">Photo/Video Only</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -202,7 +265,8 @@ const AdminCommentModeration = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Evidence</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Content</TableHead>
                       <TableHead>Name</TableHead>
                       <TableHead>Email</TableHead>
                       <TableHead>Comment</TableHead>
@@ -212,12 +276,34 @@ const AdminCommentModeration = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {comments?.map((comment) => (
-                      <TableRow key={comment.id}>
-                        <TableCell className="font-medium">
-                          {comment.evidence?.title || 'N/A'}
-                        </TableCell>
-                        <TableCell>{comment.commenter_name}</TableCell>
+                    {comments?.map((comment) => {
+                      const isPhotoComment = !!comment.photo_caption_id;
+                      return (
+                        <TableRow key={comment.id}>
+                          <TableCell>
+                            <Badge variant={isPhotoComment ? "secondary" : "outline"}>
+                              {isPhotoComment ? "Photo" : "Evidence"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            {isPhotoComment ? (
+                              <div className="flex items-center gap-2">
+                                <div className="w-10 h-10 bg-muted rounded overflow-hidden flex-shrink-0">
+                                  <img
+                                    src={supabase.storage.from('evidence-photos').getPublicUrl(comment.evidence_photo_captions?.photo_path || '').data.publicUrl}
+                                    alt="Thumbnail"
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                                <span className="text-sm">
+                                  {comment.evidence_photo_captions?.label || 'Photo'}
+                                </span>
+                              </div>
+                            ) : (
+                              comment.evidence?.title || 'N/A'
+                            )}
+                          </TableCell>
+                          <TableCell>{comment.commenter_name}</TableCell>
                         <TableCell className="text-muted-foreground">
                           {comment.commenter_email}
                         </TableCell>
@@ -242,7 +328,7 @@ const AdminCommentModeration = () => {
                                 <Button
                                   variant="default"
                                   size="sm"
-                                  onClick={() => handleApprove(comment.id)}
+                                  onClick={() => handleApprove(comment.id, isPhotoComment)}
                                   disabled={moderateMutation.isPending}
                                 >
                                   <CheckCircle className="h-4 w-4" />
@@ -260,7 +346,8 @@ const AdminCommentModeration = () => {
                           </div>
                         </TableCell>
                       </TableRow>
-                    ))}
+                    );
+                    })}
                   </TableBody>
                 </Table>
               </div>

@@ -1,15 +1,17 @@
 import { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 import { useEvidencePhotos, EvidenceWithPhotos } from "@/hooks/useEvidencePhotos";
 import Layout from "@/components/Layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Calendar, Play } from "lucide-react";
+import { ArrowLeft, Calendar, Play, MessageSquare } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { VideoPlayerDialog } from "@/components/evidence/VideoPlayerDialog";
 import { CommentsSection } from "@/components/comments/CommentsSection";
+import PhotoCommentsDialog from "@/components/comments/PhotoCommentsDialog";
 
 export default function EvidenceDetail() {
   const { id } = useParams();
@@ -19,6 +21,8 @@ export default function EvidenceDetail() {
   const [videoPlayerOpen, setVideoPlayerOpen] = useState(false);
   const [currentVideoUrl, setCurrentVideoUrl] = useState("");
   const [currentVideoName, setCurrentVideoName] = useState("");
+  const [photoCommentsOpen, setPhotoCommentsOpen] = useState(false);
+  const [selectedPhoto, setSelectedPhoto] = useState<any>(null);
 
   useEffect(() => {
     if (id) {
@@ -54,6 +58,35 @@ export default function EvidenceDetail() {
   
   const { evidenceWithPhotos } = useEvidencePhotos(evidenceArray);
   const evidenceData: EvidenceWithPhotos | undefined = evidenceWithPhotos[0];
+
+  // Fetch photo comment counts
+  const { data: photoCommentCounts } = useQuery({
+    queryKey: ['photo-comment-counts', evidenceData?.photos.map(p => p.captionId)],
+    queryFn: async () => {
+      const captionIds = evidenceData?.photos
+        .map(p => p.captionId)
+        .filter(Boolean) || [];
+      
+      if (captionIds.length === 0) return {};
+      
+      const { data, error } = await supabase
+        .from('photo_comments')
+        .select('photo_caption_id')
+        .in('photo_caption_id', captionIds)
+        .eq('moderation_status', 'approved');
+      
+      if (error) throw error;
+      
+      // Count comments per photo
+      const counts: Record<string, number> = {};
+      data.forEach(comment => {
+        counts[comment.photo_caption_id] = (counts[comment.photo_caption_id] || 0) + 1;
+      });
+      
+      return counts;
+    },
+    enabled: !!evidenceData?.photos.length
+  });
 
   const getSeverityColor = (severity: string) => {
     switch (severity.toLowerCase()) {
@@ -205,6 +238,25 @@ export default function EvidenceDetail() {
                         loading="lazy"
                       />
                     )}
+                    
+                    {/* View Comments Button */}
+                    <div className="absolute bottom-2 right-2 z-10">
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="bg-black/70 backdrop-blur hover:bg-black/90 text-white"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedPhoto(photo);
+                          setPhotoCommentsOpen(true);
+                        }}
+                      >
+                        <MessageSquare className="h-4 w-4" />
+                        {photoCommentCounts?.[photo.captionId] > 0 && (
+                          <span className="ml-1">({photoCommentCounts[photo.captionId]})</span>
+                        )}
+                      </Button>
+                    </div>
                   </div>
                   {(photo.label || photo.caption) && (
                     <div className="p-4 space-y-2">
@@ -236,6 +288,14 @@ export default function EvidenceDetail() {
         onClose={() => setVideoPlayerOpen(false)}
         videoUrl={currentVideoUrl}
         videoName={currentVideoName}
+      />
+
+      {/* Photo Comments Dialog */}
+      <PhotoCommentsDialog
+        photo={selectedPhoto}
+        evidenceId={id!}
+        open={photoCommentsOpen}
+        onOpenChange={setPhotoCommentsOpen}
       />
     </Layout>
   );

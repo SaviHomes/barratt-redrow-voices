@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Image as ImageIcon, Search, Trash2, Download, Images, Play, Edit, MessageSquare, ArrowUp, ArrowDown } from "lucide-react";
+import { Image as ImageIcon, Search, Trash2, Download, Images, Play, Edit, MessageSquare, ArrowUp, ArrowDown, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -253,12 +253,14 @@ export default function MyEvidence() {
 
   // Flatten all photos into a single paginated array
   const allPhotos = filteredEvidence.flatMap(item =>
-    item.photos.map(photo => ({
+    item.photos.map((photo, index) => ({
       ...photo,
       evidenceId: item.id,
       evidenceTitle: item.title,
       evidenceCategory: item.category,
-      evidenceSeverity: item.severity
+      evidenceSeverity: item.severity,
+      order_index: index,
+      featuredImageIndex: item.featured_image_index
     }))
   );
 
@@ -358,6 +360,34 @@ export default function MyEvidence() {
         title: "Error", 
         description: "Failed to move photo", 
         variant: "destructive" 
+      });
+    }
+  };
+
+  // Set photo as thumbnail
+  const handleSetThumbnail = async (evidenceId: string, orderIndex: number) => {
+    try {
+      const { error } = await supabase
+        .from('evidence')
+        .update({ featured_image_index: orderIndex })
+        .eq('id', evidenceId)
+        .eq('user_id', user?.id);
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Thumbnail updated",
+        description: "Photo set as thumbnail successfully"
+      });
+      
+      fetchEvidence();
+      refetchPhotos();
+    } catch (error) {
+      console.error('Error updating thumbnail:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update thumbnail",
+        variant: "destructive"
       });
     }
   };
@@ -482,6 +512,7 @@ export default function MyEvidence() {
                   const evidenceIndex = filteredEvidence.findIndex(e => e.id === photo.evidenceId);
                   const photoIndex = filteredEvidence[evidenceIndex]?.photos.findIndex(p => p.path === photo.path) ?? 0;
                   const { isFirst, isLast } = getPhotoPosition(photo);
+                  const isThumbnail = photo.featuredImageIndex === photo.order_index;
                   
                   return (
                     <div key={`${photo.evidenceId}-${photo.path}`} className="space-y-2">
@@ -490,9 +521,25 @@ export default function MyEvidence() {
                         className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group border-2 border-border hover:border-primary transition-all"
                         onClick={() => openLightbox(photo.evidenceId, photoIndex)}
                       >
-                        {/* Label badge - top left, always visible if exists */}
+                        {/* Star icon - top left, always visible if thumbnail */}
+                        <div className="absolute top-2 left-2 z-10 pointer-events-auto" onClick={(e) => e.stopPropagation()}>
+                          <Button
+                            size="sm"
+                            variant={isThumbnail ? "default" : "secondary"}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSetThumbnail(photo.evidenceId, photo.order_index);
+                            }}
+                            className={`h-7 w-7 p-0 ${isThumbnail ? "bg-yellow-500 hover:bg-yellow-600 opacity-100" : "opacity-0 group-hover:opacity-100"}`}
+                            title={isThumbnail ? "Current thumbnail" : "Set as thumbnail"}
+                          >
+                            <Star className={`h-3 w-3 ${isThumbnail ? "fill-white" : ""}`} />
+                          </Button>
+                        </div>
+
+                        {/* Label badge - below star if exists */}
                         {photo.label && (
-                          <div className="absolute top-2 left-2 z-10">
+                          <div className="absolute top-11 left-2 z-10">
                             <Badge variant="secondary" className="text-xs px-2 py-1 bg-black/70 text-white backdrop-blur-sm border-none">
                               {photo.label}
                             </Badge>

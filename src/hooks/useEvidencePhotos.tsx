@@ -10,6 +10,7 @@ export interface EvidencePhoto {
   caption?: string;
   label?: string;
   captionId?: string;
+  order_index?: number;
 }
 
 export interface EvidenceWithPhotos {
@@ -73,6 +74,7 @@ export function useEvidencePhotos(evidence: any[]) {
             caption: captionData.caption,
             label: captionData.label,
             captionId: captionData.id,
+            order_index: captionData.order_index,
           };
         });
 

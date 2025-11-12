@@ -242,7 +242,7 @@ const Index = () => {
       </section>
 
       {/* Recent Community Evidence Section */}
-      <section className="py-20 bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+      <section className="py-20 bg-gradient-to-br from-blue-50/80 via-slate-50/50 to-indigo-50/80 dark:from-blue-950/30 dark:via-slate-950/20 dark:to-indigo-950/30">
         <div className="container mx-auto px-6">
           {/* Header */}
           <div className="text-center mb-12">

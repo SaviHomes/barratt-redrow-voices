@@ -72,7 +72,7 @@ export const CommentAdminNotification = ({
 
         <div style={evidenceSection}>
           <Heading style={h2}>Evidence Post:</Heading>
-          <Text style={evidenceTitle}>{evidenceTitle}</Text>
+          <Text style={evidenceTitleStyle}>{evidenceTitle}</Text>
           
           {commentType === 'photo' && photoLabel && (
             <Text style={photoLabelText}>
@@ -104,7 +104,7 @@ export const CommentAdminNotification = ({
 
         <div style={commentBox}>
           <Heading style={h2}>Comment:</Heading>
-          <Text style={commentText}>{commentText}</Text>
+          <Text style={commentTextStyle}>{commentText}</Text>
         </div>
 
         <div style={actionSection}>
@@ -203,7 +203,7 @@ const evidenceSection = {
   margin: '24px 0'
 };
 
-const evidenceTitle = {
+const evidenceTitleStyle = {
   color: '#1f2937',
   fontSize: '16px',
   fontWeight: 'bold',
@@ -267,7 +267,7 @@ const commentBox = {
   margin: '24px 0'
 };
 
-const commentText = { 
+const commentTextStyle = { 
   color: '#1f2937', 
   fontSize: '14px', 
   lineHeight: '22px', 

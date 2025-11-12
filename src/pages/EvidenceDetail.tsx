@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { VideoPlayerDialog } from "@/components/evidence/VideoPlayerDialog";
 import { CommentsSection } from "@/components/comments/CommentsSection";
 import PhotoCommentsDialog from "@/components/comments/PhotoCommentsDialog";
+import EvidenceLightbox from "@/components/EvidenceLightbox";
 
 export default function EvidenceDetail() {
   const { id } = useParams();
@@ -25,6 +26,8 @@ export default function EvidenceDetail() {
   const [selectedPhoto, setSelectedPhoto] = useState<any>(null);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [expandedCaptions, setExpandedCaptions] = useState<Set<string>>(new Set());
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   useEffect(() => {
     if (id) {
@@ -121,6 +124,10 @@ export default function EvidenceDetail() {
       setCurrentVideoUrl(url);
       setCurrentVideoName(name);
       setVideoPlayerOpen(true);
+    } else {
+      // Open lightbox for images
+      setLightboxIndex(index);
+      setLightboxOpen(true);
     }
   };
 
@@ -361,6 +368,16 @@ export default function EvidenceDetail() {
         evidenceId={id!}
         open={photoCommentsOpen}
         onOpenChange={setPhotoCommentsOpen}
+      />
+
+      {/* Evidence Lightbox for Images */}
+      <EvidenceLightbox
+        photos={evidenceData.photos}
+        initialIndex={lightboxIndex}
+        isOpen={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+        onDeletePhoto={async () => ({ success: false })}
+        evidenceTitle={evidenceData.title}
       />
     </Layout>
   );

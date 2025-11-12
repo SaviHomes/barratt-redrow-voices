@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import PhotoCommentForm from "./PhotoCommentForm";
 import PhotoCommentsList from "./PhotoCommentsList";
@@ -59,14 +58,14 @@ export default function PhotoCommentsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden">
         <DialogHeader>
           <DialogTitle>
             Comments on: {photo.label || "Photo"}
           </DialogTitle>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 pr-4">
+        <div className="overflow-y-auto max-h-[calc(90vh-120px)] pr-4">
           <div className="space-y-6">
             {/* Photo/Video Preview */}
             <div className="relative rounded-lg overflow-hidden bg-muted max-h-[300px] flex items-center justify-center">
@@ -109,7 +108,7 @@ export default function PhotoCommentsDialog({
               />
             </div>
           </div>
-        </ScrollArea>
+        </div>
       </DialogContent>
     </Dialog>
   );

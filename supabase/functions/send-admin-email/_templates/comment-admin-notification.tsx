@@ -86,6 +86,9 @@ export const CommentAdminNotification = ({
                 <div style={videoPlaceholder}>
                   <Text style={videoIcon}>▶️</Text>
                   <Text style={videoText}>Video</Text>
+                  <Text style={videoLinkText}>
+                    <Link href={photoUrl} style={emailLink}>Click to view video</Link>
+                  </Text>
                 </div>
               ) : (
                 <img 
@@ -248,6 +251,12 @@ const videoText = {
   color: '#6b7280',
   fontSize: '14px',
   fontWeight: 'bold',
+  margin: '0 0 8px'
+};
+
+const videoLinkText = {
+  color: '#374151',
+  fontSize: '13px',
   margin: '0'
 };
 

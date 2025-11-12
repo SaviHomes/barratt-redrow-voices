@@ -110,6 +110,25 @@ export default function PhotoCommentForm({
           .from('evidence-photos')
           .getPublicUrl(photoCaption.photo_path).data.publicUrl;
 
+        // Convert image to base64 for reliable email display
+        let base64ImageUrl = photoUrl;
+        const isVideo = /\.(mp4|mov|avi|webm|mkv|m4v)$/i.test(photoCaption.photo_path);
+        
+        if (!isVideo) {
+          try {
+            const response = await fetch(photoUrl);
+            const blob = await response.blob();
+            base64ImageUrl = await new Promise<string>((resolve) => {
+              const reader = new FileReader();
+              reader.onloadend = () => resolve(reader.result as string);
+              reader.readAsDataURL(blob);
+            });
+          } catch (error) {
+            console.error('Failed to convert image to base64:', error);
+            // Fallback to original URL if conversion fails
+          }
+        }
+
         // Trigger admin notification email
         await triggerEventEmail('comment_submitted', {
           commenterName: data.commenter_name,
@@ -118,7 +137,7 @@ export default function PhotoCommentForm({
           commentType: 'photo',
           photoCaptionId,
           photoLabel: photoCaption.label || 'Photo',
-          photoUrl,
+          photoUrl: base64ImageUrl,
           evidenceTitle: (photoCaption.evidence as any)?.title || 'Evidence',
           submittedAt: new Date().toISOString(),
           viewUrl: `${window.location.origin}/evidence/${photoCaption.evidence_id}`,

@@ -24,6 +24,7 @@ export default function EvidenceDetail() {
   const [photoCommentsOpen, setPhotoCommentsOpen] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<any>(null);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const [expandedCaptions, setExpandedCaptions] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (id) {
@@ -121,6 +122,22 @@ export default function EvidenceDetail() {
       setCurrentVideoName(name);
       setVideoPlayerOpen(true);
     }
+  };
+
+  const isCaptionExpanded = (photoPath: string) => {
+    return expandedCaptions.has(photoPath);
+  };
+
+  const toggleCaption = (photoPath: string) => {
+    setExpandedCaptions(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(photoPath)) {
+        newSet.delete(photoPath);
+      } else {
+        newSet.add(photoPath);
+      }
+      return newSet;
+    });
   };
 
   if (loading) {
@@ -289,9 +306,34 @@ export default function EvidenceDetail() {
                         </h3>
                       )}
                       {photo.caption && (
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          {photo.caption}
-                        </p>
+                        <div className="space-y-1">
+                          <p className="text-sm text-muted-foreground">
+                            {isCaptionExpanded(photo.path) || photo.caption.length <= 150
+                              ? photo.caption
+                              : `${photo.caption.slice(0, 150)}...`}
+                          </p>
+                          {photo.caption.length > 150 && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleCaption(photo.path);
+                              }}
+                              className="text-xs text-primary hover:text-primary/80 font-medium flex items-center gap-1"
+                            >
+                              {isCaptionExpanded(photo.path) ? (
+                                <>
+                                  <ChevronUp className="h-3 w-3" />
+                                  See less
+                                </>
+                              ) : (
+                                <>
+                                  <ChevronDown className="h-3 w-3" />
+                                  See more
+                                </>
+                              )}
+                            </button>
+                          )}
+                        </div>
                       )}
                     </div>
                   )}

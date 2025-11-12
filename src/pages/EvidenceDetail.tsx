@@ -13,6 +13,8 @@ import { VideoPlayerDialog } from "@/components/evidence/VideoPlayerDialog";
 import { CommentsSection } from "@/components/comments/CommentsSection";
 import PhotoCommentsDialog from "@/components/comments/PhotoCommentsDialog";
 import EvidenceLightbox from "@/components/EvidenceLightbox";
+import SEOHead from "@/components/SEOHead";
+import SocialShareButtons from "@/components/evidence/SocialShareButtons";
 
 export default function EvidenceDetail() {
   const { id } = useParams();
@@ -131,6 +133,44 @@ export default function EvidenceDetail() {
     }
   };
 
+  const getOgImage = () => {
+    if (!evidenceData?.photos.length) return undefined;
+    const featuredIndex = evidence?.featured_image_index || 0;
+    const featuredPhoto = evidenceData.photos[featuredIndex] || evidenceData.photos[0];
+    return featuredPhoto?.url;
+  };
+
+  const truncateDescription = (text: string, maxLength: number = 150) => {
+    if (text.length <= maxLength) return text;
+    return text.slice(0, maxLength).trim() + '...';
+  };
+
+  const getStructuredData = () => {
+    if (!evidence || !evidenceData) return undefined;
+    
+    return {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      headline: evidenceData.title,
+      description: evidenceData.description,
+      image: getOgImage(),
+      datePublished: evidence.created_at,
+      author: {
+        "@type": "Person",
+        name: "Redrow Exposed Community"
+      },
+      publisher: {
+        "@type": "Organization",
+        name: "Redrow Exposed",
+        logo: {
+          "@type": "ImageObject",
+          url: `${window.location.origin}/redrow-exposed-og.jpg`
+        }
+      },
+      articleSection: evidenceData.category
+    };
+  };
+
   const isCaptionExpanded = (photoPath: string) => {
     return expandedCaptions.has(photoPath);
   };
@@ -184,6 +224,16 @@ export default function EvidenceDetail() {
 
   return (
     <Layout>
+      {evidence && evidenceData && (
+        <SEOHead
+          title={evidenceData.title}
+          description={truncateDescription(evidenceData.description)}
+          canonicalUrl={window.location.href}
+          ogImage={getOgImage()}
+          structuredData={getStructuredData()}
+        />
+      )}
+      
       <div className="container mx-auto px-6 py-12 max-w-6xl">
         {/* Back Button */}
         <Button
@@ -213,7 +263,19 @@ export default function EvidenceDetail() {
           <h1 className="text-4xl font-bold mb-6 text-foreground">
             {evidenceData.title}
           </h1>
+        </div>
 
+        {/* Social Share Buttons */}
+        <div className="mb-8">
+          <p className="text-sm text-muted-foreground mb-2">Share this evidence:</p>
+          <SocialShareButtons
+            url={window.location.href}
+            title={evidenceData.title}
+            description={evidenceData.description}
+          />
+        </div>
+
+        <div className="mb-8">
           {/* Description with Expand/Collapse */}
           {evidenceData.description && (
             <Card className="p-8 bg-muted/30">

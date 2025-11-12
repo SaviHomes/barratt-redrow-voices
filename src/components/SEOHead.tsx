@@ -17,6 +17,11 @@ const SEOHead = ({
 }: SEOHeadProps) => {
   const fullTitle = title.includes("Redrow") ? title : `${title} | Redrow Exposed`;
   const currentUrl = canonicalUrl || window.location.href;
+  
+  // Handle both full URLs and relative paths for ogImage
+  const fullOgImage = ogImage?.startsWith('http') 
+    ? ogImage 
+    : `${window.location.origin}${ogImage}`;
 
   return (
     <>
@@ -32,7 +37,7 @@ const SEOHead = ({
       <meta property="og:url" content={currentUrl} />
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={description} />
-      <meta property="og:image" content={ogImage} />
+      <meta property="og:image" content={fullOgImage} />
       <meta property="og:site_name" content="Redrow Exposed" />
       
       {/* Twitter */}
@@ -40,7 +45,7 @@ const SEOHead = ({
       <meta property="twitter:url" content={currentUrl} />
       <meta property="twitter:title" content={fullTitle} />
       <meta property="twitter:description" content={description} />
-      <meta property="twitter:image" content={ogImage} />
+      <meta property="twitter:image" content={fullOgImage} />
       
       {/* Additional SEO Meta Tags */}
       <meta name="author" content="Redrow Exposed" />

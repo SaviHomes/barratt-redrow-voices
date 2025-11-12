@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useSearchParams, Link } from "react-router-dom";
+import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/Layout";
 import { Input } from "@/components/ui/input";
@@ -39,6 +39,7 @@ const SORT_OPTIONS = [
 ];
 
 export default function PublicGallery() {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const isPreviewMode = searchParams.get('preview') === 'true';
   const previewUserId = searchParams.get('userId');
@@ -110,7 +111,8 @@ export default function PublicGallery() {
   });
 
   const handleEvidenceClick = async (item: EvidenceWithPhotos) => {
-    setSelectedEvidence(item);
+    // Navigate to detail page
+    navigate(`/evidence/${item.id}`);
     
     // Increment view count
     await supabase
@@ -295,11 +297,6 @@ export default function PublicGallery() {
         </section>
       </div>
 
-      <EvidenceDetailDialog
-        evidence={selectedEvidence}
-        open={!!selectedEvidence}
-        onOpenChange={(open) => !open && setSelectedEvidence(null)}
-      />
     </Layout>
   );
 }

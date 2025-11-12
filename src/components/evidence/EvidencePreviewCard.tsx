@@ -18,6 +18,8 @@ export default function EvidencePreviewCard({ evidence, onClick }: EvidencePrevi
 
   // Intersection Observer for lazy loading videos
   useEffect(() => {
+    const currentContainer = containerRef.current;
+    
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -29,13 +31,13 @@ export default function EvidencePreviewCard({ evidence, onClick }: EvidencePrevi
       { threshold: 0.1 }
     );
 
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
+    if (currentContainer) {
+      observer.observe(currentContainer);
     }
 
     return () => {
-      if (containerRef.current) {
-        observer.unobserve(containerRef.current);
+      if (currentContainer) {
+        observer.unobserve(currentContainer);
       }
     };
   }, []);
@@ -91,17 +93,19 @@ export default function EvidencePreviewCard({ evidence, onClick }: EvidencePrevi
           {thumbnailPhoto ? (
             <>
               {isThumbnailVideo ? (
-                <video
-                  ref={videoRef}
-                  src={thumbnailPhoto.url}
-                  poster={thumbnailPhoto.poster_url || undefined}
-                  className="w-full h-full object-cover"
-                  autoPlay={isVisible}
-                  loop
-                  muted={isMuted}
-                  playsInline
-                  preload="metadata"
-                />
+                <>
+                  <video
+                    ref={videoRef}
+                    src={isVisible ? thumbnailPhoto.url : undefined}
+                    poster={thumbnailPhoto.poster_url || undefined}
+                    className="w-full h-full object-cover"
+                    autoPlay
+                    loop
+                    muted={isMuted}
+                    playsInline
+                    preload="metadata"
+                  />
+                </>
               ) : (
                 <img
                   src={thumbnailPhoto.url}

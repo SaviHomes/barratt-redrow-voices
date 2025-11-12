@@ -892,6 +892,41 @@ export type Database = {
     }
     Functions: {
       delete_user_by_admin: { Args: { target_user_id: string }; Returns: Json }
+      get_user_evidence_stats: {
+        Args: never
+        Returns: {
+          evidence_count: number
+          photo_count: number
+          total_media_count: number
+          user_id: string
+          video_count: number
+        }[]
+      }
+      get_users_with_emails: {
+        Args: never
+        Returns: {
+          advice_to_others: string
+          build_style: string
+          county: string
+          created_at: string
+          decision_influenced: boolean
+          development_name: string
+          email: string
+          first_name: string
+          home_tel: string
+          id: string
+          last_name: string
+          mobile_tel: string
+          nhbc_contact: boolean
+          postcode: string
+          property_number: string
+          social_media_consent: boolean
+          street_name: string
+          town_city: string
+          user_id: string
+          whatsapp_consent: boolean
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

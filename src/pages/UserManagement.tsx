@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Users, Mail, Phone, MapPin, Home, MessageSquare, Trash2 } from "lucide-react";
+import { ArrowLeft, Users, Mail, Phone, MapPin, Home, MessageSquare, Trash2, Image, Eye } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -35,6 +35,7 @@ interface UserProfile {
   user_id: string;
   first_name: string;
   last_name: string;
+  email: string;
   street_name: string;
   property_number: string | null;
   development_name: string | null;
@@ -50,7 +51,13 @@ interface UserProfile {
   build_style: string | null;
   advice_to_others: string | null;
   created_at: string;
-  user_email?: string;
+}
+
+interface EvidenceStats {
+  evidence_count: number;
+  photo_count: number;
+  video_count: number;
+  total_media_count: number;
 }
 
 const UserManagement = () => {
@@ -60,6 +67,7 @@ const UserManagement = () => {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [users, setUsers] = useState<UserProfile[]>([]);
+  const [evidenceStats, setEvidenceStats] = useState<Map<string, EvidenceStats>>(new Map());
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 10;
 
@@ -107,11 +115,8 @@ const UserManagement = () => {
 
   const fetchUsers = async () => {
     try {
-      // Get profiles with user emails
       const { data: profiles, error: profilesError } = await supabase
-        .from("profiles")
-        .select("*")
-        .order("created_at", { ascending: false });
+        .rpc('get_users_with_emails');
 
       if (profilesError) {
         console.error("Error fetching profiles:", profilesError);
@@ -123,10 +128,7 @@ const UserManagement = () => {
         return;
       }
 
-      // Get user emails from auth.users (we'll need to get these via RPC or edge function in production)
-      // For now, we'll work with what we have in profiles
-      const usersWithEmails = profiles || [];
-      setUsers(usersWithEmails);
+      setUsers(profiles || []);
     } catch (error) {
       console.error("Error fetching users:", error);
       toast({
@@ -139,11 +141,37 @@ const UserManagement = () => {
     }
   };
 
+  const fetchEvidenceStats = async () => {
+    try {
+      const { data, error } = await supabase
+        .rpc('get_user_evidence_stats');
+
+      if (error) {
+        console.error("Error fetching evidence stats:", error);
+        return;
+      }
+
+      const statsMap = new Map<string, EvidenceStats>();
+      data?.forEach((stat: any) => {
+        statsMap.set(stat.user_id, {
+          evidence_count: Number(stat.evidence_count),
+          photo_count: Number(stat.photo_count),
+          video_count: Number(stat.video_count),
+          total_media_count: Number(stat.total_media_count),
+        });
+      });
+      setEvidenceStats(statsMap);
+    } catch (error) {
+      console.error("Error fetching evidence stats:", error);
+    }
+  };
+
   useEffect(() => {
     const init = async () => {
       await checkAdminStatus();
       if (isAdmin) {
         await fetchUsers();
+        await fetchEvidenceStats();
       }
     };
     init();
@@ -293,7 +321,7 @@ const UserManagement = () => {
                         </AlertDialogContent>
                       </AlertDialog>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                       {/* Personal Information */}
                       <div className="space-y-3">
                         <h3 className="font-semibold text-lg flex items-center gap-2">
@@ -302,7 +330,8 @@ const UserManagement = () => {
                         </h3>
                         <div className="space-y-2">
                           <p><span className="font-medium">Name:</span> {user.first_name} {user.last_name}</p>
-                          <p><span className="font-medium">User ID:</span> {user.user_id}</p>
+                          <p><span className="font-medium">Email:</span> {user.email}</p>
+                          <p><span className="font-medium">User ID:</span> <span className="text-xs">{user.user_id}</span></p>
                           <p><span className="font-medium">Registered:</span> {new Date(user.created_at).toLocaleDateString()}</p>
                         </div>
                       </div>
@@ -360,6 +389,35 @@ const UserManagement = () => {
                           </div>
                           {user.build_style && (
                             <p><span className="font-medium">Build Style:</span> {user.build_style}</p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Evidence Uploads */}
+                      <div className="space-y-3">
+                        <h3 className="font-semibold text-lg flex items-center gap-2">
+                          <Image className="h-4 w-4" />
+                          Uploaded Evidence
+                        </h3>
+                        <div className="space-y-2">
+                          {evidenceStats.get(user.user_id) ? (
+                            <>
+                              <p><span className="font-medium">Evidence Posts:</span> {evidenceStats.get(user.user_id)!.evidence_count}</p>
+                              <p><span className="font-medium">Photos:</span> {evidenceStats.get(user.user_id)!.photo_count}</p>
+                              <p><span className="font-medium">Videos:</span> {evidenceStats.get(user.user_id)!.video_count}</p>
+                              <p><span className="font-medium">Total Media:</span> {evidenceStats.get(user.user_id)!.total_media_count}</p>
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="mt-2"
+                                onClick={() => navigate(`/my-evidence?userId=${user.user_id}&preview=admin`)}
+                              >
+                                <Eye className="h-4 w-4 mr-2" />
+                                View Evidence
+                              </Button>
+                            </>
+                          ) : (
+                            <p className="text-muted-foreground">No evidence uploaded</p>
                           )}
                         </div>
                       </div>

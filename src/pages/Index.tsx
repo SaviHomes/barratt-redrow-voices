@@ -241,6 +241,68 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Recent Community Evidence Section */}
+      <section className="py-20 bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+        <div className="container mx-auto px-6">
+          {/* Header */}
+          <div className="text-center mb-12">
+            <Badge variant="secondary" className="mb-4">
+              Community Stories
+            </Badge>
+            <h2 className="text-4xl font-bold text-foreground mb-4">
+              Latest Community Evidence
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Real, verified submissions from homeowners documenting their experiences. 
+              Every story helps build awareness and accountability.
+            </p>
+          </div>
+
+          {/* Evidence Cards Grid */}
+          {recentEvidenceLoading ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+              {[1, 2, 3].map(i => (
+                <Skeleton key={i} className="h-96 rounded-lg" />
+              ))}
+            </div>
+          ) : recentEvidenceWithPhotos.length > 0 ? (
+            <>
+              <div className="space-y-6 mb-10">
+                {recentEvidenceWithPhotos.map(evidence => (
+                  <EvidencePreviewCard
+                    key={evidence.id}
+                    evidence={evidence}
+                    onClick={() => navigate(`/evidence/${evidence.id}`)}
+                  />
+                ))}
+              </div>
+              
+              {/* Call-to-Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <Button size="lg" asChild>
+                  <a href="/public-gallery" className="flex items-center gap-2">
+                    View All Evidence
+                    <ArrowRight className="h-5 w-5" />
+                  </a>
+                </Button>
+                <Button size="lg" variant="outline" asChild>
+                  <a href="/upload-evidence">Submit Your Evidence</a>
+                </Button>
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground mb-4">
+                No evidence has been published yet. Be the first to share your story!
+              </p>
+              <Button asChild>
+                <a href="/upload-evidence">Submit Evidence</a>
+              </Button>
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* Features Section */}
       <section id="features" className="py-20">
         <div className="container mx-auto px-6">
@@ -326,68 +388,6 @@ const Index = () => {
               </CardHeader>
             </Card>
           </div>
-        </div>
-      </section>
-
-      {/* Recent Community Evidence Section */}
-      <section className="py-20 bg-gradient-to-br from-primary/5 via-background to-secondary/5">
-        <div className="container mx-auto px-6">
-          {/* Header */}
-          <div className="text-center mb-12">
-            <Badge variant="secondary" className="mb-4">
-              Community Stories
-            </Badge>
-            <h2 className="text-4xl font-bold text-foreground mb-4">
-              Latest Community Evidence
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Real, verified submissions from homeowners documenting their experiences. 
-              Every story helps build awareness and accountability.
-            </p>
-          </div>
-
-          {/* Evidence Cards Grid */}
-          {recentEvidenceLoading ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-              {[1, 2, 3].map(i => (
-                <Skeleton key={i} className="h-96 rounded-lg" />
-              ))}
-            </div>
-          ) : recentEvidenceWithPhotos.length > 0 ? (
-            <>
-              <div className="space-y-6 mb-10">
-                {recentEvidenceWithPhotos.map(evidence => (
-                  <EvidencePreviewCard
-                    key={evidence.id}
-                    evidence={evidence}
-                    onClick={() => navigate(`/evidence/${evidence.id}`)}
-                  />
-                ))}
-              </div>
-              
-              {/* Call-to-Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <Button size="lg" asChild>
-                  <a href="/public-gallery" className="flex items-center gap-2">
-                    View All Evidence
-                    <ArrowRight className="h-5 w-5" />
-                  </a>
-                </Button>
-                <Button size="lg" variant="outline" asChild>
-                  <a href="/upload-evidence">Submit Your Evidence</a>
-                </Button>
-              </div>
-            </>
-          ) : (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground mb-4">
-                No evidence has been published yet. Be the first to share your story!
-              </p>
-              <Button asChild>
-                <a href="/upload-evidence">Submit Evidence</a>
-              </Button>
-            </div>
-          )}
         </div>
       </section>
 

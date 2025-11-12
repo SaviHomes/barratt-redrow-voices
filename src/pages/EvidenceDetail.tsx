@@ -109,7 +109,7 @@ export default function EvidenceDetail() {
           <p className="text-muted-foreground mb-8">
             This evidence may have been removed or is not publicly available.
           </p>
-          <Button onClick={() => navigate('/')}>
+          <Button variant="default" onClick={() => navigate('/')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Homepage
           </Button>
@@ -123,7 +123,7 @@ export default function EvidenceDetail() {
       <div className="container mx-auto px-6 py-12 max-w-6xl">
         {/* Back Button */}
         <Button
-          variant="ghost"
+          variant="default"
           onClick={() => navigate('/')}
           className="mb-8"
         >

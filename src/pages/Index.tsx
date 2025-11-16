@@ -15,6 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import EvidencePreviewCard from "@/components/evidence/EvidencePreviewCard";
 import { useEvidencePhotos } from "@/hooks/useEvidencePhotos";
 import { useNavigate } from "react-router-dom";
+import motorwayBanner from "@/assets/motorway-banner.jpg";
 
 interface FAQ {
   id: string;
@@ -140,6 +141,16 @@ const Index = () => {
       </script>
 
     <Layout>
+      {/* Motorway Banner */}
+      <section className="relative w-full h-[300px] md:h-[400px] lg:h-[500px] overflow-hidden">
+        <img 
+          src={motorwayBanner} 
+          alt="RedrowExposed.co.uk - Motorway Bridge Banner" 
+          className="w-full h-full object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/30"></div>
+      </section>
+
       {/* Hero Section */}
       <section className="py-20 bg-gradient-to-br from-primary/5 via-background to-secondary/20">
         <div className="container mx-auto px-6 text-center">

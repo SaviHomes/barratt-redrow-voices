@@ -128,7 +128,12 @@ export default function Login() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Password</FormLabel>
+                      <div className="flex justify-between items-center">
+                        <FormLabel>Password</FormLabel>
+                        <Link to="/forgot-password" className="text-sm text-primary hover:underline">
+                          Forgot Password?
+                        </Link>
+                      </div>
                       <FormControl>
                         <Input {...field} type="password" placeholder="Enter your password" />
                       </FormControl>

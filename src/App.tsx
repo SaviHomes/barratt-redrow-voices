@@ -34,6 +34,8 @@ import NewsArticles from "./pages/NewsArticles";
 import AdminArticles from "./pages/AdminArticles";
 import Socials from "./pages/Socials";
 import AdminSocials from "./pages/AdminSocials";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +50,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/submit-claim" element={<SubmitClaim />} />
             <Route path="/group-litigation-info" element={<GroupLitigationInfo />} />
             <Route path="/redrow-defects" element={<RedrowDefects />} />

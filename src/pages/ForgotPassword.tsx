@@ -34,20 +34,24 @@ export default function ForgotPassword() {
     setIsLoading(true);
     
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
-        redirectTo: `${window.location.origin}/reset-password`,
+      const { data: response, error } = await supabase.functions.invoke('send-password-reset', {
+        body: { email: data.email }
       });
 
       if (error) {
         toast({
           title: "Error",
-          description: error.message,
+          description: "Failed to send reset email. Please try again.",
           variant: "destructive",
         });
         return;
       }
 
       setEmailSent(true);
+      toast({
+        title: "Check your email",
+        description: "If an account exists with this email, you'll receive a password reset link.",
+      });
     } catch (error) {
       toast({
         title: "Error",

@@ -698,6 +698,33 @@ export type Database = {
         }
         Relationships: []
       }
+      password_reset_tokens: {
+        Row: {
+          created_at: string | null
+          email: string
+          expires_at: string
+          id: string
+          token: string
+          used_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          expires_at?: string
+          id?: string
+          token: string
+          used_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          expires_at?: string
+          id?: string
+          token?: string
+          used_at?: string | null
+        }
+        Relationships: []
+      }
       photo_comments: {
         Row: {
           comment_text: string
@@ -1002,6 +1029,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_expired_password_tokens: { Args: never; Returns: undefined }
       delete_user_by_admin: { Args: { target_user_id: string }; Returns: Json }
       get_user_evidence_stats: {
         Args: never

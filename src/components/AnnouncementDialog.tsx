@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -6,7 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Shield, Scale, Megaphone, Handshake, ClipboardList, Bell, Newspaper, Wrench, Database } from "lucide-react";
+import { Shield, Scale, Megaphone, Handshake, ClipboardList, Bell, Newspaper, Wrench, Database, Tv } from "lucide-react";
 
 const STORAGE_KEY = "announcement-dismissed-v1";
 
@@ -103,6 +104,49 @@ export function AnnouncementDialog() {
               <li className="flex items-start gap-3">
                 <Database className="h-5 w-5 text-amber-600 dark:text-amber-500 mt-0.5 shrink-0" />
                 <span><span className="font-medium">A single source of truth</span> platform for Redrow property issues</span>
+              </li>
+            </ul>
+          </div>
+
+          <div className="border-t border-border" />
+
+          {/* Media Attention Section */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-lg font-semibold text-blue-600 dark:text-blue-400">
+              <Tv className="h-5 w-5" />
+              Media Attention
+            </div>
+            <p className="pl-7 text-muted-foreground">
+              The recent threat of legal action and attempt to silence homeowner voices is a story 
+              that deserves to be told. We will be reporting these developments to various media outlets including:
+            </p>
+            <ul className="pl-7 space-y-2">
+              <li className="flex items-start gap-3">
+                <Newspaper className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
+                <span className="flex items-center gap-2 flex-wrap">
+                  <span className="font-medium">News outlets already covering Redrow issues</span>
+                  <Link to="/news-articles" onClick={handleDismiss}>
+                    <Button variant="outline" size="sm" className="h-7">
+                      View News Articles →
+                    </Button>
+                  </Link>
+                </span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Tv className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
+                <span><span className="font-medium">Sky News</span></span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Tv className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
+                <span><span className="font-medium">BBC</span></span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Tv className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
+                <span><span className="font-medium">ITV</span></span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Newspaper className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
+                <span><span className="font-medium">The Comet Newspaper</span></span>
               </li>
             </ul>
           </div>

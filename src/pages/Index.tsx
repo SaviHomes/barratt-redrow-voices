@@ -16,6 +16,7 @@ import EvidencePreviewCard from "@/components/evidence/EvidencePreviewCard";
 import { useEvidencePhotos } from "@/hooks/useEvidencePhotos";
 import { useNavigate } from "react-router-dom";
 import motorwayBanner from "@/assets/motorway-banner.jpg";
+import { AnnouncementDialog } from "@/components/AnnouncementDialog";
 
 interface FAQ {
   id: string;
@@ -83,6 +84,7 @@ const Index = () => {
 
   return (
     <>
+      <AnnouncementDialog />
       {/* SEO Meta Tags */}
       <title>Redrow Exposed - Redrow Property Defects, Build Quality Issues & Homeowner Complaints</title>
       <meta name="description" content="The definitive resource for Redrow property defects and build quality issues. Submit financial claims, document defects, read complaints, and get compensation for Redrow homeowner problems." />

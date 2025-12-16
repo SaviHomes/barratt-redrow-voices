@@ -17,7 +17,6 @@ import { useEvidencePhotos } from "@/hooks/useEvidencePhotos";
 import { useNavigate } from "react-router-dom";
 import motorwayBanner from "@/assets/motorway-banner.jpg";
 import { AnnouncementDialog } from "@/components/AnnouncementDialog";
-
 interface FAQ {
   id: string;
   question: string;
@@ -26,52 +25,52 @@ interface FAQ {
   order_index: number;
   is_published: boolean;
 }
-
 const Index = () => {
-  const { user } = useAuth();
+  const {
+    user
+  } = useAuth();
   const navigate = useNavigate();
   const [faqs, setFaqs] = useState<FAQ[]>([]);
-  const { customerExperiencesEnabled } = useSiteSettings();
+  const {
+    customerExperiencesEnabled
+  } = useSiteSettings();
   const [recentEvidence, setRecentEvidence] = useState<any[]>([]);
   const [recentEvidenceLoading, setRecentEvidenceLoading] = useState(true);
-  
+
   // Track visitor analytics
   useVisitorTracking();
 
   // Fetch photos for recent evidence
-  const { evidenceWithPhotos: recentEvidenceWithPhotos } = useEvidencePhotos(recentEvidence);
-
+  const {
+    evidenceWithPhotos: recentEvidenceWithPhotos
+  } = useEvidencePhotos(recentEvidence);
   useEffect(() => {
     fetchFAQs();
     fetchRecentEvidence();
   }, []);
-
   const fetchFAQs = async () => {
     try {
-      const { data, error } = await supabase
-        .from('faqs')
-        .select('*')
-        .eq('is_published', true)
-        .order('order_index', { ascending: true });
-      
+      const {
+        data,
+        error
+      } = await supabase.from('faqs').select('*').eq('is_published', true).order('order_index', {
+        ascending: true
+      });
       if (error) throw error;
       setFaqs(data || []);
     } catch (error) {
       console.error('Error fetching FAQs:', error);
     }
   };
-
   const fetchRecentEvidence = async () => {
     setRecentEvidenceLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('evidence')
-        .select('*')
-        .eq('moderation_status', 'approved')
-        .eq('is_public', true)
-        .order('created_at', { ascending: false })
-        .limit(3);
-      
+      const {
+        data,
+        error
+      } = await supabase.from('evidence').select('*').eq('moderation_status', 'approved').eq('is_public', true).order('created_at', {
+        ascending: false
+      }).limit(3);
       if (error) throw error;
       setRecentEvidence(data || []);
     } catch (error) {
@@ -81,9 +80,7 @@ const Index = () => {
       setRecentEvidenceLoading(false);
     }
   };
-
-  return (
-    <>
+  return <>
       <AnnouncementDialog />
       {/* SEO Meta Tags */}
       <title>Redrow Exposed - Redrow Property Defects, Build Quality Issues & Homeowner Complaints</title>
@@ -94,62 +91,54 @@ const Index = () => {
       {/* Structured Data */}
       <script type="application/ld+json">
         {JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "Organization",
-          "name": "Redrow Exposed",
-          "description": "Platform for Redrow homeowners to document property defects, submit financial claims, and share experiences about build quality issues",
-          "url": window.location.origin,
-          "sameAs": [],
-          "potentialAction": {
-            "@type": "SearchAction",
-            "target": `${window.location.origin}/redrow-defects?q={search_term_string}`,
-            "query-input": "required name=search_term_string"
-          }
-        })}
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Redrow Exposed",
+        "description": "Platform for Redrow homeowners to document property defects, submit financial claims, and share experiences about build quality issues",
+        "url": window.location.origin,
+        "sameAs": [],
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": `${window.location.origin}/redrow-defects?q={search_term_string}`,
+          "query-input": "required name=search_term_string"
+        }
+      })}
       </script>
 
       {/* FAQ Structured Data */}
       <script type="application/ld+json">
         {JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "FAQPage",
-          "mainEntity": [
-            {
-              "@type": "Question",
-              "name": "What types of Redrow property defects are common?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Common Redrow defects include structural issues, water damage, electrical problems, heating/insulation issues, roof leaks, and poor build quality finishing."
-              }
-            },
-            {
-              "@type": "Question", 
-              "name": "Can I claim compensation for Redrow property defects?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Yes, you may be entitled to compensation for repair costs, temporary accommodation, legal fees, and inconvenience caused by Redrow property defects."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "How do I submit a complaint about Redrow build quality?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "You can submit a formal complaint through our platform, contact Redrow customer care directly, or escalate to the Housing Ombudsman if necessary."
-              }
-            }
-          ]
-        })}
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [{
+          "@type": "Question",
+          "name": "What types of Redrow property defects are common?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Common Redrow defects include structural issues, water damage, electrical problems, heating/insulation issues, roof leaks, and poor build quality finishing."
+          }
+        }, {
+          "@type": "Question",
+          "name": "Can I claim compensation for Redrow property defects?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, you may be entitled to compensation for repair costs, temporary accommodation, legal fees, and inconvenience caused by Redrow property defects."
+          }
+        }, {
+          "@type": "Question",
+          "name": "How do I submit a complaint about Redrow build quality?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "You can submit a formal complaint through our platform, contact Redrow customer care directly, or escalate to the Housing Ombudsman if necessary."
+          }
+        }]
+      })}
       </script>
 
     <Layout>
       {/* Motorway Banner */}
       <section className="relative w-full h-[300px] md:h-[400px] lg:h-[500px] overflow-hidden">
-        <img 
-          src={motorwayBanner} 
-          alt="RedrowExposed.co.uk - Motorway Bridge Banner" 
-          className="w-full h-full object-cover object-center"
-        />
+        <img src={motorwayBanner} alt="RedrowExposed.co.uk - Motorway Bridge Banner" className="w-full h-full object-cover object-center" />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/30"></div>
       </section>
 
@@ -272,22 +261,11 @@ const Index = () => {
           </div>
 
           {/* Evidence Cards Grid */}
-          {recentEvidenceLoading ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-              {[1, 2, 3].map(i => (
-                <Skeleton key={i} className="h-96 rounded-lg" />
-              ))}
-            </div>
-          ) : recentEvidenceWithPhotos.length > 0 ? (
-            <>
+          {recentEvidenceLoading ? <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+              {[1, 2, 3].map(i => <Skeleton key={i} className="h-96 rounded-lg" />)}
+            </div> : recentEvidenceWithPhotos.length > 0 ? <>
               <div className="space-y-6 mb-10">
-                {recentEvidenceWithPhotos.map(evidence => (
-                  <EvidencePreviewCard
-                    key={evidence.id}
-                    evidence={evidence}
-                    onClick={() => navigate(`/evidence/${evidence.id}`)}
-                  />
-                ))}
+                {recentEvidenceWithPhotos.map(evidence => <EvidencePreviewCard key={evidence.id} evidence={evidence} onClick={() => navigate(`/evidence/${evidence.id}`)} />)}
               </div>
               
               {/* Call-to-Action Buttons */}
@@ -302,17 +280,14 @@ const Index = () => {
                   <a href="/upload-evidence">Submit Your Evidence</a>
                 </Button>
               </div>
-            </>
-          ) : (
-            <div className="text-center py-8">
+            </> : <div className="text-center py-8">
               <p className="text-muted-foreground mb-4">
                 No evidence has been published yet. Be the first to share your story!
               </p>
               <Button asChild>
                 <a href="/upload-evidence">Submit Evidence</a>
               </Button>
-            </div>
-          )}
+            </div>}
         </div>
       </section>
 
@@ -422,14 +397,11 @@ const Index = () => {
 
           <div className="grid grid-cols-4 gap-4 max-w-2xl mx-auto">
             {/* Facebook */}
-            <button
-              onClick={() => {
-                const url = encodeURIComponent(window.location.href);
-                const text = encodeURIComponent("Join the RedrowExposed community - A platform for homeowner transparency and accountability");
-                window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`, '_blank');
-              }}
-              className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border"
-            >
+            <button onClick={() => {
+              const url = encodeURIComponent(window.location.href);
+              const text = encodeURIComponent("Join the RedrowExposed community - A platform for homeowner transparency and accountability");
+              window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`, '_blank');
+            }} className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border">
               <div className="w-12 h-12 bg-[#1877F2]/10 rounded-full flex items-center justify-center mb-3 group-hover:bg-[#1877F2]/20 transition-colors">
                 <Facebook className="h-6 w-6 text-[#1877F2] group-hover:text-white transition-colors" />
               </div>
@@ -437,14 +409,11 @@ const Index = () => {
             </button>
 
             {/* Twitter/X */}
-            <button
-              onClick={() => {
-                const url = encodeURIComponent(window.location.href);
-                const text = encodeURIComponent("Check out RedrowExposed - A platform for homeowner transparency and accountability #HomeownerRights #PropertyIssues");
-                window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
-              }}
-              className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border"
-            >
+            <button onClick={() => {
+              const url = encodeURIComponent(window.location.href);
+              const text = encodeURIComponent("Check out RedrowExposed - A platform for homeowner transparency and accountability #HomeownerRights #PropertyIssues");
+              window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
+            }} className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border">
               <div className="w-12 h-12 bg-foreground/10 rounded-full flex items-center justify-center mb-3 group-hover:bg-foreground/20 transition-colors">
                 <Twitter className="h-6 w-6 text-foreground group-hover:text-white transition-colors" />
               </div>
@@ -452,15 +421,12 @@ const Index = () => {
             </button>
 
             {/* LinkedIn */}
-            <button
-              onClick={() => {
-                const url = encodeURIComponent(window.location.href);
-                const title = encodeURIComponent("RedrowExposed - Homeowner Transparency Platform");
-                const summary = encodeURIComponent("A community-driven platform for Barratt Redrow homeowners to share experiences and drive accountability");
-                window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}&title=${title}&summary=${summary}`, '_blank');
-              }}
-              className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border"
-            >
+            <button onClick={() => {
+              const url = encodeURIComponent(window.location.href);
+              const title = encodeURIComponent("RedrowExposed - Homeowner Transparency Platform");
+              const summary = encodeURIComponent("A community-driven platform for Barratt Redrow homeowners to share experiences and drive accountability");
+              window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}&title=${title}&summary=${summary}`, '_blank');
+            }} className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border">
               <div className="w-12 h-12 bg-[#0A66C2]/10 rounded-full flex items-center justify-center mb-3 group-hover:bg-[#0A66C2]/20 transition-colors">
                 <Linkedin className="h-6 w-6 text-[#0A66C2] group-hover:text-white transition-colors" />
               </div>
@@ -468,14 +434,11 @@ const Index = () => {
             </button>
 
             {/* WhatsApp */}
-            <button
-              onClick={() => {
-                const url = encodeURIComponent(window.location.href);
-                const text = encodeURIComponent("Check out RedrowExposed - A platform for homeowner transparency and accountability");
-                window.open(`https://wa.me/?text=${text}%20${url}`, '_blank');
-              }}
-              className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border"
-            >
+            <button onClick={() => {
+              const url = encodeURIComponent(window.location.href);
+              const text = encodeURIComponent("Check out RedrowExposed - A platform for homeowner transparency and accountability");
+              window.open(`https://wa.me/?text=${text}%20${url}`, '_blank');
+            }} className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border">
               <div className="w-12 h-12 bg-[#25D366]/10 rounded-full flex items-center justify-center mb-3 group-hover:bg-[#25D366]/20 transition-colors">
                 <MessageCircle className="h-6 w-6 text-[#25D366] group-hover:text-white transition-colors" />
               </div>
@@ -483,14 +446,11 @@ const Index = () => {
             </button>
 
             {/* Telegram */}
-            <button
-              onClick={() => {
-                const url = encodeURIComponent(window.location.href);
-                const text = encodeURIComponent("Check out RedrowExposed - A platform for homeowner transparency and accountability");
-                window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank');
-              }}
-              className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border"
-            >
+            <button onClick={() => {
+              const url = encodeURIComponent(window.location.href);
+              const text = encodeURIComponent("Check out RedrowExposed - A platform for homeowner transparency and accountability");
+              window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank');
+            }} className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border">
               <div className="w-12 h-12 bg-[#0088CC]/10 rounded-full flex items-center justify-center mb-3 group-hover:bg-[#0088CC]/20 transition-colors">
                 <Send className="h-6 w-6 text-[#0088CC] group-hover:text-white transition-colors" />
               </div>
@@ -498,14 +458,11 @@ const Index = () => {
             </button>
 
             {/* Email */}
-            <button
-              onClick={() => {
-                const subject = encodeURIComponent("RedrowExposed - Homeowner Transparency Platform");
-                const body = encodeURIComponent(`I wanted to share this platform with you: RedrowExposed\n\nIt's a community-driven platform for Barratt Redrow homeowners to share experiences, upload evidence of property issues, and drive accountability in the housing industry.\n\nCheck it out: ${window.location.href}\n\nBest regards`);
-                window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
-              }}
-              className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border"
-            >
+            <button onClick={() => {
+              const subject = encodeURIComponent("RedrowExposed - Homeowner Transparency Platform");
+              const body = encodeURIComponent(`I wanted to share this platform with you: RedrowExposed\n\nIt's a community-driven platform for Barratt Redrow homeowners to share experiences, upload evidence of property issues, and drive accountability in the housing industry.\n\nCheck it out: ${window.location.href}\n\nBest regards`);
+              window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
+            }} className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border">
               <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-3 group-hover:bg-primary/20 transition-colors">
                 <Mail className="h-6 w-6 text-primary group-hover:text-white transition-colors" />
               </div>
@@ -513,25 +470,22 @@ const Index = () => {
             </button>
 
             {/* Copy Link */}
-            <button
-              onClick={async () => {
-                try {
-                  await navigator.clipboard.writeText(window.location.href);
-                  // You could add a toast notification here
-                  alert('Link copied to clipboard!');
-                } catch (err) {
-                  // Fallback for older browsers
-                  const textArea = document.createElement('textarea');
-                  textArea.value = window.location.href;
-                  document.body.appendChild(textArea);
-                  textArea.select();
-                  document.execCommand('copy');
-                  document.body.removeChild(textArea);
-                  alert('Link copied to clipboard!');
-                }
-              }}
-              className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border"
-            >
+            <button onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(window.location.href);
+                // You could add a toast notification here
+                alert('Link copied to clipboard!');
+              } catch (err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = window.location.href;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('Link copied to clipboard!');
+              }
+            }} className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border">
               <div className="w-12 h-12 bg-secondary/30 rounded-full flex items-center justify-center mb-3 group-hover:bg-secondary/50 transition-colors">
                 <Copy className="h-6 w-6 text-muted-foreground group-hover:text-foreground transition-colors" />
               </div>
@@ -539,14 +493,11 @@ const Index = () => {
             </button>
 
             {/* Reddit */}
-            <button
-              onClick={() => {
-                const url = encodeURIComponent(window.location.href);
-                const title = encodeURIComponent("RedrowExposed - A platform for homeowner transparency and accountability");
-                window.open(`https://reddit.com/submit?url=${url}&title=${title}`, '_blank');
-              }}
-              className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border"
-            >
+            <button onClick={() => {
+              const url = encodeURIComponent(window.location.href);
+              const title = encodeURIComponent("RedrowExposed - A platform for homeowner transparency and accountability");
+              window.open(`https://reddit.com/submit?url=${url}&title=${title}`, '_blank');
+            }} className="group flex flex-col items-center p-6 bg-card hover:bg-accent rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg border border-border">
               <div className="w-12 h-12 bg-[#FF4500]/10 rounded-full flex items-center justify-center mb-3 group-hover:bg-[#FF4500]/20 transition-colors">
                 <MessageSquare className="h-6 w-6 text-[#FF4500] group-hover:text-white transition-colors" />
               </div>
@@ -608,26 +559,16 @@ const Index = () => {
           </div>
 
           <Accordion type="multiple" className="max-w-4xl mx-auto space-y-4">
-            {faqs.length > 0 ? (
-              faqs.map((faq) => (
-                <AccordionItem 
-                  key={faq.id} 
-                  value={faq.id}
-                  className="border rounded-lg px-6 bg-card"
-                >
+            {faqs.length > 0 ? faqs.map(faq => <AccordionItem key={faq.id} value={faq.id} className="border rounded-lg px-6 bg-card">
                   <AccordionTrigger className="text-left hover:no-underline py-6">
                     <span className="text-lg font-semibold">{faq.question}</span>
                   </AccordionTrigger>
                   <AccordionContent className="text-muted-foreground pb-6">
                     {faq.answer}
                   </AccordionContent>
-                </AccordionItem>
-              ))
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
+                </AccordionItem>) : <div className="text-center py-8 text-muted-foreground">
                 No FAQs available at this time.
-              </div>
-            )}
+              </div>}
           </Accordion>
         </div>
       </section>
@@ -667,9 +608,7 @@ const Index = () => {
             </div>
           </div>
           <div className="mt-8 pt-8 border-t border-border text-center">
-            <p className="text-muted-foreground mb-2">
-              © 2024 RedrowExposed. Empowering homeowners through transparency.
-            </p>
+            <p className="text-muted-foreground mb-2">© 2025 RedrowExposed. Empowering homeowners through transparency.</p>
             <div className="text-sm text-muted-foreground">
               <p className="mb-2">
                 <strong>Redrow Exposed</strong> - The UK's definitive resource for Barratt Redrow homeowner experiences and property issues
@@ -685,8 +624,6 @@ const Index = () => {
         </div>
       </footer>
     </Layout>
-    </>
-  );
+    </>;
 };
-
 export default Index;

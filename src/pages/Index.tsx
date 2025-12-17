@@ -112,10 +112,10 @@ const Index = () => {
         "@type": "FAQPage",
         "mainEntity": [{
           "@type": "Question",
-          "name": "What types of Redrow property defects are common?",
+          "name": "What types of defects have homeowners reported?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Common Redrow defects include structural issues, water damage, electrical problems, heating/insulation issues, roof leaks, and poor build quality finishing."
+            "text": "Homeowner defects include structural issues, water damage, electrical problems, heating/insulation issues, roof leaks, and poor build quality finishing."
           }
         }, {
           "@type": "Question",

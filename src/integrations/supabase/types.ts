@@ -101,6 +101,51 @@ export type Database = {
         }
         Relationships: []
       }
+      complaints: {
+        Row: {
+          admin_notes: string | null
+          complaint_date: string
+          created_at: string | null
+          created_by: string | null
+          description: string
+          id: string
+          is_published: boolean | null
+          location: string
+          source: string | null
+          source_url: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          complaint_date: string
+          created_at?: string | null
+          created_by?: string | null
+          description: string
+          id?: string
+          is_published?: boolean | null
+          location: string
+          source?: string | null
+          source_url?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          complaint_date?: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string
+          id?: string
+          is_published?: boolean | null
+          location?: string
+          source?: string | null
+          source_url?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       development_ratings: {
         Row: {
           build_quality_rating: number | null

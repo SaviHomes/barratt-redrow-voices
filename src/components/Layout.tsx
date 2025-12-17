@@ -20,7 +20,8 @@ export default function Layout({
   return <div className="min-h-screen bg-background">
       {/* Development Notice */}
       <div className="bg-muted py-3 text-center border-b border-border">
-        <p className="text-sm text-muted-foreground px-4">🚧 Site in Development - This platform is under active development. Some content, figures, layouts, and features are provisional and may change as submissions are verified and additional source material is added. Content reflects contributor experiences and illustrative summaries rather than definitive statements of fact.<strong>Site in Development</strong> - Content, statistics, and features shown are placeholders for demonstration purposes
+        <p className="text-sm text-muted-foreground px-4">
+          🚧 Site in Development - This platform is under active development. Some content, figures, layouts, and features are provisional and may change. Content reflects contributor experiences and illustrative summaries rather than definitive statements of fact.
         </p>
       </div>
 

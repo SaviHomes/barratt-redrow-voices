@@ -526,18 +526,10 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 text-center">
+          <div className="text-center">
             <div>
-              <div className="text-4xl font-bold text-primary mb-2">500+</div>
-              <div className="text-muted-foreground">Homeowner Stories</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-primary mb-2">1,200+</div>
-              <div className="text-muted-foreground">Photos Uploaded</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-primary mb-2">85%</div>
-              <div className="text-muted-foreground">Issues Documented</div>
+              <div className="text-4xl font-bold text-primary mb-2">100+</div>
+              <div className="text-muted-foreground">Dissatisfied Redrow homeowners</div>
             </div>
           </div>
         </div>

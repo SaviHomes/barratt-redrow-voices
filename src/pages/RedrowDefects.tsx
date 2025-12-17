@@ -35,22 +35,16 @@ const RedrowDefects = () => {
 
   const developmentIssues = [
     {
-      name: "The Meadows, Birmingham",
-      year: "2019-2021",
-      issues: "Multiple properties with foundation problems, water ingress",
-      status: "Ongoing legal action"
+      name: "Hazel Park, Stevenage",
+      status: "Ongoing"
     },
     {
-      name: "Riverside Gardens, Manchester", 
-      year: "2020-2022",
-      issues: "Heating system failures, poor insulation, electrical faults",
-      status: "Remedial work partially completed"
+      name: "Hendricks Green, Goffs Oak, Hertfordshire",
+      status: "Ongoing"
     },
     {
-      name: "Heritage Park, Leeds",
-      year: "2018-2020", 
-      issues: "Roof leaks, window defects, drainage problems",
-      status: "Individual claims being processed"
+      name: "Hedera Gardens, Royston",
+      status: "Ongoing"
     }
   ];
 
@@ -184,20 +178,14 @@ const RedrowDefects = () => {
                 {developmentIssues.map((development, index) => (
                   <Card key={index}>
                     <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <CardTitle className="flex items-center gap-2">
-                            <MapPin className="h-5 w-5 text-primary" />
-                            {development.name}
-                          </CardTitle>
-                          <CardDescription>Built: {development.year}</CardDescription>
-                        </div>
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="flex items-center gap-2">
+                          <MapPin className="h-5 w-5 text-primary" />
+                          {development.name}
+                        </CardTitle>
                         <Badge variant="outline">{development.status}</Badge>
                       </div>
                     </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground">{development.issues}</p>
-                    </CardContent>
                   </Card>
                 ))}
               </div>

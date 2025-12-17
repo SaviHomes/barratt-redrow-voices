@@ -7,7 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Shield, Scale, Megaphone, Handshake, ClipboardList, Bell, Newspaper, Wrench, Database, Tv } from "lucide-react";
+import { Shield, Scale, Megaphone, Handshake, ClipboardList, Bell, Newspaper, Wrench, Database, Tv, Clock } from "lucide-react";
 
 const STORAGE_KEY = "announcement-dismissed-v1";
 
@@ -36,6 +36,19 @@ export function AnnouncementDialog() {
             Standing Strong for Homeowner Rights
           </DialogTitle>
         </DialogHeader>
+
+        {/* Eye-catching Coming Soon Banner */}
+        <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg p-4 text-white shadow-lg">
+          <div className="flex items-center gap-3">
+            <Clock className="h-8 w-8 animate-pulse shrink-0" />
+            <div>
+              <div className="font-bold text-lg">🚨 New Content Incoming!</div>
+              <p className="text-white/90 text-sm">
+                We are preparing new material from a number of sources which will be updated within the next 24 hours.
+              </p>
+            </div>
+          </div>
+        </div>
 
         <div className="space-y-6 py-4">
           {/* Important Notice Section */}

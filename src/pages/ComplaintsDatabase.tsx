@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MapPin, Calendar, Search, ExternalLink, Loader2 } from "lucide-react";
+import { MapPin, Calendar, Search, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 const ComplaintsDatabase = () => {
@@ -126,23 +126,7 @@ const ComplaintsDatabase = () => {
                   <div className="space-y-4">
                     {/* Header */}
                     <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
-                      <div className="flex-1">
-                        <h3 className="text-xl font-semibold mb-2">{complaint.title}</h3>
-                      </div>
-                      
-                      {complaint.source_url && (
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          asChild
-                          className="h-8 px-3 text-xs"
-                        >
-                          <a href={complaint.source_url} target="_blank" rel="noopener noreferrer">
-                            <ExternalLink className="h-3 w-3 mr-1" />
-                            View Source
-                          </a>
-                        </Button>
-                      )}
+                      <h3 className="text-xl font-semibold mb-2">{complaint.title}</h3>
                     </div>
 
                     {/* Description */}

@@ -39,25 +39,16 @@ const RedrowComplaints = () => {
 
   const recentComplaints = [
     {
-      location: "Heritage Village, Birmingham",
-      date: "March 2024",
-      issue: "Multiple roof leaks causing interior damage. Redrow refusing warranty coverage.",
-      status: "Unresolved",
-      rating: 1
+      location: "Hazel Park, Stevenage",
+      status: "Ongoing"
     },
     {
-      location: "Meadowbrook, Manchester",
-      date: "February 2024", 
-      issue: "Electrical faults throughout property. Safety concerns raised with local authority.",
-      status: "Ongoing",
-      rating: 1
+      location: "Hendricks Green, Goffs Oak, Hertfordshire",
+      status: "Ongoing"
     },
     {
-      location: "Riverside Gardens, Leeds",
-      date: "January 2024",
-      issue: "Foundation settling causing cracks. Told it's 'normal settling' by Redrow.",
-      status: "Escalated",
-      rating: 2
+      location: "Hedera Gardens, Royston",
+      status: "Ongoing"
     }
   ];
 
@@ -233,29 +224,12 @@ const RedrowComplaints = () => {
                       <div className="flex items-start justify-between">
                         <div>
                           <CardTitle className="text-lg">{complaint.location}</CardTitle>
-                          <CardDescription className="flex items-center gap-2">
-                            <Clock className="h-4 w-4" />
-                            {complaint.date}
-                          </CardDescription>
                         </div>
-                        <div className="text-right">
-                          <div className="flex items-center gap-1 mb-2">
-                            {[1,2,3,4,5].map((star) => (
-                              <Star 
-                                key={star} 
-                                className={`h-4 w-4 ${star <= complaint.rating ? 'fill-destructive text-destructive' : 'text-muted-foreground'}`} 
-                              />
-                            ))}
-                          </div>
-                          <Badge variant={complaint.status === "Unresolved" ? "destructive" : "secondary"}>
-                            {complaint.status}
-                          </Badge>
-                        </div>
+                        <Badge variant="secondary">
+                          {complaint.status}
+                        </Badge>
                       </div>
                     </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground">{complaint.issue}</p>
-                    </CardContent>
                   </Card>
                 ))}
                </div>

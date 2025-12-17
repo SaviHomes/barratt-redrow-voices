@@ -1,77 +1,45 @@
 import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import Layout from "@/components/Layout";
 import SEOHead from "@/components/SEOHead";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MapPin, Calendar, Star, Search, Filter } from "lucide-react";
+import { MapPin, Calendar, Search, ExternalLink, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const ComplaintsDatabase = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterCategory, setFilterCategory] = useState("all");
   const [sortBy, setSortBy] = useState("recent");
 
-  // Real documented complaints from news sources and official records
-  const complaints = [
-    {
-      id: 3,
-      title: "Property was built on a Swallowhole",
-      description: "We were looking to purchase a Henley at Monchelsea Park, Langley, however our search came back with \"Moderate Potential for Collapsibility\" and that the property was built on a \"Swallowhole\", unfortunately Redrow, who openly admitted to knowing about the issues before selling it to us, are refusing to return the money paid for upgraded appliances, which has left us hugely out of pocket. I would strongly recommend getting your own searches carried out before instructing solicitors to save you a whole world of pain! Heaven knows what the rest of the development is like….",
-      location: "Monchelsea Park, Langley",
-      category: "",
-      severity: "",
-      date: "2024-03-01",
-      status: "",
-      sourceUrl: "",
-      sourcePublication: "",
-      tags: [],
-      comments: []
+  // Fetch published complaints from database
+  const { data: complaints = [], isLoading } = useQuery({
+    queryKey: ['published-complaints'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('complaints')
+        .select('*')
+        .eq('is_published', true)
+        .order('complaint_date', { ascending: false });
+      
+      if (error) throw error;
+      return data;
     }
-  ];
-
-  const categories = [
-    "all"
-  ];
-
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case "Critical": return "destructive";
-      case "High": return "secondary";
-      case "Medium": return "outline";
-      default: return "outline";
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Legal Action": return "destructive";
-      case "Unresolved": return "secondary";
-      case "Ongoing": return "outline";
-      case "Disputed": return "secondary";
-      case "Partially Resolved": return "outline";
-      default: return "outline";
-    }
-  };
+  });
 
   const filteredComplaints = complaints
     .filter(complaint => 
-      (filterCategory === "all" || complaint.category === filterCategory) &&
-      (searchTerm === "" || 
-        complaint.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        complaint.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        complaint.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        complaint.sourcePublication.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+      searchTerm === "" || 
+      complaint.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      complaint.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      complaint.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (complaint.source && complaint.source.toLowerCase().includes(searchTerm.toLowerCase()))
     )
     .sort((a, b) => {
-      if (sortBy === "recent") return new Date(b.date).getTime() - new Date(a.date).getTime();
-      if (sortBy === "severity") {
-        const severityOrder = { "Critical": 0, "High": 1, "Medium": 2, "Low": 3 };
-        return (severityOrder[a.severity as keyof typeof severityOrder] || 4) - (severityOrder[b.severity as keyof typeof severityOrder] || 4);
+      if (sortBy === "recent") {
+        return new Date(b.complaint_date).getTime() - new Date(a.complaint_date).getTime();
       }
-      if (sortBy === "comments") return (b.comments?.length || 0) - (a.comments?.length || 0);
       return 0;
     });
 
@@ -107,30 +75,12 @@ const ComplaintsDatabase = () => {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="search"
-                    placeholder="Search by keywords, location, or development..."
+                    placeholder="Search by keywords, location, or source..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10"
                   />
                 </div>
-              </div>
-              
-              <div className="md:w-48">
-                <label htmlFor="category" className="block text-sm font-medium mb-2">
-                  Category
-                </label>
-                <Select value={filterCategory} onValueChange={setFilterCategory}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All Categories" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map(category => (
-                      <SelectItem key={category} value={category}>
-                        {category === "all" ? "All Categories" : category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               </div>
 
               <div className="md:w-48">
@@ -143,8 +93,6 @@ const ComplaintsDatabase = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="recent">Most Recent</SelectItem>
-                    <SelectItem value="severity">Most Severe</SelectItem>
-                    <SelectItem value="comments">Most Discussed</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -157,6 +105,20 @@ const ComplaintsDatabase = () => {
               </p>
             </div>
 
+            {/* Loading State */}
+            {isLoading && (
+              <div className="flex justify-center items-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              </div>
+            )}
+
+            {/* Empty State */}
+            {!isLoading && filteredComplaints.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">No complaints found.</p>
+              </div>
+            )}
+
             {/* Complaints Grid */}
             <div className="space-y-6">
               {filteredComplaints.map((complaint) => (
@@ -166,45 +128,21 @@ const ComplaintsDatabase = () => {
                     <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
                       <div className="flex-1">
                         <h3 className="text-xl font-semibold mb-2">{complaint.title}</h3>
-                        {(complaint.severity || complaint.status || complaint.category) && (
-                          <div className="flex flex-wrap gap-2 mb-3">
-                            {complaint.severity && (
-                              <Badge variant={getSeverityColor(complaint.severity)}>
-                                {complaint.severity} Priority
-                              </Badge>
-                            )}
-                            {complaint.status && (
-                              <Badge variant={getStatusColor(complaint.status)}>
-                                {complaint.status}
-                              </Badge>
-                            )}
-                            {complaint.category && (
-                              <Badge variant="outline">{complaint.category}</Badge>
-                            )}
-                          </div>
-                        )}
                       </div>
                       
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        {complaint.sourceUrl && (
-                          <>
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              asChild
-                              className="h-6 px-2 text-xs"
-                            >
-                              <a href={complaint.sourceUrl} target="_blank" rel="noopener noreferrer">
-                                Source
-                              </a>
-                            </Button>
-                            {(complaint.comments?.length || 0) > 0 && <span>•</span>}
-                          </>
-                        )}
-                        {(complaint.comments?.length || 0) > 0 && (
-                          <span>{complaint.comments?.length} responses</span>
-                        )}
-                      </div>
+                      {complaint.source_url && (
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          asChild
+                          className="h-8 px-3 text-xs"
+                        >
+                          <a href={complaint.source_url} target="_blank" rel="noopener noreferrer">
+                            <ExternalLink className="h-3 w-3 mr-1" />
+                            View Source
+                          </a>
+                        </Button>
+                      )}
                     </div>
 
                     {/* Description */}
@@ -220,65 +158,18 @@ const ComplaintsDatabase = () => {
                       </div>
                       <div className="flex items-center gap-1">
                         <Calendar className="h-4 w-4" />
-                        <span>{new Date(complaint.date).toLocaleDateString()}</span>
+                        <span>{new Date(complaint.complaint_date).toLocaleDateString()}</span>
                       </div>
-                      {complaint.sourcePublication && (
+                      {complaint.source && (
                         <>
                           <span>•</span>
-                          <span>{complaint.sourcePublication}</span>
-                        </>
-                      )}
-                      {(complaint.comments?.length || 0) > 0 && (
-                        <>
-                          <span>•</span>
-                          <span>{complaint.comments?.length} comments</span>
+                          <span>Source: {complaint.source}</span>
                         </>
                       )}
                     </div>
-
-                    {/* Comments Section */}
-                    {complaint.comments && complaint.comments.length > 0 && (
-                      <div className="mt-4 p-4 bg-muted/30 rounded-lg">
-                        <h4 className="font-medium mb-3 text-sm">Community Responses:</h4>
-                        <div className="space-y-3">
-                          {complaint.comments.map((comment, index) => (
-                            <div key={index} className="text-sm">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="font-medium text-xs">{comment.author}</span>
-                                <span className="text-xs text-muted-foreground">
-                                  {new Date(comment.date).toLocaleDateString()}
-                                </span>
-                              </div>
-                              <p className="text-muted-foreground">{comment.comment}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Tags */}
-                    {complaint.tags && complaint.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mt-4">
-                        {complaint.tags.map(tag => (
-                          <span
-                            key={tag}
-                            className="px-2 py-1 bg-muted text-muted-foreground text-xs rounded-md"
-                          >
-                            #{tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
                   </div>
                 </Card>
               ))}
-            </div>
-
-            {/* Load More */}
-            <div className="text-center mt-12">
-              <Button variant="outline" size="lg">
-                Load More Complaints
-              </Button>
             </div>
 
             {/* CTA Section */}

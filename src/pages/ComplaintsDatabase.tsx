@@ -8,48 +8,35 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MapPin, Calendar, Search, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-
 const ComplaintsDatabase = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("recent");
 
   // Fetch published complaints from database
-  const { data: complaints = [], isLoading } = useQuery({
+  const {
+    data: complaints = [],
+    isLoading
+  } = useQuery({
     queryKey: ['published-complaints'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('complaints')
-        .select('*')
-        .eq('is_published', true)
-        .order('complaint_date', { ascending: false });
-      
+      const {
+        data,
+        error
+      } = await supabase.from('complaints').select('*').eq('is_published', true).order('complaint_date', {
+        ascending: false
+      });
       if (error) throw error;
       return data;
     }
   });
-
-  const filteredComplaints = complaints
-    .filter(complaint => 
-      searchTerm === "" || 
-      complaint.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      complaint.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      complaint.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (complaint.source && complaint.source.toLowerCase().includes(searchTerm.toLowerCase()))
-    )
-    .sort((a, b) => {
-      if (sortBy === "recent") {
-        return new Date(b.complaint_date).getTime() - new Date(a.complaint_date).getTime();
-      }
-      return 0;
-    });
-
-  return (
-    <>
-      <SEOHead
-        title="Redrow Complaints Database - Real Customer Experiences"
-        description="Browse through hundreds of real complaints and issues reported by Redrow homeowners. Find detailed accounts of defects, poor customer service, and unresolved problems."
-        keywords="Redrow complaints, homeowner issues, property defects, customer service problems, building quality"
-      />
+  const filteredComplaints = complaints.filter(complaint => searchTerm === "" || complaint.title.toLowerCase().includes(searchTerm.toLowerCase()) || complaint.description.toLowerCase().includes(searchTerm.toLowerCase()) || complaint.location.toLowerCase().includes(searchTerm.toLowerCase()) || complaint.source && complaint.source.toLowerCase().includes(searchTerm.toLowerCase())).sort((a, b) => {
+    if (sortBy === "recent") {
+      return new Date(b.complaint_date).getTime() - new Date(a.complaint_date).getTime();
+    }
+    return 0;
+  });
+  return <>
+      <SEOHead title="Redrow Complaints Database - Real Customer Experiences" description="Browse through hundreds of real complaints and issues reported by Redrow homeowners. Find detailed accounts of defects, poor customer service, and unresolved problems." keywords="Redrow complaints, homeowner issues, property defects, customer service problems, building quality" />
       
       <Layout>
         <main className="min-h-screen py-12">
@@ -59,10 +46,7 @@ const ComplaintsDatabase = () => {
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
                 Redrow Complaints Database
               </h1>
-              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-                Real complaints and experiences from Redrow homeowners across the UK. 
-                Search through detailed accounts of defects, poor service, and unresolved issues.
-              </p>
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">Real complaints and experiences from Redrow homeowners across the UK. Search through detailed accounts of defects, poor service, and unresolved issues..</p>
             </div>
 
             {/* Search and Filter */}
@@ -73,13 +57,7 @@ const ComplaintsDatabase = () => {
                 </label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="search"
-                    placeholder="Search by keywords, location, or source..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
+                  <Input id="search" placeholder="Search by keywords, location, or source..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10" />
                 </div>
               </div>
 
@@ -106,23 +84,18 @@ const ComplaintsDatabase = () => {
             </div>
 
             {/* Loading State */}
-            {isLoading && (
-              <div className="flex justify-center items-center py-12">
+            {isLoading && <div className="flex justify-center items-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-              </div>
-            )}
+              </div>}
 
             {/* Empty State */}
-            {!isLoading && filteredComplaints.length === 0 && (
-              <div className="text-center py-12">
+            {!isLoading && filteredComplaints.length === 0 && <div className="text-center py-12">
                 <p className="text-muted-foreground">No complaints found.</p>
-              </div>
-            )}
+              </div>}
 
             {/* Complaints Grid */}
             <div className="space-y-6">
-              {filteredComplaints.map((complaint) => (
-                <Card key={complaint.id} className="p-6 hover:shadow-lg transition-shadow">
+              {filteredComplaints.map(complaint => <Card key={complaint.id} className="p-6 hover:shadow-lg transition-shadow">
                   <div className="space-y-4">
                     {/* Header */}
                     <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
@@ -144,16 +117,13 @@ const ComplaintsDatabase = () => {
                         <Calendar className="h-4 w-4" />
                         <span>{new Date(complaint.complaint_date).toLocaleDateString()}</span>
                       </div>
-                      {complaint.source && (
-                        <>
+                      {complaint.source && <>
                           <span>•</span>
                           <span>Source: {complaint.source}</span>
-                        </>
-                      )}
+                        </>}
                     </div>
                   </div>
-                </Card>
-              ))}
+                </Card>)}
             </div>
 
             {/* CTA Section */}
@@ -176,8 +146,6 @@ const ComplaintsDatabase = () => {
           </div>
         </main>
       </Layout>
-    </>
-  );
+    </>;
 };
-
 export default ComplaintsDatabase;

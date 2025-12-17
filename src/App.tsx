@@ -36,6 +36,7 @@ import Socials from "./pages/Socials";
 import AdminSocials from "./pages/AdminSocials";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import AdminComplaints from "./pages/AdminComplaints";
 
 const queryClient = new QueryClient();
 
@@ -74,6 +75,7 @@ const App = () => (
             <Route path="/admin/settings" element={<AdminSettings />} />
             <Route path="/admin/articles" element={<AdminArticles />} />
             <Route path="/admin/socials" element={<AdminSocials />} />
+            <Route path="/admin/complaints" element={<AdminComplaints />} />
             <Route path="/public-gallery" element={<PublicGallery />} />
             <Route path="/news-articles" element={<NewsArticles />} />
             <Route path="/socials" element={<Socials />} />

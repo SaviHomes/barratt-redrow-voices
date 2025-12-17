@@ -72,28 +72,17 @@ const ComplaintsDatabase = () => {
     },
     {
       id: 3,
-      title: "Rising Complaint Volumes to Housing Ombudsman",
-      description: "Official Housing Ombudsman data shows increasing complaint volumes against Redrow, with common issues including poor build quality, unresolved defects, and inadequate customer service response times. The ombudsman has highlighted systemic issues requiring attention.",
-      location: "Multiple Developments UK-wide",
-      category: "Official Records",
-      severity: "Medium",
+      title: "Property was built on a Swallowhole",
+      description: "We were looking to purchase a Henley at Monchelsea Park, Langley, however our search came back with \"Moderate Potential for Collapsibility\" and that the property was built on a \"Swallowhole\", unfortunately Redrow, who openly admitted to knowing about the issues before selling it to us, are refusing to return the money paid for upgraded appliances, which has left us hugely out of pocket. I would strongly recommend getting your own searches carried out before instructing solicitors to save you a whole world of pain! Heaven knows what the rest of the development is like….",
+      location: "Monchelsea Park, Langley",
+      category: "",
+      severity: "",
       date: "2024-03-01",
-      status: "Documented",
-      sourceUrl: "https://www.housing-ombudsman.org.uk/about-us/corporate-information/publications/annual-report-2023/",
-      sourcePublication: "Housing Ombudsman Service",
-      tags: ["Official Complaints", "Build Quality", "Customer Service"],
-      comments: [
-        {
-          author: "Industry Observer",
-          comment: "The trend in complaints suggests systemic issues that need addressing at corporate level.",
-          date: "2024-03-05"
-        },
-        {
-          author: "Consumer Rights Advocate",
-          comment: "These official statistics confirm what homeowners have been saying for years.",
-          date: "2024-03-08"
-        }
-      ]
+      status: "",
+      sourceUrl: "",
+      sourcePublication: "",
+      tags: [],
+      comments: []
     },
     {
       id: 4,
@@ -313,30 +302,44 @@ const ComplaintsDatabase = () => {
                     <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
                       <div className="flex-1">
                         <h3 className="text-xl font-semibold mb-2">{complaint.title}</h3>
-                        <div className="flex flex-wrap gap-2 mb-3">
-                          <Badge variant={getSeverityColor(complaint.severity)}>
-                            {complaint.severity} Priority
-                          </Badge>
-                          <Badge variant={getStatusColor(complaint.status)}>
-                            {complaint.status}
-                          </Badge>
-                          <Badge variant="outline">{complaint.category}</Badge>
-                        </div>
+                        {(complaint.severity || complaint.status || complaint.category) && (
+                          <div className="flex flex-wrap gap-2 mb-3">
+                            {complaint.severity && (
+                              <Badge variant={getSeverityColor(complaint.severity)}>
+                                {complaint.severity} Priority
+                              </Badge>
+                            )}
+                            {complaint.status && (
+                              <Badge variant={getStatusColor(complaint.status)}>
+                                {complaint.status}
+                              </Badge>
+                            )}
+                            {complaint.category && (
+                              <Badge variant="outline">{complaint.category}</Badge>
+                            )}
+                          </div>
+                        )}
                       </div>
                       
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          asChild
-                          className="h-6 px-2 text-xs"
-                        >
-                          <a href={complaint.sourceUrl} target="_blank" rel="noopener noreferrer">
-                            Source
-                          </a>
-                        </Button>
-                        <span>•</span>
-                        <span>{complaint.comments?.length || 0} responses</span>
+                        {complaint.sourceUrl && (
+                          <>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              asChild
+                              className="h-6 px-2 text-xs"
+                            >
+                              <a href={complaint.sourceUrl} target="_blank" rel="noopener noreferrer">
+                                Source
+                              </a>
+                            </Button>
+                            {(complaint.comments?.length || 0) > 0 && <span>•</span>}
+                          </>
+                        )}
+                        {(complaint.comments?.length || 0) > 0 && (
+                          <span>{complaint.comments?.length} responses</span>
+                        )}
                       </div>
                     </div>
 
@@ -355,10 +358,18 @@ const ComplaintsDatabase = () => {
                         <Calendar className="h-4 w-4" />
                         <span>{new Date(complaint.date).toLocaleDateString()}</span>
                       </div>
-                      <span>•</span>
-                      <span>{complaint.sourcePublication}</span>
-                      <span>•</span>
-                      <span>{complaint.comments?.length || 0} comments</span>
+                      {complaint.sourcePublication && (
+                        <>
+                          <span>•</span>
+                          <span>{complaint.sourcePublication}</span>
+                        </>
+                      )}
+                      {(complaint.comments?.length || 0) > 0 && (
+                        <>
+                          <span>•</span>
+                          <span>{complaint.comments?.length} comments</span>
+                        </>
+                      )}
                     </div>
 
                     {/* Comments Section */}
@@ -382,16 +393,18 @@ const ComplaintsDatabase = () => {
                     )}
 
                     {/* Tags */}
-                    <div className="flex flex-wrap gap-2 mt-4">
-                      {complaint.tags.map(tag => (
-                        <span
-                          key={tag}
-                          className="px-2 py-1 bg-muted text-muted-foreground text-xs rounded-md"
-                        >
-                          #{tag}
-                        </span>
-                      ))}
-                    </div>
+                    {complaint.tags && complaint.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-4">
+                        {complaint.tags.map(tag => (
+                          <span
+                            key={tag}
+                            className="px-2 py-1 bg-muted text-muted-foreground text-xs rounded-md"
+                          >
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </Card>
               ))}

@@ -16,61 +16,6 @@ const ComplaintsDatabase = () => {
   // Real documented complaints from news sources and official records
   const complaints = [
     {
-      id: 1,
-      title: "Nightmare New-Build Home with Multiple Defects",
-      description: "Stephen Fullard's home at Cornflower Court has suffered from numerous issues including poor workmanship, unfinished work, and ongoing problems despite multiple complaints. The homeowner describes the experience as a 'nightmare' with Redrow failing to address serious defects.",
-      location: "Cornflower Court, Hetton-le-Hole",
-      category: "Multiple Defects",
-      severity: "Critical",
-      date: "2024-01-15",
-      status: "Ongoing",
-      sourceUrl: "https://www.chroniclelive.co.uk/news/north-east-news/redrow-homes-hetton-complaints-28234567",
-      sourcePublication: "Chronicle Live",
-      tags: ["Poor Workmanship", "Unfinished Work", "Multiple Defects"],
-      comments: [
-        {
-          author: "Local Resident",
-          comment: "We've had similar issues in our development. It seems to be a pattern with Redrow builds.",
-          date: "2024-01-20"
-        },
-        {
-          author: "Another Homeowner",
-          comment: "Three years later and still fighting for basic repairs. This is unacceptable.",
-          date: "2024-01-25"
-        }
-      ]
-    },
-    {
-      id: 2,
-      title: "Living on 'A Building Site' Years After Purchase",
-      description: "Residents at The Willows development in Darlington describe their luxury homes as being situated on what feels like 'a building site' years after purchasing. Ongoing construction issues, incomplete infrastructure, and poor site management have left homeowners frustrated.",
-      location: "The Willows, Darlington",
-      category: "Site Management",
-      severity: "High",
-      date: "2024-02-08",
-      status: "Ongoing",
-      sourceUrl: "https://www.darlingtonandstocktontimes.co.uk/news/24089432.redrow-homes-darlington-willows-problems/",
-      sourcePublication: "Darlington & Stockton Times",
-      tags: ["Site Management", "Infrastructure", "Incomplete Development"],
-      comments: [
-        {
-          author: "Willows Resident",
-          comment: "Three years on and we're still dealing with mud, noise, and unfinished roads. This isn't what we paid for.",
-          date: "2024-02-12"
-        },
-        {
-          author: "Another Resident", 
-          comment: "The marketing promised a completed development. Reality is very different.",
-          date: "2024-02-15"
-        },
-        {
-          author: "Concerned Neighbour",
-          comment: "Feel so sorry for these families. They deserve better from such a big company.",
-          date: "2024-02-18"
-        }
-      ]
-    },
-    {
       id: 3,
       title: "Property was built on a Swallowhole",
       description: "We were looking to purchase a Henley at Monchelsea Park, Langley, however our search came back with \"Moderate Potential for Collapsibility\" and that the property was built on a \"Swallowhole\", unfortunately Redrow, who openly admitted to knowing about the issues before selling it to us, are refusing to return the money paid for upgraded appliances, which has left us hugely out of pocket. I would strongly recommend getting your own searches carried out before instructing solicitors to save you a whole world of pain! Heaven knows what the rest of the development is like….",
@@ -83,92 +28,11 @@ const ComplaintsDatabase = () => {
       sourcePublication: "",
       tags: [],
       comments: []
-    },
-    {
-      id: 4,
-      title: "Heating System Failures in Winter Months",
-      description: "Multiple reports of heating system failures, poor installation, and recurring breakdowns in new-build properties. Some residents report being without heating for extended periods during winter months, with slow response times for emergency repairs.",
-      location: "Various Redrow Developments",
-      category: "Heating & Plumbing",
-      severity: "High",
-      date: "2024-01-28",
-      status: "Pattern Identified",
-      sourceUrl: "https://www.which.co.uk/news/article/new-build-heating-problems-redrow-aG8X9pL5wK2s",
-      sourcePublication: "Which? Consumer Reports",
-      tags: ["Heating", "Winter Issues", "Emergency Repairs"],
-      comments: [
-        {
-          author: "Affected Homeowner",
-          comment: "Two weeks without heating in January with young children. Unacceptable for a new-build home.",
-          date: "2024-02-01"
-        },
-        {
-          author: "Another Victim",
-          comment: "Same issue here. It took three engineers and a month to fix properly.",
-          date: "2024-02-05"
-        }
-      ]
-    },
-    {
-      id: 5,
-      title: "Electrical Safety Concerns and Rewiring Requirements",
-      description: "Reports of electrical faults, improper installations, and safety concerns in new builds. Some properties have required complete rewiring within the first year of occupation after independent electricians identified dangerous installations.",
-      location: "Multiple Sites",
-      category: "Electrical",
-      severity: "Critical",
-      date: "2023-11-15",
-      status: "Safety Concern",
-      sourceUrl: "https://www.bbc.co.uk/news/business-new-build-electrical-faults-investigation-67123456",
-      sourcePublication: "BBC News",
-      tags: ["Electrical Safety", "Rewiring", "Installation Faults"],
-      comments: [
-        {
-          author: "Electrical Contractor",
-          comment: "Seeing too many of these issues in new builds. Proper testing and certification is essential.",
-          date: "2023-11-20"
-        },
-        {
-          author: "Safety Inspector",
-          comment: "These installations would never have passed proper inspection. Very concerning.",
-          date: "2023-11-25"
-        }
-      ]
-    },
-    {
-      id: 6,
-      title: "Garden and Landscaping Disputes",
-      description: "Homeowners report significant differences between promised landscaping and what was actually delivered. Issues include poor drainage, unsuitable soil, and incomplete garden boundaries. Many report gardens that are unusable due to poor preparation.",
-      location: "Various Developments",
-      category: "Landscaping",
-      severity: "Medium",
-      date: "2024-01-10",
-      status: "Ongoing",
-      sourceUrl: "https://www.theguardian.com/money/2024/jan/12/new-build-home-garden-drainage-issues-redrow",
-      sourcePublication: "The Guardian",
-      tags: ["Landscaping", "Drainage", "Garden Boundaries"],
-      comments: [
-        {
-          author: "Garden Designer",
-          comment: "Proper soil preparation is crucial. These shortcuts cause long-term problems for homeowners.",
-          date: "2024-01-15"
-        },
-        {
-          author: "Frustrated Homeowner",
-          comment: "Paid extra for 'premium landscaping' and got a muddy mess that floods every time it rains.",
-          date: "2024-01-18"
-        }
-      ]
     }
   ];
 
   const categories = [
-    "all",
-    "Multiple Defects",
-    "Site Management", 
-    "Official Records",
-    "Heating & Plumbing",
-    "Electrical",
-    "Landscaping"
+    "all"
   ];
 
   const getSeverityColor = (severity: string) => {

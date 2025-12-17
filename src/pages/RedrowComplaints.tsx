@@ -80,7 +80,7 @@ const RedrowComplaints = () => {
           },
           "reviewRating": {
             "@type": "Rating", 
-            "ratingValue": "2.1",
+            "ratingValue": "1",
             "bestRating": "5"
           },
           "author": {
@@ -114,18 +114,34 @@ const RedrowComplaints = () => {
               {/* Overall Rating */}
               <div className="flex items-center justify-center gap-4 mb-8">
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-destructive">2.1</div>
+                  <div className="text-4xl font-bold text-destructive">1</div>
                   <div className="flex items-center justify-center mb-2">
                     {[1,2,3,4,5].map((star) => (
                       <Star 
                         key={star} 
-                        className={`h-5 w-5 ${star <= 2 ? 'fill-destructive text-destructive' : 'text-muted-foreground'}`} 
+                        className={`h-5 w-5 ${star <= 1 ? 'fill-destructive text-destructive' : 'text-muted-foreground'}`} 
                       />
                     ))}
                   </div>
-                  <p className="text-sm text-muted-foreground">Based on 446 reviews</p>
+                  <p className="text-sm text-muted-foreground">Source: Allagents.co.uk</p>
                 </div>
               </div>
+
+              {/* Featured Review */}
+              <Card className="mb-8 text-left border-destructive/30 bg-destructive/5">
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-3">
+                    <MessageSquare className="h-6 w-6 text-destructive flex-shrink-0 mt-1" />
+                    <div>
+                      <h3 className="font-bold text-destructive mb-2">DO NOT BUY A REDROW HOUSE!!!!!</h3>
+                      <p className="text-muted-foreground text-sm leading-relaxed mb-3">
+                        5 years in and we're still finding major issues there since build!! 5 years in and we're still finding major issues with our "new" home and now were in 2020 we though we'd have the FIRST year in this house with no major work being required to fix major issues!! Newest issue is a bowed roof in 2 places ..except it's not a new issue and has been there since we bought it but we never noticed it ...someone else did now as it appears worse (it's a 3 storey house). Of course, Redrow don't want to know so over to the NHBC but if Redrow think this is the end of it, they have another thing coming. Don't think it's related to them forgetting to insulate the room at all anyway! (early issue, noticed during a snowy winter). People on here with good homes are unbelievably lucky and I hope it lasts for them but this is not the experience of our whole Estate! - please do not buy a Redrow house!
+                      </p>
+                      <p className="text-xs text-muted-foreground">Source: Allagents.co.uk</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
               <Button onClick={() => setShowReviewForm(!showReviewForm)} className="mr-4">
                 Share Your Experience
@@ -160,26 +176,12 @@ const RedrowComplaints = () => {
             )}
 
             {/* Complaint Statistics */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 max-w-2xl mx-auto">
               <Card>
                 <CardContent className="p-6 text-center">
                   <MessageSquare className="h-8 w-8 text-primary mx-auto mb-3" />
-                  <div className="text-3xl font-bold text-primary mb-2">446</div>
-                  <p className="text-muted-foreground">Total Complaints</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-6 text-center">
-                  <TrendingUp className="h-8 w-8 text-destructive mx-auto mb-3" />
-                  <div className="text-3xl font-bold text-destructive mb-2">23%</div>
-                  <p className="text-muted-foreground">Increase this year</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-6 text-center">
-                  <Clock className="h-8 w-8 text-orange-500 mx-auto mb-3" />
-                  <div className="text-3xl font-bold text-orange-500 mb-2">67%</div>
-                  <p className="text-muted-foreground">Unresolved cases</p>
+                  <div className="text-3xl font-bold text-primary mb-2">100's of</div>
+                  <p className="text-muted-foreground">total Complaints</p>
                 </CardContent>
               </Card>
               <Card>

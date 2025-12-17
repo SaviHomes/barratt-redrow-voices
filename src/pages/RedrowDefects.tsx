@@ -118,8 +118,8 @@ const RedrowDefects = () => {
               <Card>
                 <CardContent className="p-6 text-center">
                   <Home className="h-8 w-8 text-primary mx-auto mb-3" />
-                  <div className="text-3xl font-bold text-primary mb-2">500+</div>
-                  <p className="text-muted-foreground">Properties with reported defects</p>
+                  <div className="text-3xl font-bold text-primary mb-2">1000's of</div>
+                  <p className="text-muted-foreground">reported defects</p>
                 </CardContent>
               </Card>
               <Card>

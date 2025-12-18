@@ -164,8 +164,8 @@ const Index = () => {
             <Button variant="outline" size="lg" className="px-8 py-6 text-lg" asChild>
               <a href="/redrow-defects">View Redrow Defects</a>
             </Button>
-            <Button variant="outline" size="lg" className="px-8 py-6 text-lg" asChild>
-              <a href="/redrow-complaints">Read Complaints</a>
+            <Button variant="destructive" size="lg" className="px-8 py-6 text-lg" asChild>
+              <a href="/complaints-database">Read Complaints</a>
             </Button>
           </div>
           

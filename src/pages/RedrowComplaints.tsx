@@ -140,7 +140,7 @@ const RedrowComplaints = () => {
               <Button variant="outline" asChild>
                 <Link to="/submit-claim">Submit Formal Complaint</Link>
               </Button>
-              <Button variant="destructive" asChild>
+              <Button variant="destructive" className="ml-4" asChild>
                 <Link to="/complaints-database">Read Complaints</Link>
               </Button>
             </div>

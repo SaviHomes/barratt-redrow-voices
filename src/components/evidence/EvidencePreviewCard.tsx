@@ -10,7 +10,7 @@ interface EvidencePreviewCardProps {
   commentCount?: number;
 }
 
-export default function EvidencePreviewCard({ evidence, onClick }: EvidencePreviewCardProps) {
+export default function EvidencePreviewCard({ evidence, onClick, commentCount }: EvidencePreviewCardProps) {
   const imageCount = evidence.photos.length;
   const [isMuted, setIsMuted] = useState(true);
   const [isVisible, setIsVisible] = useState(false);

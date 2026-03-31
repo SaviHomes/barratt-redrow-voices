@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Calendar, Image as ImageIcon, MessageSquare, Volume2, VolumeX } from "lucide-react";
 import { EvidenceWithPhotos } from "@/hooks/useEvidencePhotos";
@@ -184,6 +186,22 @@ export default function EvidencePreviewCard({ evidence, onClick, commentCount }:
               {evidence.description}
             </p>
           )}
+
+          {/* Action Buttons */}
+          <div className="flex flex-wrap gap-2 pt-1">
+            <Button variant="outline" size="sm" asChild onClick={(e) => e.stopPropagation()}>
+              <Link to={`/evidence/${evidence.id}`}>
+                <ImageIcon className="h-4 w-4 mr-1" />
+                View More Images
+              </Link>
+            </Button>
+            <Button variant="outline" size="sm" asChild onClick={(e) => e.stopPropagation()}>
+              <Link to={`/evidence/${evidence.id}#comments`}>
+                <MessageSquare className="h-4 w-4 mr-1" />
+                View Comments
+              </Link>
+            </Button>
+          </div>
         </div>
       </div>
     </Card>

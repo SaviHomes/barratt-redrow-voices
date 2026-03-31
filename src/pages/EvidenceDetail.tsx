@@ -413,7 +413,9 @@ export default function EvidenceDetail() {
         )}
 
         {/* Comments Section */}
-        <CommentsSection evidenceId={id!} />
+        <div id="comments">
+          <CommentsSection evidenceId={id!} />
+        </div>
       </div>
 
       {/* Video Player */}

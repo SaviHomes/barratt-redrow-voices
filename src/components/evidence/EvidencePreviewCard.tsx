@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Calendar, Image as ImageIcon, MessageSquare, Volume2, VolumeX } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { CommentsSection } from "@/components/comments/CommentsSection";
 import { EvidenceWithPhotos } from "@/hooks/useEvidencePhotos";
 
 interface EvidencePreviewCardProps {
@@ -16,6 +18,7 @@ export default function EvidencePreviewCard({ evidence, onClick, commentCount }:
   const imageCount = evidence.photos.length;
   const [isMuted, setIsMuted] = useState(true);
   const [isVisible, setIsVisible] = useState(false);
+  const [showCommentsDialog, setShowCommentsDialog] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -85,6 +88,7 @@ export default function EvidencePreviewCard({ evidence, onClick, commentCount }:
   };
 
   return (
+    <>
     <Card
       ref={containerRef}
       className="overflow-hidden cursor-pointer transition-all hover:shadow-lg hover:border-primary/50"
@@ -195,15 +199,23 @@ export default function EvidencePreviewCard({ evidence, onClick, commentCount }:
                 View More Images
               </Link>
             </Button>
-            <Button variant="outline" size="sm" asChild onClick={(e) => e.stopPropagation()}>
-              <Link to={`/evidence/${evidence.id}#comments`}>
-                <MessageSquare className="h-4 w-4 mr-1" />
-                View Comments
-              </Link>
+            <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); setShowCommentsDialog(true); }}>
+              <MessageSquare className="h-4 w-4 mr-1" />
+              View Comments
             </Button>
           </div>
         </div>
       </div>
     </Card>
+
+      <Dialog open={showCommentsDialog} onOpenChange={setShowCommentsDialog}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+          <DialogHeader>
+            <DialogTitle>Comments — {evidence.title}</DialogTitle>
+          </DialogHeader>
+          <CommentsSection evidenceId={evidence.id} />
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

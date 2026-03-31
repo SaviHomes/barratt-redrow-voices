@@ -59,6 +59,7 @@ export default function PublicGallery() {
 
   useEffect(() => {
     fetchPublicEvidence();
+    fetchRecentComments();
   }, [categoryFilter, severityFilter, sortBy, isPreviewMode, previewUserId]);
 
   const fetchPublicEvidence = async () => {

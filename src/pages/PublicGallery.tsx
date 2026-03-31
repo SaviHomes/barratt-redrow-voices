@@ -351,6 +351,44 @@ export default function PublicGallery() {
             )}
           </div>
         </section>
+
+        {/* Recent Comments Section */}
+        {recentComments.length > 0 && !isPreviewMode && (
+          <section className="py-8 border-t">
+            <div className="container max-w-7xl">
+              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                <MessageSquare className="h-6 w-6 text-primary" />
+                Recent Comments
+              </h2>
+              <div className="space-y-4">
+                {recentComments.map((comment) => (
+                  <Card key={comment.id} className="hover:shadow-md transition-shadow">
+                    <CardContent className="pt-6">
+                      <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 mb-2">
+                        <span className="font-semibold text-foreground">
+                          {comment.commenter_name}
+                        </span>
+                        <span className="text-sm text-muted-foreground">
+                          {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+                        </span>
+                        <Link
+                          to={`/evidence/${comment.evidence_id}`}
+                          className="text-sm text-primary hover:underline sm:ml-auto"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          on: {comment.evidence_title}
+                        </Link>
+                      </div>
+                      <p className="text-foreground line-clamp-2">
+                        {comment.comment_text}
+                      </p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
       </div>
 
     </Layout>

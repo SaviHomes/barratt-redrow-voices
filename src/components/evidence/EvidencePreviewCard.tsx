@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Calendar, Image as ImageIcon, MessageSquare, Volume2, VolumeX } from "lucide-react";
 import { EvidenceWithPhotos } from "@/hooks/useEvidencePhotos";

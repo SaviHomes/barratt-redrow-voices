@@ -98,11 +98,72 @@ export default function PublicGallery() {
 
       if (error) throw error;
       setEvidence(data || []);
+
+      // Fetch comment counts for these evidence items
+      if (data && data.length > 0) {
+        const evidenceIds = data.map((e: any) => e.id);
+        const { data: commentData } = await supabase
+          .from('evidence_comments')
+          .select('evidence_id')
+          .eq('moderation_status', 'approved')
+          .in('evidence_id', evidenceIds);
+
+        if (commentData) {
+          const counts: Record<string, number> = {};
+          commentData.forEach((c: any) => {
+            counts[c.evidence_id] = (counts[c.evidence_id] || 0) + 1;
+          });
+          setCommentCounts(counts);
+        }
+      }
     } catch (error) {
       console.error('Error fetching public evidence:', error);
       setEvidence([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchRecentComments = async () => {
+    try {
+      // Fetch latest 5 approved comments
+      const { data: comments, error } = await supabase
+        .from('evidence_comments')
+        .select('id, commenter_name, comment_text, created_at, evidence_id')
+        .eq('moderation_status', 'approved')
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      if (error) throw error;
+      if (!comments || comments.length === 0) {
+        setRecentComments([]);
+        return;
+      }
+
+      // Fetch evidence titles for these comments
+      const evidenceIds = [...new Set(comments.map(c => c.evidence_id))];
+      const { data: evidenceData } = await supabase
+        .from('evidence')
+        .select('id, title')
+        .eq('is_public', true)
+        .in('id', evidenceIds);
+
+      const evidenceTitles: Record<string, string> = {};
+      evidenceData?.forEach((e: any) => {
+        evidenceTitles[e.id] = e.title;
+      });
+
+      // Only keep comments whose evidence is public
+      const enrichedComments = comments
+        .filter(c => evidenceTitles[c.evidence_id])
+        .map(c => ({
+          ...c,
+          evidence_title: evidenceTitles[c.evidence_id],
+        }));
+
+      setRecentComments(enrichedComments);
+    } catch (error) {
+      console.error('Error fetching recent comments:', error);
     }
   };
 

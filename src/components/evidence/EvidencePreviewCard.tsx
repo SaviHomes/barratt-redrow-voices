@@ -206,5 +206,15 @@ export default function EvidencePreviewCard({ evidence, onClick, commentCount }:
         </div>
       </div>
     </Card>
+
+      <Dialog open={showCommentsDialog} onOpenChange={setShowCommentsDialog}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+          <DialogHeader>
+            <DialogTitle>Comments — {evidence.title}</DialogTitle>
+          </DialogHeader>
+          <CommentsSection evidenceId={evidence.id} />
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

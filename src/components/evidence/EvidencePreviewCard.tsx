@@ -88,6 +88,7 @@ export default function EvidencePreviewCard({ evidence, onClick, commentCount }:
   };
 
   return (
+    <>
     <Card
       ref={containerRef}
       className="overflow-hidden cursor-pointer transition-all hover:shadow-lg hover:border-primary/50"

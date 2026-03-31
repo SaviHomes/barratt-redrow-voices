@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Calendar, Image as ImageIcon, Volume2, VolumeX } from "lucide-react";
+import { Calendar, Image as ImageIcon, MessageSquare, Volume2, VolumeX } from "lucide-react";
 import { EvidenceWithPhotos } from "@/hooks/useEvidencePhotos";
 
 interface EvidencePreviewCardProps {
   evidence: EvidenceWithPhotos;
   onClick?: () => void;
+  commentCount?: number;
 }
 
 export default function EvidencePreviewCard({ evidence, onClick }: EvidencePreviewCardProps) {

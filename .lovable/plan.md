@@ -1,42 +1,27 @@
 
 
-## Plan: Add Comment Counts to Evidence Cards + Recent Comments Section on Public Gallery
+## Plan: Add "View More Images" and "View Comments" Buttons to EvidencePreviewCard
 
 ### Overview
-Two additions: (1) show approved comment count badges on `EvidencePreviewCard` components, and (2) add a "Recent Comments" section to the Public Gallery page showing the latest approved comments with links to their evidence posts.
+Add two buttons below the description text on each `EvidencePreviewCard` that link to the evidence detail page — one scrolling to images, one to comments.
 
-### 1. Add Comment Count Badge to EvidencePreviewCard
+### Changes
 
 **File:** `src/components/evidence/EvidencePreviewCard.tsx`
 
-- Import `MessageSquare` icon from lucide-react
-- Accept an optional `commentCount` prop
-- Add a comment count badge in the badges row (next to photo count), showing `MessageSquare` icon + count
+- Import `Link` from `react-router-dom`, `Button` from `@/components/ui/button`, and `ImageIcon`/`MessageSquare` icons (already imported)
+- Add a row of two buttons below the description paragraph:
+  - **"View More Images"** — links to `/evidence/{id}` (where the photos section lives)
+  - **"View Comments"** — links to `/evidence/{id}#comments` (scrolls to comments section)
+- Both buttons use `e.stopPropagation()` to prevent triggering the card's `onClick`
+- Use `variant="outline"` with small size for a clean look
 
-### 2. Fetch Comment Counts in Public Gallery
+**File:** `src/pages/EvidenceDetail.tsx`
 
-**File:** `src/pages/PublicGallery.tsx`
-
-- After fetching evidence, query `evidence_comments` table to get counts of approved comments grouped by `evidence_id`
-- Pass `commentCount` prop to each `EvidencePreviewCard`
-
-### 3. Fetch Comment Counts on Homepage
-
-**File:** `src/pages/Index.tsx`
-
-- Same approach as Public Gallery — fetch approved comment counts for the 3 recent evidence items and pass to `EvidencePreviewCard`
-
-### 4. Add "Recent Comments" Section to Public Gallery
-
-**File:** `src/pages/PublicGallery.tsx`
-
-- Add a section below the gallery grid showing the 5 most recent approved comments
-- Each comment displays: commenter name, truncated comment text, evidence title as a link to `/evidence/:id`, and relative timestamp
-- Query `evidence_comments` joined with evidence title (via separate query since no FK), filtered by `moderation_status = 'approved'` and evidence `is_public = true`
+- Add `id="comments"` to the `CommentsSection` wrapper so the `#comments` hash link scrolls to it
 
 ### Technical Details
-
-- Comment counts query: `SELECT evidence_id, COUNT(*) FROM evidence_comments WHERE moderation_status = 'approved' GROUP BY evidence_id` — filtered to only the current evidence IDs
-- Recent comments query: fetch latest 5 approved comments, then fetch their evidence titles separately
-- No database changes needed — all data already exists with correct RLS policies
+- Buttons are rendered as `Link` components via `asChild` on `Button`
+- `stopPropagation` ensures clicking buttons doesn't also navigate via the card's `onClick`
+- The `#comments` anchor uses a simple `id` attribute on the comments section div
 

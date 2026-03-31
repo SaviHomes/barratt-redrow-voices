@@ -8,11 +8,13 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Card, CardContent } from "@/components/ui/card";
 import EvidencePreviewCard from "@/components/evidence/EvidencePreviewCard";
 import EvidenceDetailDialog from "@/components/evidence/EvidenceDetailDialog";
 import { useEvidencePhotos, EvidenceWithPhotos } from "@/hooks/useEvidencePhotos";
-import { Search, Filter, SortAsc, Eye, ArrowLeft } from "lucide-react";
+import { Search, Filter, SortAsc, Eye, ArrowLeft, MessageSquare } from "lucide-react";
 import SEOHead from "@/components/SEOHead";
+import { formatDistanceToNow } from "date-fns";
 
 const CATEGORIES = [
   { value: "all", label: "All Categories" },

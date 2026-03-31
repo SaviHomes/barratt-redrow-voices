@@ -52,6 +52,8 @@ export default function PublicGallery() {
   const [severityFilter, setSeverityFilter] = useState("all");
   const [sortBy, setSortBy] = useState("recent");
   const [selectedEvidence, setSelectedEvidence] = useState<EvidenceWithPhotos | null>(null);
+  const [commentCounts, setCommentCounts] = useState<Record<string, number>>({});
+  const [recentComments, setRecentComments] = useState<any[]>([]);
 
   const { evidenceWithPhotos, loading: photosLoading } = useEvidencePhotos(evidence);
 

@@ -18,6 +18,7 @@ export default function EvidencePreviewCard({ evidence, onClick, commentCount }:
   const imageCount = evidence.photos.length;
   const [isMuted, setIsMuted] = useState(true);
   const [isVisible, setIsVisible] = useState(false);
+  const [showCommentsDialog, setShowCommentsDialog] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 

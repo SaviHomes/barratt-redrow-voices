@@ -1,27 +1,25 @@
 
 
-## Plan: Add "View More Images" and "View Comments" Buttons to EvidencePreviewCard
+## Plan: Show Comments in a Popup Dialog
 
 ### Overview
-Add two buttons below the description text on each `EvidencePreviewCard` that link to the evidence detail page — one scrolling to images, one to comments.
+Change the "View Comments" button on `EvidencePreviewCard` to open a dialog showing that evidence post's approved comments and a comment form, instead of navigating to the detail page.
 
 ### Changes
 
-**File:** `src/components/evidence/EvidencePreviewCard.tsx`
+**File: `src/components/evidence/EvidencePreviewCard.tsx`**
+- Add state `showCommentsDialog` (boolean)
+- Replace the "View Comments" `Link` button with a regular `Button` that sets `showCommentsDialog = true`
+- Import and render `CommentsSection` inside a `Dialog` at the bottom of the component
+- The dialog will show the evidence title, the existing `CommentsSection` component (which already handles fetching approved comments + comment form), wrapped in a scrollable container
 
-- Import `Link` from `react-router-dom`, `Button` from `@/components/ui/button`, and `ImageIcon`/`MessageSquare` icons (already imported)
-- Add a row of two buttons below the description paragraph:
-  - **"View More Images"** — links to `/evidence/{id}` (where the photos section lives)
-  - **"View Comments"** — links to `/evidence/{id}#comments` (scrolls to comments section)
-- Both buttons use `e.stopPropagation()` to prevent triggering the card's `onClick`
-- Use `variant="outline"` with small size for a clean look
-
-**File:** `src/pages/EvidenceDetail.tsx`
-
-- Add `id="comments"` to the `CommentsSection` wrapper so the `#comments` hash link scrolls to it
+**No new components needed** — reuses the existing `CommentsSection` from `src/components/comments/CommentsSection.tsx` which already handles:
+- Fetching approved comments for an evidence ID
+- Displaying the comments list
+- Comment submission form with refresh
 
 ### Technical Details
-- Buttons are rendered as `Link` components via `asChild` on `Button`
-- `stopPropagation` ensures clicking buttons doesn't also navigate via the card's `onClick`
-- The `#comments` anchor uses a simple `id` attribute on the comments section div
+- Import `Dialog`, `DialogContent`, `DialogHeader`, `DialogTitle` from UI components
+- `stopPropagation` on the button click to prevent card navigation
+- Dialog uses `max-h-[80vh] overflow-y-auto` for scrollable content
 

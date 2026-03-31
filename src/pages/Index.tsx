@@ -284,7 +284,7 @@ const Index = () => {
               {[1, 2, 3].map(i => <Skeleton key={i} className="h-96 rounded-lg" />)}
             </div> : recentEvidenceWithPhotos.length > 0 ? <>
               <div className="space-y-6 mb-10">
-                {recentEvidenceWithPhotos.map(evidence => <EvidencePreviewCard key={evidence.id} evidence={evidence} onClick={() => navigate(`/evidence/${evidence.id}`)} />)}
+                {recentEvidenceWithPhotos.map(evidence => <EvidencePreviewCard key={evidence.id} evidence={evidence} onClick={() => navigate(`/evidence/${evidence.id}`)} commentCount={commentCounts[evidence.id] || 0} />)}
               </div>
               
               {/* Call-to-Action Buttons */}

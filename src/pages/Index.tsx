@@ -74,6 +74,24 @@ const Index = () => {
       }).limit(3);
       if (error) throw error;
       setRecentEvidence(data || []);
+
+      // Fetch comment counts
+      if (data && data.length > 0) {
+        const evidenceIds = data.map((e: any) => e.id);
+        const { data: commentData } = await supabase
+          .from('evidence_comments')
+          .select('evidence_id')
+          .eq('moderation_status', 'approved')
+          .in('evidence_id', evidenceIds);
+
+        if (commentData) {
+          const counts: Record<string, number> = {};
+          commentData.forEach((c: any) => {
+            counts[c.evidence_id] = (counts[c.evidence_id] || 0) + 1;
+          });
+          setCommentCounts(counts);
+        }
+      }
     } catch (error) {
       console.error('Error fetching recent evidence:', error);
       setRecentEvidence([]);

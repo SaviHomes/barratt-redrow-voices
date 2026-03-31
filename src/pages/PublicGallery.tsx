@@ -8,11 +8,13 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Card, CardContent } from "@/components/ui/card";
 import EvidencePreviewCard from "@/components/evidence/EvidencePreviewCard";
 import EvidenceDetailDialog from "@/components/evidence/EvidenceDetailDialog";
 import { useEvidencePhotos, EvidenceWithPhotos } from "@/hooks/useEvidencePhotos";
-import { Search, Filter, SortAsc, Eye, ArrowLeft } from "lucide-react";
+import { Search, Filter, SortAsc, Eye, ArrowLeft, MessageSquare } from "lucide-react";
 import SEOHead from "@/components/SEOHead";
+import { formatDistanceToNow } from "date-fns";
 
 const CATEGORIES = [
   { value: "all", label: "All Categories" },
@@ -50,11 +52,14 @@ export default function PublicGallery() {
   const [severityFilter, setSeverityFilter] = useState("all");
   const [sortBy, setSortBy] = useState("recent");
   const [selectedEvidence, setSelectedEvidence] = useState<EvidenceWithPhotos | null>(null);
+  const [commentCounts, setCommentCounts] = useState<Record<string, number>>({});
+  const [recentComments, setRecentComments] = useState<any[]>([]);
 
   const { evidenceWithPhotos, loading: photosLoading } = useEvidencePhotos(evidence);
 
   useEffect(() => {
     fetchPublicEvidence();
+    fetchRecentComments();
   }, [categoryFilter, severityFilter, sortBy, isPreviewMode, previewUserId]);
 
   const fetchPublicEvidence = async () => {
@@ -93,11 +98,72 @@ export default function PublicGallery() {
 
       if (error) throw error;
       setEvidence(data || []);
+
+      // Fetch comment counts for these evidence items
+      if (data && data.length > 0) {
+        const evidenceIds = data.map((e: any) => e.id);
+        const { data: commentData } = await supabase
+          .from('evidence_comments')
+          .select('evidence_id')
+          .eq('moderation_status', 'approved')
+          .in('evidence_id', evidenceIds);
+
+        if (commentData) {
+          const counts: Record<string, number> = {};
+          commentData.forEach((c: any) => {
+            counts[c.evidence_id] = (counts[c.evidence_id] || 0) + 1;
+          });
+          setCommentCounts(counts);
+        }
+      }
     } catch (error) {
       console.error('Error fetching public evidence:', error);
       setEvidence([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchRecentComments = async () => {
+    try {
+      // Fetch latest 5 approved comments
+      const { data: comments, error } = await supabase
+        .from('evidence_comments')
+        .select('id, commenter_name, comment_text, created_at, evidence_id')
+        .eq('moderation_status', 'approved')
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      if (error) throw error;
+      if (!comments || comments.length === 0) {
+        setRecentComments([]);
+        return;
+      }
+
+      // Fetch evidence titles for these comments
+      const evidenceIds = [...new Set(comments.map(c => c.evidence_id))];
+      const { data: evidenceData } = await supabase
+        .from('evidence')
+        .select('id, title')
+        .eq('is_public', true)
+        .in('id', evidenceIds);
+
+      const evidenceTitles: Record<string, string> = {};
+      evidenceData?.forEach((e: any) => {
+        evidenceTitles[e.id] = e.title;
+      });
+
+      // Only keep comments whose evidence is public
+      const enrichedComments = comments
+        .filter(c => evidenceTitles[c.evidence_id])
+        .map(c => ({
+          ...c,
+          evidence_title: evidenceTitles[c.evidence_id],
+        }));
+
+      setRecentComments(enrichedComments);
+    } catch (error) {
+      console.error('Error fetching recent comments:', error);
     }
   };
 
@@ -277,6 +343,7 @@ export default function PublicGallery() {
                       key={item.id}
                       evidence={item}
                       onClick={() => handleEvidenceClick(item)}
+                      commentCount={commentCounts[item.id] || 0}
                     />
                   ))}
                 </div>
@@ -284,6 +351,44 @@ export default function PublicGallery() {
             )}
           </div>
         </section>
+
+        {/* Recent Comments Section */}
+        {recentComments.length > 0 && !isPreviewMode && (
+          <section className="py-8 border-t">
+            <div className="container max-w-7xl">
+              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                <MessageSquare className="h-6 w-6 text-primary" />
+                Recent Comments
+              </h2>
+              <div className="space-y-4">
+                {recentComments.map((comment) => (
+                  <Card key={comment.id} className="hover:shadow-md transition-shadow">
+                    <CardContent className="pt-6">
+                      <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 mb-2">
+                        <span className="font-semibold text-foreground">
+                          {comment.commenter_name}
+                        </span>
+                        <span className="text-sm text-muted-foreground">
+                          {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+                        </span>
+                        <Link
+                          to={`/evidence/${comment.evidence_id}`}
+                          className="text-sm text-primary hover:underline sm:ml-auto"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          on: {comment.evidence_title}
+                        </Link>
+                      </div>
+                      <p className="text-foreground line-clamp-2">
+                        {comment.comment_text}
+                      </p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
       </div>
 
     </Layout>

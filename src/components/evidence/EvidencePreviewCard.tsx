@@ -1,15 +1,16 @@
 import { useState, useRef, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Calendar, Image as ImageIcon, Volume2, VolumeX } from "lucide-react";
+import { Calendar, Image as ImageIcon, MessageSquare, Volume2, VolumeX } from "lucide-react";
 import { EvidenceWithPhotos } from "@/hooks/useEvidencePhotos";
 
 interface EvidencePreviewCardProps {
   evidence: EvidenceWithPhotos;
   onClick?: () => void;
+  commentCount?: number;
 }
 
-export default function EvidencePreviewCard({ evidence, onClick }: EvidencePreviewCardProps) {
+export default function EvidencePreviewCard({ evidence, onClick, commentCount }: EvidencePreviewCardProps) {
   const imageCount = evidence.photos.length;
   const [isMuted, setIsMuted] = useState(true);
   const [isVisible, setIsVisible] = useState(false);
@@ -158,6 +159,12 @@ export default function EvidencePreviewCard({ evidence, onClick }: EvidencePrevi
               <Badge variant="outline" className="text-xs">
                 <ImageIcon className="h-3 w-3 mr-1" />
                 {imageCount} {imageCount === 1 ? 'photo' : 'photos'}
+              </Badge>
+            )}
+            {(commentCount ?? 0) > 0 && (
+              <Badge variant="outline" className="text-xs">
+                <MessageSquare className="h-3 w-3 mr-1" />
+                {commentCount} {commentCount === 1 ? 'comment' : 'comments'}
               </Badge>
             )}
             <Badge variant="outline" className="text-xs ml-auto">

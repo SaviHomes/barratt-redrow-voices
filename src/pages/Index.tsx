@@ -36,6 +36,7 @@ const Index = () => {
   } = useSiteSettings();
   const [recentEvidence, setRecentEvidence] = useState<any[]>([]);
   const [recentEvidenceLoading, setRecentEvidenceLoading] = useState(true);
+  const [commentCounts, setCommentCounts] = useState<Record<string, number>>({});
 
   // Track visitor analytics
   useVisitorTracking();
@@ -73,6 +74,24 @@ const Index = () => {
       }).limit(3);
       if (error) throw error;
       setRecentEvidence(data || []);
+
+      // Fetch comment counts
+      if (data && data.length > 0) {
+        const evidenceIds = data.map((e: any) => e.id);
+        const { data: commentData } = await supabase
+          .from('evidence_comments')
+          .select('evidence_id')
+          .eq('moderation_status', 'approved')
+          .in('evidence_id', evidenceIds);
+
+        if (commentData) {
+          const counts: Record<string, number> = {};
+          commentData.forEach((c: any) => {
+            counts[c.evidence_id] = (counts[c.evidence_id] || 0) + 1;
+          });
+          setCommentCounts(counts);
+        }
+      }
     } catch (error) {
       console.error('Error fetching recent evidence:', error);
       setRecentEvidence([]);
@@ -265,7 +284,7 @@ const Index = () => {
               {[1, 2, 3].map(i => <Skeleton key={i} className="h-96 rounded-lg" />)}
             </div> : recentEvidenceWithPhotos.length > 0 ? <>
               <div className="space-y-6 mb-10">
-                {recentEvidenceWithPhotos.map(evidence => <EvidencePreviewCard key={evidence.id} evidence={evidence} onClick={() => navigate(`/evidence/${evidence.id}`)} />)}
+                {recentEvidenceWithPhotos.map(evidence => <EvidencePreviewCard key={evidence.id} evidence={evidence} onClick={() => navigate(`/evidence/${evidence.id}`)} commentCount={commentCounts[evidence.id] || 0} />)}
               </div>
               
               {/* Call-to-Action Buttons */}

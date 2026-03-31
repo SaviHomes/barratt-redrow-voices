@@ -198,11 +198,9 @@ export default function EvidencePreviewCard({ evidence, onClick, commentCount }:
                 View More Images
               </Link>
             </Button>
-            <Button variant="outline" size="sm" asChild onClick={(e) => e.stopPropagation()}>
-              <Link to={`/evidence/${evidence.id}#comments`}>
-                <MessageSquare className="h-4 w-4 mr-1" />
-                View Comments
-              </Link>
+            <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); setShowCommentsDialog(true); }}>
+              <MessageSquare className="h-4 w-4 mr-1" />
+              View Comments
             </Button>
           </div>
         </div>

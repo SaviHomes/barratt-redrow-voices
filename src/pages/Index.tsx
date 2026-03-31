@@ -36,6 +36,7 @@ const Index = () => {
   } = useSiteSettings();
   const [recentEvidence, setRecentEvidence] = useState<any[]>([]);
   const [recentEvidenceLoading, setRecentEvidenceLoading] = useState(true);
+  const [commentCounts, setCommentCounts] = useState<Record<string, number>>({});
 
   // Track visitor analytics
   useVisitorTracking();

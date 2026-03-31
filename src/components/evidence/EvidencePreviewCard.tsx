@@ -161,6 +161,12 @@ export default function EvidencePreviewCard({ evidence, onClick, commentCount }:
                 {imageCount} {imageCount === 1 ? 'photo' : 'photos'}
               </Badge>
             )}
+            {(commentCount ?? 0) > 0 && (
+              <Badge variant="outline" className="text-xs">
+                <MessageSquare className="h-3 w-3 mr-1" />
+                {commentCount} {commentCount === 1 ? 'comment' : 'comments'}
+              </Badge>
+            )}
             <Badge variant="outline" className="text-xs ml-auto">
               <Calendar className="h-3 w-3 mr-1" />
               {new Date(evidence.created_at).toLocaleDateString()}

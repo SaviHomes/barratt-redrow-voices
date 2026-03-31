@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Calendar, Image as ImageIcon, MessageSquare, Volume2, VolumeX } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { CommentsSection } from "@/components/comments/CommentsSection";
 import { EvidenceWithPhotos } from "@/hooks/useEvidencePhotos";
 
 interface EvidencePreviewCardProps {

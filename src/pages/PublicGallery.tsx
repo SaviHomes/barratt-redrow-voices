@@ -343,6 +343,7 @@ export default function PublicGallery() {
                       key={item.id}
                       evidence={item}
                       onClick={() => handleEvidenceClick(item)}
+                      commentCount={commentCounts[item.id] || 0}
                     />
                   ))}
                 </div>

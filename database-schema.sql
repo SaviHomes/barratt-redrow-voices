@@ -136,6 +136,7 @@ CREATE TABLE public.evidence (
   description TEXT,
   category TEXT NOT NULL CHECK (category IN ('structural', 'electrical', 'plumbing', 'finishing', 'external', 'other')),
   severity TEXT NOT NULL CHECK (severity IN ('minor', 'moderate', 'severe', 'critical')),
+  development_name TEXT,
   is_public BOOLEAN DEFAULT false,
   view_count INTEGER DEFAULT 0,
   featured_image_index INTEGER DEFAULT 0,

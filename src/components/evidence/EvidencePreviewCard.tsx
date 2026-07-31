@@ -181,7 +181,9 @@ export default function EvidencePreviewCard({ evidence, onClick, commentCount }:
 
           {/* Title */}
           <h3 className="font-bold text-xl leading-tight line-clamp-2">
-            {evidence.title}
+            {evidence.development_name
+              ? `${evidence.title} — ${evidence.development_name}`
+              : evidence.title}
           </h3>
 
           {/* Description - Show more text */}

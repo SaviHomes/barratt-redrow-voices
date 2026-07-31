@@ -453,6 +453,7 @@ export type Database = {
           category: string
           created_at: string
           description: string | null
+          development_name: string | null
           featured_image_index: number | null
           id: string
           is_public: boolean | null
@@ -472,6 +473,7 @@ export type Database = {
           category: string
           created_at?: string
           description?: string | null
+          development_name?: string | null
           featured_image_index?: number | null
           id?: string
           is_public?: boolean | null
@@ -491,6 +493,7 @@ export type Database = {
           category?: string
           created_at?: string
           description?: string | null
+          development_name?: string | null
           featured_image_index?: number | null
           id?: string
           is_public?: boolean | null

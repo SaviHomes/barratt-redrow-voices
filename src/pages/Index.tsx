@@ -289,8 +289,8 @@ const Index = () => {
               
               {/* Call-to-Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <Button size="lg" asChild>
-                  <a href="/public-gallery" className="flex items-center gap-2">
+              <Button size="lg" asChild>
+                  <a href="https://www.redrowexposed.co.uk/evidence/09a9b3d9-063f-4c58-8fa8-e1e55f8598fd" className="flex items-center gap-2">
                     View All Evidence
                     <ArrowRight className="h-5 w-5" />
                   </a>

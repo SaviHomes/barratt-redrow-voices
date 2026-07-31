@@ -1,25 +1,13 @@
-
-
-## Plan: Show Comments in a Popup Dialog
+## Plan: Update "View All Evidence" Homepage Button
 
 ### Overview
-Change the "View Comments" button on `EvidencePreviewCard` to open a dialog showing that evidence post's approved comments and a comment form, instead of navigating to the detail page.
+On the homepage, the "View All Evidence" call-to-action button currently navigates to `/public-gallery`. Change it so it takes the user to the specific evidence detail URL requested.
 
 ### Changes
 
-**File: `src/components/evidence/EvidencePreviewCard.tsx`**
-- Add state `showCommentsDialog` (boolean)
-- Replace the "View Comments" `Link` button with a regular `Button` that sets `showCommentsDialog = true`
-- Import and render `CommentsSection` inside a `Dialog` at the bottom of the component
-- The dialog will show the evidence title, the existing `CommentsSection` component (which already handles fetching approved comments + comment form), wrapped in a scrollable container
+**File: `src/pages/Index.tsx`**
+- Update the `href` of the "View All Evidence" button (around line 293) from `/public-gallery` to `https://www.redrowexposed.co.uk/evidence/09a9b3d9-063f-4c58-8fa8-e1e55f8598fd`.
+- Keep the existing button styling, size, and arrow icon unchanged.
 
-**No new components needed** — reuses the existing `CommentsSection` from `src/components/comments/CommentsSection.tsx` which already handles:
-- Fetching approved comments for an evidence ID
-- Displaying the comments list
-- Comment submission form with refresh
-
-### Technical Details
-- Import `Dialog`, `DialogContent`, `DialogHeader`, `DialogTitle` from UI components
-- `stopPropagation` on the button click to prevent card navigation
-- Dialog uses `max-h-[80vh] overflow-y-auto` for scrollable content
-
+### Verification
+- After the change, clicking the homepage "View All Evidence" button will open the requested external evidence detail URL in the same tab (or navigate the router if the domain is the same origin).

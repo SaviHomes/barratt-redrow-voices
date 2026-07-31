@@ -26,6 +26,7 @@ export interface EvidenceWithPhotos {
   is_public?: boolean;
   view_count?: number;
   featured_image_index?: number;
+  development_name?: string | null;
 }
 
 export function useEvidencePhotos(evidence: any[]) {

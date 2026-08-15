@@ -7,7 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Shield, Scale, Megaphone, Handshake, ClipboardList, Bell, Newspaper, Wrench, Database, Tv, Clock, MapPin } from "lucide-react";
+import { Shield, Scale, Megaphone, Handshake, ClipboardList, Bell, Newspaper, Wrench, Database, Tv, Clock, MapPin, ExternalLink } from "lucide-react";
 
 const STORAGE_KEY = "announcement-dismissed-v1";
 

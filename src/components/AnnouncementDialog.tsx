@@ -7,7 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Shield, Scale, Megaphone, Handshake, ClipboardList, Bell, Newspaper, Wrench, Database, Tv, Clock, MapPin } from "lucide-react";
+import { Shield, Scale, Megaphone, Handshake, ClipboardList, Bell, Newspaper, Wrench, Database, Tv, Clock, MapPin, ExternalLink } from "lucide-react";
 
 const STORAGE_KEY = "announcement-dismissed-v1";
 
@@ -70,9 +70,35 @@ export function AnnouncementDialog() {
                 </Button>
               </Link>
             </div>
-          </div>
+        </div>
 
-          <div className="border-t border-border" />
+        {/* Facebook Group Section */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 text-lg font-semibold text-sky-600 dark:text-sky-400">
+            <ExternalLink className="h-5 w-5" />
+            Facebook Group: Don't Buy Redrow
+          </div>
+          <div className="pl-7 space-y-3 text-muted-foreground">
+            <p>
+              There is an independent Facebook group called <span className="font-semibold text-foreground">Don't Buy Redrow</span> where homeowners and potential buyers share experiences.
+            </p>
+            <p>
+              Please note that this website is not affiliated with and is not responsible for the content or activity of that group.
+            </p>
+            <a
+              href="https://www.facebook.com/share/g/19GHJCV7Qj/?mibextid=wwXIfr"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={handleDismiss}
+            >
+              <Button variant="outline" size="sm" className="h-8">
+                Visit Facebook Group →
+              </Button>
+            </a>
+          </div>
+        </div>
+
+        <div className="border-t border-border" />
 
           {/* Important Notice Section */}
           <div className="space-y-3">

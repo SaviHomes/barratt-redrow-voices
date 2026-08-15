@@ -51,6 +51,29 @@ export function AnnouncementDialog() {
         </div>
 
         <div className="space-y-6 py-4">
+          {/* Hazel Park, Stevenage Section */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-lg font-semibold text-blue-600 dark:text-blue-400">
+              <MapPin className="h-5 w-5" />
+              Hazel Park, Stevenage
+            </div>
+            <div className="pl-7 space-y-3 text-muted-foreground">
+              <p>
+                The experiences shared on this site are drawn from my own journey as a homeowner on the <span className="font-semibold text-foreground">Hazel Park development in Stevenage</span>.
+              </p>
+              <p>
+                If you are considering buying a property there and would like an honest, first-hand view of what life on the development has been like, please reach out.
+              </p>
+              <Link to="/contact" onClick={handleDismiss}>
+                <Button variant="outline" size="sm" className="h-8">
+                  Get in Touch →
+                </Button>
+              </Link>
+            </div>
+          </div>
+
+          <div className="border-t border-border" />
+
           {/* Important Notice Section */}
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-lg font-semibold text-destructive">

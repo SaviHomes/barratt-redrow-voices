@@ -59,7 +59,7 @@ export function AnnouncementDialog() {
             </div>
             <div className="pl-7 space-y-3 text-muted-foreground">
               <p>
-                The experiences shared on this site are drawn from my own journey as a homeowner on the <span className="font-semibold text-foreground">Hazel Park development in Stevenage</span>.
+                The experiences shared on this site are drawn from my own experience of the <span className="font-semibold text-foreground">Hazel Park development in Stevenage</span>.
               </p>
               <p>
                 If you are considering buying a property there and would like an honest, first-hand view of what life on the development has been like, please reach out.
